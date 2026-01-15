@@ -1,4 +1,4 @@
-package com.example.general_first_aid_kit.ui.theme
+package com.example.general_first_aid_kit.presentation.theme
 
 import android.app.Activity
 import android.os.Build
