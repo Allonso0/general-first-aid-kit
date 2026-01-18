@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">general-first-aid-kit</string>
+
+    <string name="welcome_title">Все аптечки в одном приложении</string>
+    <string name="welcome_description">Создавайте аптечки и приглашайте членов семьи, коллег или друзей</string>
+    <string name="btn_login">Войти</string>
+    <string name="btn_create_account">Зарегистрироваться</string>
+
+    <string name="image_description">Изображение счастливой семьи</string>
 </resources>

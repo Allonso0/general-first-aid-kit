@@ -2,10 +2,16 @@ package com.example.general_first_aid_kit.presentation.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
+val GreenPrimary = Color(0xFF62A382)
+val GreenSecondary = Color(0xFF9FD6B6)
+val GreenAccent = Color(0xFF7CD0A3)
 
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
+val Black = Color(0xFF0A100D)
+val White = Color(0xFFF6F9F7)
+val LightGray = Color(0xFF949494)
+
+val TextBlack = Color(0xFF0A100D)
+val TextWhite = Color(0xFFF6F9F7)
+val TextGreen = Color(0xFF62A382)
+val TextGray = Color(0xFF949494)
+val TextRed = Color(0xFFA36263)
