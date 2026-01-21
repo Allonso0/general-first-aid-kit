@@ -15,3 +15,5 @@ val TextWhite = Color(0xFFF6F9F7)
 val TextGreen = Color(0xFF62A382)
 val TextGray = Color(0xFF949494)
 val TextRed = Color(0xFFA36263)
+
+val ButtonRed = Color(0xFFD69FA0)
