@@ -8,8 +8,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import com.example.general_first_aid_kit.presentation.navigation.NavigationRoot
-import com.example.general_first_aid_kit.presentation.theme.GeneralfirstaidkitTheme
+import com.example.general_first_aid_kit.presentation.ui.theme.GeneralfirstaidkitTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,19 +26,3 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
-//@Composable
-//fun Greeting(name: String, modifier: Modifier = Modifier) {
-//    Text(
-//        text = "Hello $name!",
-//        modifier = modifier
-//    )
-//}
-//
-//@Preview(showBackground = true)
-//@Composable
-//fun GreetingPreview() {
-//    GeneralfirstaidkitTheme {
-//        Greeting("Android")
-//    }
-//}

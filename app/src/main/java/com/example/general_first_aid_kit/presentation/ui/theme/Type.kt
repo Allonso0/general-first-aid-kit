@@ -1,4 +1,4 @@
-package com.example.general_first_aid_kit.presentation.theme
+package com.example.general_first_aid_kit.presentation.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
@@ -7,7 +7,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
 val Typography = Typography(
-    // Крупные заголовки
     headlineLarge = TextStyle(
         fontFamily = FontFamily.Default,
         fontWeight = FontWeight.Bold,
@@ -16,7 +15,6 @@ val Typography = Typography(
         letterSpacing = 0.sp
     ),
 
-    // Заголовки экранов
     titleLarge = TextStyle(
         fontFamily = FontFamily.Default,
         fontWeight = FontWeight.SemiBold,
@@ -25,7 +23,6 @@ val Typography = Typography(
         letterSpacing = 0.sp
     ),
 
-    // Подзаголовки или акцентный текст
     titleMedium = TextStyle(
         fontFamily = FontFamily.Default,
         fontWeight = FontWeight.Medium,
@@ -34,7 +31,6 @@ val Typography = Typography(
         letterSpacing = 0.15.sp
     ),
 
-    // Основной текст
     bodyLarge = TextStyle(
         fontFamily = FontFamily.Default,
         fontWeight = FontWeight.SemiBold,
@@ -43,12 +39,19 @@ val Typography = Typography(
         letterSpacing = 0.sp
     ),
 
-    // Подписи, мелкий текст, лейблы
     labelSmall = TextStyle(
         fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Medium,
+        fontWeight = FontWeight.Normal,
         fontSize = 12.sp,
         lineHeight = 16.sp,
-        letterSpacing = 0.5.sp
-    )
+        letterSpacing = 0.sp
+    ),
+
+    labelLarge = TextStyle(
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.Bold,
+        fontSize = 12.sp,
+        lineHeight = 16.sp,
+        letterSpacing = 0.sp
+    ),
 )

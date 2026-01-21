@@ -1,4 +1,4 @@
-package com.example.general_first_aid_kit.presentation.theme
+package com.example.general_first_aid_kit.presentation.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

@@ -1,7 +1,9 @@
 package com.example.general_first_aid_kit.presentation.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.rememberNavBackStack
@@ -11,12 +13,18 @@ import com.example.general_first_aid_kit.presentation.screens.GreetingScreen
 import com.example.general_first_aid_kit.presentation.screens.LoginScreen
 import com.example.general_first_aid_kit.presentation.screens.MainScreen
 import com.example.general_first_aid_kit.presentation.screens.RegistrationScreen
+import com.example.general_first_aid_kit.presentation.viewmodels.AuthViewModel
 
 @Composable
 fun NavigationRoot(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: AuthViewModel = hiltViewModel()
 ) {
-    val backStack = rememberNavBackStack(Route.Welcome)
+    val startRoute = remember {
+        if (viewModel.isLogged()) Route.Main else Route.Welcome
+    }
+
+    val backStack = rememberNavBackStack(startRoute)
 
     NavDisplay(
         modifier = modifier,
@@ -41,16 +49,19 @@ fun NavigationRoot(
                 is Route.Login -> NavEntry(key) {
                     LoginScreen(
                         onNavigateBack = { backStack.removeLastOrNull() },
-                        onLoginSuccess = {
+                        onSuccess = {
                             backStack.clear()
                             backStack.add(Route.Main)
+                        },
+                        onForgotPasswordClick = {
+                            //TODO: экран восстановления пароля
                         }
                     )
                 }
                 is Route.Register -> NavEntry(key) {
                     RegistrationScreen(
                         onNavigateBack = { backStack.removeLastOrNull() },
-                        onRegistrationSuccess = {
+                        onRegistrationClick = {
                             backStack.clear()
                             backStack.add(Route.Main)
                         }
@@ -59,6 +70,7 @@ fun NavigationRoot(
                 is Route.Main -> NavEntry(key) {
                     MainScreen(
                         onLogout = {
+                            viewModel.onSignOutClick()
                             backStack.clear()
                             backStack.add(Route.Welcome)
                         }
