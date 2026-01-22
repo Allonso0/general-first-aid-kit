@@ -13,6 +13,7 @@ import com.example.general_first_aid_kit.presentation.screens.GreetingScreen
 import com.example.general_first_aid_kit.presentation.screens.LoginScreen
 import com.example.general_first_aid_kit.presentation.screens.MainScreen
 import com.example.general_first_aid_kit.presentation.screens.ProfileScreen
+import com.example.general_first_aid_kit.presentation.screens.ProfileSettingsScreen
 import com.example.general_first_aid_kit.presentation.screens.RegistrationScreen
 import com.example.general_first_aid_kit.presentation.viewmodels.AuthViewModel
 
@@ -80,7 +81,15 @@ fun NavigationRoot(
                             viewModel.onSignOutClick()
                             backStack.clear()
                             backStack.add(Route.Welcome)
+                        },
+                        onNavigateToProfileSettings = {
+                            backStack.add(Route.ProfileSettings)
                         }
+                    )
+                }
+                is Route.ProfileSettings -> NavEntry(key) {
+                    ProfileSettingsScreen(
+                        onNavigateBack = { backStack.removeLastOrNull() }
                     )
                 }
                 else -> error("Unknown key: $key")

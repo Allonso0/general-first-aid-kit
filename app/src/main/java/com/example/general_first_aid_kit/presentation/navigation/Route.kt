@@ -20,4 +20,7 @@ sealed interface Route: NavKey {
 
     @Serializable
     data object Profile: Route, NavKey
+
+    @Serializable
+    data object ProfileSettings: Route, NavKey
 }

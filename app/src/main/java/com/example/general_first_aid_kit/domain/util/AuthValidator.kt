@@ -1,8 +1,5 @@
 package com.example.general_first_aid_kit.domain.util
 
-import androidx.compose.ui.res.stringResource
-import com.example.general_first_aid_kit.R
-
 sealed class ValidationResult {
     data object Success : ValidationResult()
     data class Error(val message: String): ValidationResult()

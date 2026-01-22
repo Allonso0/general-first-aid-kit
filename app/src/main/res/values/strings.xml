@@ -33,6 +33,7 @@
 
     <!--Ошибки-->
     <string name="empty_name_error">Имя не может быть пустым</string>
+    <string name="name_validation_error">Имя должно иметь длину от 2-х до 20-ти символов</string>
 
     <!--Общие-->
     <string name="settings">Настройки</string>

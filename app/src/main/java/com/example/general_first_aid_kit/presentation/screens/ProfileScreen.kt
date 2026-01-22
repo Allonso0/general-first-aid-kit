@@ -23,26 +23,28 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import coil.compose.AsyncImage
 import com.example.general_first_aid_kit.R
 import com.example.general_first_aid_kit.presentation.component.ProfileMenuItem
+import com.example.general_first_aid_kit.presentation.ui.theme.Black
 import com.example.general_first_aid_kit.presentation.ui.theme.ButtonRed
 import com.example.general_first_aid_kit.presentation.ui.theme.Dimensions
 import com.example.general_first_aid_kit.presentation.ui.theme.GreenPrimary
 import com.example.general_first_aid_kit.presentation.ui.theme.LightGray
 import com.example.general_first_aid_kit.presentation.ui.theme.TextBlack
-import com.example.general_first_aid_kit.presentation.ui.theme.TextGray
+import com.example.general_first_aid_kit.presentation.ui.theme.TextGreen
 import com.example.general_first_aid_kit.presentation.ui.theme.TextRed
-import com.example.general_first_aid_kit.presentation.ui.theme.TextWhite
 import com.example.general_first_aid_kit.presentation.ui.theme.White
 import com.example.general_first_aid_kit.presentation.viewmodels.ProfileViewModel
 
@@ -51,9 +53,14 @@ import com.example.general_first_aid_kit.presentation.viewmodels.ProfileViewMode
 fun ProfileScreen(
     onNavigateBack: () -> Unit,
     onLogout: () -> Unit,
+    onNavigateToProfileSettings: () -> Unit,
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
     val user by viewModel.user.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.reloadUser()
+    }
 
     Scaffold(
         topBar = {
@@ -61,14 +68,14 @@ fun ProfileScreen(
                 title = { Text(
                     text = stringResource(R.string.profile),
                     style = MaterialTheme.typography.titleLarge,
-                    color = TextWhite,
+                    color = TextGreen,
                     textAlign = TextAlign.Center
                 ) },
                 navigationIcon = {
                     IconButton(
                         onClick = onNavigateBack,
                         colors = IconButtonDefaults.iconButtonColors(
-                            contentColor = White
+                            contentColor = GreenPrimary
                         )
                     ) {
                         Icon(
@@ -78,16 +85,16 @@ fun ProfileScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = GreenPrimary
+                    containerColor = White
                 )
             )
         },
-        containerColor = GreenPrimary
+        containerColor = White
     ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(GreenPrimary)
+                .background(White)
                 .padding(innerPadding)
                 .padding(horizontal = Dimensions.PaddingLarge),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -98,15 +105,24 @@ fun ProfileScreen(
                 modifier = Modifier
                     .size(Dimensions.AvatarLarge)
                     .clip(CircleShape)
-                    .background(White),
+                    .background(LightGray.copy(alpha = 0.3f)),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    painter = painterResource(R.drawable.baseline_person_24),
-                    contentDescription = null,
-                    modifier = Modifier.size(Dimensions.AvatarMedium),
-                    tint = TextGray
-                )
+                if (user?.avatarURL != null) {
+                    AsyncImage(
+                        model = user?.avatarURL,
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    Icon(
+                        painter = painterResource(R.drawable.baseline_person_24),
+                        contentDescription = null,
+                        modifier = Modifier.size(Dimensions.AvatarMedium),
+                        tint = LightGray
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(Dimensions.SpacingMedium))
@@ -114,22 +130,22 @@ fun ProfileScreen(
             Text(
                 text = user?.name ?: "Загрузка...",
                 style = MaterialTheme.typography.titleMedium,
-                color = TextWhite
+                color = TextBlack
             )
 
             Text(
                 text = user?.email ?: "",
                 style = MaterialTheme.typography.labelSmall,
-                color = TextWhite
+                color = TextBlack
             )
 
             Spacer(modifier = Modifier.height(Dimensions.SpacingExtraLarge))
-            HorizontalDivider(color = White)
+            HorizontalDivider(color = Black)
 
             ProfileMenuItem(
                 icon = painterResource(R.drawable.baseline_person_24),
                 text = stringResource(R.string.profile_settings),
-                onClick = { }
+                onClick = { onNavigateToProfileSettings() }
             )
 
             ProfileMenuItem(

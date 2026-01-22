@@ -16,11 +16,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import com.example.general_first_aid_kit.R
+import com.example.general_first_aid_kit.presentation.ui.theme.Black
 import com.example.general_first_aid_kit.presentation.ui.theme.Dimensions
-import com.example.general_first_aid_kit.presentation.ui.theme.GreenPrimary
-import com.example.general_first_aid_kit.presentation.ui.theme.TextGreen
-import com.example.general_first_aid_kit.presentation.ui.theme.TextWhite
-import com.example.general_first_aid_kit.presentation.ui.theme.White
+import com.example.general_first_aid_kit.presentation.ui.theme.TextBlack
 
 @Composable
 fun ProfileMenuItem(
@@ -38,7 +36,7 @@ fun ProfileMenuItem(
         Icon(
             painter = icon,
             contentDescription = null,
-            tint = White
+            tint = Black
         )
 
         Spacer(modifier = Modifier.width(Dimensions.SpacingMedium))
@@ -46,15 +44,15 @@ fun ProfileMenuItem(
         Text(
             text = text,
             style = MaterialTheme.typography.bodyLarge,
-            color = TextWhite,
+            color = TextBlack,
             modifier = Modifier.weight(1f)
         )
 
         Icon(
             painter = painterResource(R.drawable.baseline_arrow_forward_ios_24),
             contentDescription = null,
-            tint = White
+            tint = Black
         )
     }
-    HorizontalDivider(color = White)
+    HorizontalDivider(color = Black)
 }
