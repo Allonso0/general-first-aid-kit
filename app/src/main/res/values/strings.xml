@@ -1,27 +1,44 @@
 <resources>
     <string name="app_name">general-first-aid-kit</string>
 
+    <!--Экран приветствия-->
     <string name="welcome_title">Все аптечки в одном приложении</string>
     <string name="welcome_description">Создавайте аптечки и приглашайте членов семьи, коллег или друзей</string>
-    <string name="btn_login">Войти</string>
-    <string name="btn_create_account">Зарегистрироваться</string>
+    <string name="image_description">Изображение счастливой семьи</string>
 
+    <!--Экран входа-->
     <string name="login_title">Вход</string>
     <string name="email_label">Электронная почта*</string>
     <string name="password_label">Пароль*</string>
-    <string name="remember_me">Запомнить меня</string>
     <string name="forgot_password">Забыли пароль?</string>
     <string name="login_greeting_title">Рады снова Вас видеть!</string>
     <string name="login_description_title">Войдите в Ваш аккаунт, чтобы проверить состояние аптечек</string>
 
-    <string name="registration_title">Вход</string>
+    <!--Экран регистрации-->
+    <string name="registration_title">Регистрация</string>
     <string name="registration_greeting_title">Начните заботиться вместе!</string>
     <string name="registration_description_title">Зарегистрируйтесь, чтобы получить доступ к общим аптечкам</string>
     <string name="username_label">Имя*</string>
 
-    <string name="image_description">Изображение счастливой семьи</string>
+    <!--Основной экран (Аптечки)-->
+    <string name="add_kit">Добавить аптечку</string>
+    <string name="kits">Аптечки</string>
+
+    <!--Экран профиля-->
+    <string name="profile">Профиль</string>
+    <string name="log_out">Выйти из аккаунта</string>
+    <string name="profile_settings">Редактировать профиль</string>
+    <string name="notifications_log">Журнал уведомлений</string>
+    <string name="how_to_use_the_app">Как пользоваться приложением?</string>
+
+    <!--Ошибки-->
+    <string name="empty_name_error">Имя не может быть пустым</string>
+    <string name="name_validation_error">Имя должно иметь длину от 2-х до 20-ти символов</string>
+
+    <!--Общие-->
+    <string name="settings">Настройки</string>
+    <string name="btn_login">Войти</string>
+    <string name="btn_create_account">Зарегистрироваться</string>
     <string name="back_button_description">Назад</string>
     <string name="visibility_switch">Переключить видимость пароля</string>
-
-    <string name="empty_name_error">Имя не может быть пустым</string>
 </resources>

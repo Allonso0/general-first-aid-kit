@@ -34,7 +34,6 @@ import com.example.general_first_aid_kit.presentation.ui.theme.White
 
 @Composable
 fun GreetingScreen(
-    modifier: Modifier = Modifier,
     onNavigateToLogin: () -> Unit,
     onNavigateToRegister: () -> Unit
 ) {

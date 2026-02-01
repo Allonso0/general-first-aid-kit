@@ -22,4 +22,7 @@ object Dimensions {
     val LargeButtonHeight = 60.dp
 
     val SemiCircleHeightDefault = 400.dp
+
+    val AvatarLarge = 120.dp
+    val AvatarMedium = 80.dp
 }
