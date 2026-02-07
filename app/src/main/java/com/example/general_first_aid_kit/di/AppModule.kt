@@ -1,15 +1,17 @@
 package com.example.general_first_aid_kit.di
 
+import android.content.Context
 import com.example.general_first_aid_kit.data.repository.AuthRepositoryImpl
 import com.example.general_first_aid_kit.data.repository.UserRepositoryImpl
 import com.example.general_first_aid_kit.domain.repository.AuthRepository
 import com.example.general_first_aid_kit.domain.repository.UserRepository
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.storage.FirebaseStorage
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import io.github.jan.supabase.storage.Storage
 import javax.inject.Singleton
 
 @Module
@@ -28,11 +30,11 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideUserRepository(auth: FirebaseAuth, storage: FirebaseStorage): UserRepository {
-        return UserRepositoryImpl(auth, storage)
+    fun provideUserRepository(
+        auth: FirebaseAuth,
+        storage: Storage,
+        @ApplicationContext context: Context
+    ): UserRepository {
+        return UserRepositoryImpl(auth, storage, context)
     }
-
-    @Provides
-    @Singleton
-    fun provideFirebaseStorage(): FirebaseStorage = FirebaseStorage.getInstance()
 }
