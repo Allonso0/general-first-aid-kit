@@ -1,17 +1,23 @@
 package com.example.general_first_aid_kit.data.repository
 
+import android.content.Context
 import android.net.Uri
 import com.example.general_first_aid_kit.domain.model.User
 import com.example.general_first_aid_kit.domain.repository.UserRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.userProfileChangeRequest
-import com.google.firebase.storage.FirebaseStorage
+import dagger.hilt.android.qualifiers.ApplicationContext
+import io.github.jan.supabase.storage.Storage
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import androidx.core.net.toUri
 
 class UserRepositoryImpl @Inject constructor(
     private val firebaseAuth: FirebaseAuth,
-    private val storage: FirebaseStorage
+    private val supabaseStorage: Storage,
+    @ApplicationContext private val context: Context
 ) : UserRepository {
 
     override fun getCurrentUser(): User? {
@@ -24,17 +30,27 @@ class UserRepositoryImpl @Inject constructor(
         )
     }
 
-    override suspend fun updateUserProfile(name: String, photoUri: Uri?): Result<Unit> {
-        return try {
+    override suspend fun updateUserProfile(name: String, photoUri: Uri?): Result<Unit> = withContext(
+        Dispatchers.IO) {
+        return@withContext try {
             val user = firebaseAuth.currentUser
-                ?: return Result.failure(Exception("Пользователь не найден"))
+                ?: return@withContext Result.failure(Exception("Пользователь не найден"))
 
             var finalPhotoUri: Uri? = null
 
             if (photoUri != null) {
-                val storageRef = storage.reference.child("avatars/${user.uid}.jpg")
-                storageRef.putFile(photoUri).await()
-                finalPhotoUri = storageRef.downloadUrl.await()
+                val fileName = "${user.uid}.jpg"
+                val bucket = supabaseStorage.from("avatars")
+
+                val bytes = context.contentResolver.openInputStream(photoUri)?.use { it.readBytes() }
+                    ?: throw Exception("Не удалось прочитать изображение")
+
+                bucket.upload(path = fileName, data = bytes) {
+                    upsert = true
+                }
+
+                val urlString = bucket.publicUrl(fileName)
+                finalPhotoUri = urlString.toUri()
             }
 
             val profileUpdates = userProfileChangeRequest {
