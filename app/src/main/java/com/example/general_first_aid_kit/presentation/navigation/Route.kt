@@ -23,4 +23,7 @@ sealed interface Route: NavKey {
 
     @Serializable
     data object ProfileSettings: Route, NavKey
+
+    @Serializable
+    data object CreateKit : Route, NavKey
 }

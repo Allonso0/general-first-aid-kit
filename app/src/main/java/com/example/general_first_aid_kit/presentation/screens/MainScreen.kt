@@ -1,10 +1,19 @@
 package com.example.general_first_aid_kit.presentation.screens
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -12,22 +21,43 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SecondaryTabRow
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.general_first_aid_kit.R
+import com.example.general_first_aid_kit.presentation.component.KitCard
+import com.example.general_first_aid_kit.presentation.ui.theme.Dimensions
 import com.example.general_first_aid_kit.presentation.ui.theme.GreenPrimary
+import com.example.general_first_aid_kit.presentation.ui.theme.TextGray
 import com.example.general_first_aid_kit.presentation.ui.theme.TextGreen
+import com.example.general_first_aid_kit.presentation.ui.theme.TextRed
 import com.example.general_first_aid_kit.presentation.ui.theme.White
+import com.example.general_first_aid_kit.presentation.viewmodels.MainViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
-    onProfileClick: () -> Unit
+    onProfileClick: () -> Unit,
+    onAddKitClick: () -> Unit,
+    viewModel: MainViewModel = hiltViewModel()
 ) {
+    val state by viewModel.uiState.collectAsState()
+    val isArchiveMode by viewModel.isArchiveMode.collectAsState()
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -63,31 +93,124 @@ fun MainScreen(
                             tint = White
                         )
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = White
+                )
             )
         },
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = { },
-                shape = CircleShape,
-                containerColor = GreenPrimary,
-                contentColor = White
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.baseline_add_24),
-                    contentDescription = stringResource(R.string.add_kit),
-                    tint = White
-                )
+            if (!isArchiveMode) {
+                FloatingActionButton(
+                    onClick = onAddKitClick,
+                    shape = CircleShape,
+                    containerColor = GreenPrimary,
+                    contentColor = White
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.baseline_add_24),
+                        contentDescription = stringResource(R.string.add_kit),
+                        tint = White
+                    )
+                }
             }
-        }
+        },
+        containerColor = White
     ) { innerPadding ->
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding),
-            contentAlignment = Alignment.Center
+                .padding(innerPadding)
         ) {
-            Text("Здесь будет список аптечек")
+            SecondaryTabRow(
+                selectedTabIndex = if (isArchiveMode) 1 else 0,
+                containerColor = White,
+                contentColor = GreenPrimary,
+                indicator = {
+                    TabRowDefaults.SecondaryIndicator(
+                        modifier = Modifier.tabIndicatorOffset(if (isArchiveMode) 1 else 0),
+                        color = GreenPrimary,
+                        height = 3.dp
+                    )
+                },
+                divider = { }
+            ) {
+                Tab(
+                    selected = !isArchiveMode,
+                    onClick = { viewModel.setArchiveMode(false) },
+                    selectedContentColor = GreenPrimary,
+                    unselectedContentColor = TextGray
+                ) {
+                    Text(
+                        text = "Активные",
+                        modifier = Modifier.padding(Dimensions.PaddingMedium),
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+                Tab(
+                    selected = isArchiveMode,
+                    onClick = { viewModel.setArchiveMode(true) },
+                    selectedContentColor = GreenPrimary,
+                    unselectedContentColor = TextGray
+                ) {
+                    Text(
+                        text = "Архивные",
+                        modifier = Modifier.padding(Dimensions.PaddingMedium),
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(Dimensions.SpacingMedium))
+
+            Surface(
+                modifier = Modifier.fillMaxSize(),
+                color = White
+            ) {
+                when {
+                    state.isLoading -> {
+                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            CircularProgressIndicator(color = GreenPrimary)
+                        }
+                    }
+
+                    state.error != null -> {
+                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            Text(
+                                text = "Ошибка: ${state.error}",
+                                color = TextRed,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.padding(Dimensions.PaddingMedium)
+                            )
+                        }
+                    }
+
+                    state.kits.isEmpty() -> {
+                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            Text(
+                                text = "Список пуст.\nНажмите +, чтобы создать аптечку.",
+                                color = GreenPrimary,
+                                textAlign = TextAlign.Center,
+                                style = MaterialTheme.typography.bodyLarge,
+                                modifier = Modifier.padding(Dimensions.PaddingExtraLarge)
+                            )
+                        }
+                    }
+
+                    else -> {
+                        LazyColumn(
+                            contentPadding = PaddingValues(Dimensions.PaddingMedium),
+                            verticalArrangement = Arrangement.spacedBy(Dimensions.SpacingMedium)
+                        ) {
+                            items(state.kits) { kit ->
+                                KitCard(kit = kit, onClick = { /* Навигация к деталям аптечки */ })
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }

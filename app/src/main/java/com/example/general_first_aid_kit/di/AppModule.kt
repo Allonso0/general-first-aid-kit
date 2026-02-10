@@ -6,6 +6,7 @@ import com.example.general_first_aid_kit.data.repository.UserRepositoryImpl
 import com.example.general_first_aid_kit.domain.repository.AuthRepository
 import com.example.general_first_aid_kit.domain.repository.UserRepository
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -24,17 +25,5 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideAuthRepository(auth: FirebaseAuth): AuthRepository {
-        return AuthRepositoryImpl(auth)
-    }
-
-    @Provides
-    @Singleton
-    fun provideUserRepository(
-        auth: FirebaseAuth,
-        storage: Storage,
-        @ApplicationContext context: Context
-    ): UserRepository {
-        return UserRepositoryImpl(auth, storage, context)
-    }
+    fun provideFirebaseFireStore(): FirebaseFirestore = FirebaseFirestore.getInstance()
 }

@@ -9,6 +9,7 @@ import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
+import com.example.general_first_aid_kit.presentation.screens.CreateKitScreen
 import com.example.general_first_aid_kit.presentation.screens.GreetingScreen
 import com.example.general_first_aid_kit.presentation.screens.LoginScreen
 import com.example.general_first_aid_kit.presentation.screens.MainScreen
@@ -71,7 +72,8 @@ fun NavigationRoot(
                 }
                 is Route.Main -> NavEntry(key) {
                     MainScreen(
-                        onProfileClick = { backStack.add(Route.Profile) }
+                        onProfileClick = { backStack.add(Route.Profile) },
+                        onAddKitClick = { backStack.add(Route.CreateKit) }
                     )
                 }
                 is Route.Profile -> NavEntry(key) {
@@ -89,6 +91,11 @@ fun NavigationRoot(
                 }
                 is Route.ProfileSettings -> NavEntry(key) {
                     ProfileSettingsScreen(
+                        onNavigateBack = { backStack.removeLastOrNull() }
+                    )
+                }
+                is Route.CreateKit -> NavEntry(key) {
+                    CreateKitScreen(
                         onNavigateBack = { backStack.removeLastOrNull() }
                     )
                 }
