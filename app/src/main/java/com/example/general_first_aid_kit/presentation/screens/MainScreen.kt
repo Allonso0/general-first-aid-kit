@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -23,10 +22,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SecondaryTabRow
 import androidx.compose.material3.Surface
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -39,6 +41,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.general_first_aid_kit.R
+import com.example.general_first_aid_kit.presentation.component.DeleteBackground
 import com.example.general_first_aid_kit.presentation.component.KitCard
 import com.example.general_first_aid_kit.presentation.ui.theme.Dimensions
 import com.example.general_first_aid_kit.presentation.ui.theme.GreenPrimary
@@ -204,8 +207,36 @@ fun MainScreen(
                             contentPadding = PaddingValues(Dimensions.PaddingMedium),
                             verticalArrangement = Arrangement.spacedBy(Dimensions.SpacingMedium)
                         ) {
-                            items(state.kits) { kit ->
-                                KitCard(kit = kit, onClick = { /* Навигация к деталям аптечки */ })
+                            items(
+                                items = state.kits,
+                                key = { it.id }
+                            ) { kit ->
+
+                                val dismissState = rememberSwipeToDismissBoxState(
+                                    confirmValueChange = { dismissValue ->
+                                        when(dismissValue) {
+                                            SwipeToDismissBoxValue.EndToStart -> {
+                                                viewModel.deleteKit(kit)
+                                                true
+                                            }
+                                            else -> false
+                                        }
+                                    },
+                                    positionalThreshold = { it * 0.25f }
+                                )
+
+                                SwipeToDismissBox(
+                                    state = dismissState,
+                                    enableDismissFromStartToEnd = false,
+                                    backgroundContent = { DeleteBackground(dismissState) },
+                                    content = {
+                                        KitCard(
+                                            kit = kit,
+                                            onClick = { /* Навигация к деталям аптечки */ }
+                                        )
+                                    }
+                                )
+
                             }
                         }
                     }

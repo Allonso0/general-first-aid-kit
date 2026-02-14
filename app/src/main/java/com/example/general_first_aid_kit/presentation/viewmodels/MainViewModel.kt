@@ -3,6 +3,7 @@ package com.example.general_first_aid_kit.presentation.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.general_first_aid_kit.domain.model.Kit
+import com.example.general_first_aid_kit.domain.usecase.DeleteKitUseCase
 import com.example.general_first_aid_kit.domain.usecase.GetKitsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,11 +14,13 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val getKitsUseCase: GetKitsUseCase
+    private val getKitsUseCase: GetKitsUseCase,
+    private val deleteKitUseCase: DeleteKitUseCase
 ) : ViewModel() {
 
     private val _isArchiveMode = MutableStateFlow(false)
@@ -45,6 +48,12 @@ class MainViewModel @Inject constructor(
 
     fun setArchiveMode(enabled: Boolean) {
         _isArchiveMode.value = enabled
+    }
+
+    fun deleteKit(kit: Kit) {
+        viewModelScope.launch {
+            deleteKitUseCase(kit.id)
+        }
     }
 }
 

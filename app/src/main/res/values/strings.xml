@@ -23,6 +23,7 @@
     <!--Основной экран (Аптечки)-->
     <string name="add_kit">Добавить аптечку</string>
     <string name="kits">Аптечки</string>
+    <string name="delete">Удалить</string>
 
     <!--Экран создания аптечки-->
     <string name="choose_color">Выберите цвет</string>

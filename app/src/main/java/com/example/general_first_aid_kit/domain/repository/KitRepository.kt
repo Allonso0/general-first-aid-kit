@@ -7,4 +7,6 @@ interface KitRepository {
     suspend fun createKit(kit: Kit): Result<Unit>
 
     fun getKits(userId: String): Flow<List<Kit>>
+
+    suspend fun deleteKit(kitId: String): Result<Unit>
 }

@@ -50,4 +50,11 @@ class KitRepositoryImpl @Inject constructor(
 
         awaitClose { subscription.remove() }
     }
+
+    override suspend fun deleteKit(kitId: String): Result<Unit> = try {
+        firestore.collection("kits").document(kitId).delete().await()
+        Result.success(Unit)
+    } catch (e: Exception) {
+        Result.failure(e)
+    }
 }
