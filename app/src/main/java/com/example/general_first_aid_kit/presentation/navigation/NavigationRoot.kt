@@ -11,6 +11,7 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.example.general_first_aid_kit.presentation.screens.CreateKitScreen
 import com.example.general_first_aid_kit.presentation.screens.GreetingScreen
+import com.example.general_first_aid_kit.presentation.screens.KitScreen
 import com.example.general_first_aid_kit.presentation.screens.LoginScreen
 import com.example.general_first_aid_kit.presentation.screens.MainScreen
 import com.example.general_first_aid_kit.presentation.screens.ProfileScreen
@@ -73,7 +74,10 @@ fun NavigationRoot(
                 is Route.Main -> NavEntry(key) {
                     MainScreen(
                         onProfileClick = { backStack.add(Route.Profile) },
-                        onAddKitClick = { backStack.add(Route.CreateKit) }
+                        onAddKitClick = { backStack.add(Route.CreateKit) },
+                        onKitCardClick = { id, name ->
+                            backStack.add(Route.KitScreen(id, name))
+                        }
                     )
                 }
                 is Route.Profile -> NavEntry(key) {
@@ -98,6 +102,19 @@ fun NavigationRoot(
                     CreateKitScreen(
                         onNavigateBack = { backStack.removeLastOrNull() }
                     )
+                }
+                is Route.KitScreen -> NavEntry(key) {
+                    KitScreen(
+                        kitId = key.id,
+                        kitName = key.name,
+                        onNavigateBack = { backStack.removeLastOrNull() },
+                        onNavigateToKitSettings = {
+                            backStack.add(Route.KitInfo(key.id, key.name))
+                        }
+                    )
+                }
+                is Route.KitInfo -> NavEntry(key) {
+
                 }
                 else -> error("Unknown key: $key")
             }

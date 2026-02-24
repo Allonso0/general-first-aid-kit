@@ -56,6 +56,7 @@ import com.example.general_first_aid_kit.presentation.viewmodels.MainViewModel
 fun MainScreen(
     onProfileClick: () -> Unit,
     onAddKitClick: () -> Unit,
+    onKitCardClick: (String, String) -> Unit,
     viewModel: MainViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
@@ -232,7 +233,7 @@ fun MainScreen(
                                     content = {
                                         KitCard(
                                             kit = kit,
-                                            onClick = { /* Навигация к деталям аптечки */ }
+                                            onClick = { onKitCardClick(kit.id, kit.name) }
                                         )
                                     }
                                 )

@@ -3,6 +3,7 @@ package com.example.general_first_aid_kit.presentation.ui.theme
 import androidx.compose.ui.unit.dp
 
 object Dimensions {
+    val CategoryVerticalPadding = 2.dp
     val PaddingSmall = 8.dp
     val PaddingMedium = 16.dp
     val PaddingLarge = 24.dp
@@ -33,4 +34,8 @@ object Dimensions {
     val KitCoverWidth = 40.dp
     val HorizontalDividerThickness = 1.dp
     val KitCardElevation = 6.dp
+    val SearchFieldHeight = 50.dp
+
+    val MedicationCardHeight = 100.dp
+    val MedicationCardElevation = 6.dp
 }

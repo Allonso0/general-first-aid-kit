@@ -7,23 +7,29 @@ import kotlinx.serialization.Serializable
 sealed interface Route: NavKey {
 
     @Serializable
-    data object Welcome: Route, NavKey
+    data object Welcome: Route
 
     @Serializable
-    data object Login: Route, NavKey
+    data object Login: Route
 
     @Serializable
-    data object Register: Route, NavKey
+    data object Register: Route
 
     @Serializable
-    data object Main: Route, NavKey
+    data object Main: Route
 
     @Serializable
-    data object Profile: Route, NavKey
+    data object Profile: Route
 
     @Serializable
-    data object ProfileSettings: Route, NavKey
+    data object ProfileSettings: Route
 
     @Serializable
-    data object CreateKit : Route, NavKey
+    data object CreateKit : Route
+
+    @Serializable
+    data class KitScreen(val id: String, val name: String): Route
+
+    @Serializable
+    data class KitInfo(val id: String, val name: String): Route
 }
