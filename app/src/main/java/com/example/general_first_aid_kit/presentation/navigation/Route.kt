@@ -28,8 +28,8 @@ sealed interface Route: NavKey {
     data object CreateKit : Route
 
     @Serializable
-    data class KitScreen(val id: String, val name: String): Route
+    data class KitScreen(val id: String, val name: String, val location: String, val colorIndex: Int): Route
 
     @Serializable
-    data class KitInfo(val id: String, val name: String): Route
+    data class KitSettings(val id: String, val name: String, val location: String, val colorIndex: Int): Route
 }

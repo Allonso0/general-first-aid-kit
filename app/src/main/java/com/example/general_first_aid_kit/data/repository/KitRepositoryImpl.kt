@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
+
 class KitRepositoryImpl @Inject constructor(
     private val firestore: FirebaseFirestore
 ) : KitRepository {
@@ -28,6 +29,25 @@ class KitRepositoryImpl @Inject constructor(
             Result.success(Unit)
         } catch (e: Exception) {
             e.printStackTrace()
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun updateKit(
+        kitId: String,
+        name: String,
+        location: String,
+        colorIndex: Int
+    ): Result<Unit> {
+        return try {
+            firestore.collection("kits").document(kitId)
+                .update(
+                    "name", name,
+                    "location", location,
+                    "colorIndex", colorIndex
+                ).await()
+            Result.success(Unit)
+        } catch (e: Exception) {
             Result.failure(e)
         }
     }

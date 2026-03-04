@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.general_first_aid_kit.R
 import com.example.general_first_aid_kit.presentation.component.DeleteBackground
+import com.example.general_first_aid_kit.presentation.component.GenericTabRow
 import com.example.general_first_aid_kit.presentation.component.KitCard
 import com.example.general_first_aid_kit.presentation.ui.theme.Dimensions
 import com.example.general_first_aid_kit.presentation.ui.theme.GreenPrimary
@@ -56,7 +57,7 @@ import com.example.general_first_aid_kit.presentation.viewmodels.MainViewModel
 fun MainScreen(
     onProfileClick: () -> Unit,
     onAddKitClick: () -> Unit,
-    onKitCardClick: (String, String) -> Unit,
+    onKitCardClick: (String, String, String, Int) -> Unit,
     viewModel: MainViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
@@ -65,11 +66,13 @@ fun MainScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text(
-                    text = stringResource(R.string.kits),
-                    style = MaterialTheme.typography.titleLarge,
-                    color = TextGreen
-                ) },
+                title = {
+                    Text(
+                        text = stringResource(R.string.kits),
+                        style = MaterialTheme.typography.titleLarge,
+                        color = TextGreen
+                    )
+                },
                 navigationIcon = {
                     IconButton(
                         onClick = onProfileClick,
@@ -126,46 +129,11 @@ fun MainScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            SecondaryTabRow(
+            GenericTabRow(
                 selectedTabIndex = if (isArchiveMode) 1 else 0,
-                containerColor = White,
-                contentColor = GreenPrimary,
-                indicator = {
-                    TabRowDefaults.SecondaryIndicator(
-                        modifier = Modifier.tabIndicatorOffset(if (isArchiveMode) 1 else 0),
-                        color = GreenPrimary,
-                        height = 3.dp
-                    )
-                },
-                divider = { }
-            ) {
-                Tab(
-                    selected = !isArchiveMode,
-                    onClick = { viewModel.setArchiveMode(false) },
-                    selectedContentColor = GreenPrimary,
-                    unselectedContentColor = TextGray
-                ) {
-                    Text(
-                        text = "Активные",
-                        modifier = Modifier.padding(Dimensions.PaddingMedium),
-                        style = MaterialTheme.typography.titleSmall,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                }
-                Tab(
-                    selected = isArchiveMode,
-                    onClick = { viewModel.setArchiveMode(true) },
-                    selectedContentColor = GreenPrimary,
-                    unselectedContentColor = TextGray
-                ) {
-                    Text(
-                        text = "Архивные",
-                        modifier = Modifier.padding(Dimensions.PaddingMedium),
-                        style = MaterialTheme.typography.titleSmall,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                }
-            }
+                tabs = listOf("Активные", "Архивные"),
+                onTabSelected = { viewModel.setArchiveMode(it == 1) }
+            )
 
             Spacer(modifier = Modifier.height(Dimensions.SpacingMedium))
 
@@ -215,11 +183,12 @@ fun MainScreen(
 
                                 val dismissState = rememberSwipeToDismissBoxState(
                                     confirmValueChange = { dismissValue ->
-                                        when(dismissValue) {
+                                        when (dismissValue) {
                                             SwipeToDismissBoxValue.EndToStart -> {
                                                 viewModel.deleteKit(kit)
                                                 true
                                             }
+
                                             else -> false
                                         }
                                     },
@@ -233,7 +202,7 @@ fun MainScreen(
                                     content = {
                                         KitCard(
                                             kit = kit,
-                                            onClick = { onKitCardClick(kit.id, kit.name) }
+                                            onClick = { onKitCardClick(kit.id, kit.name, kit.location, kit.colorIndex) }
                                         )
                                     }
                                 )

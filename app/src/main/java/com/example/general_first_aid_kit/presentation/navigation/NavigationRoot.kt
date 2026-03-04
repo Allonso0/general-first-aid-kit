@@ -12,6 +12,7 @@ import androidx.navigation3.ui.NavDisplay
 import com.example.general_first_aid_kit.presentation.screens.CreateKitScreen
 import com.example.general_first_aid_kit.presentation.screens.GreetingScreen
 import com.example.general_first_aid_kit.presentation.screens.KitScreen
+import com.example.general_first_aid_kit.presentation.screens.KitSettingsScreen
 import com.example.general_first_aid_kit.presentation.screens.LoginScreen
 import com.example.general_first_aid_kit.presentation.screens.MainScreen
 import com.example.general_first_aid_kit.presentation.screens.ProfileScreen
@@ -75,8 +76,8 @@ fun NavigationRoot(
                     MainScreen(
                         onProfileClick = { backStack.add(Route.Profile) },
                         onAddKitClick = { backStack.add(Route.CreateKit) },
-                        onKitCardClick = { id, name ->
-                            backStack.add(Route.KitScreen(id, name))
+                        onKitCardClick = { id, name, location, colorIndex ->
+                            backStack.add(Route.KitScreen(id, name, location, colorIndex))
                         }
                     )
                 }
@@ -109,12 +110,26 @@ fun NavigationRoot(
                         kitName = key.name,
                         onNavigateBack = { backStack.removeLastOrNull() },
                         onNavigateToKitSettings = {
-                            backStack.add(Route.KitInfo(key.id, key.name))
+                            backStack.add(Route.KitSettings(key.id, key.name, key.location, key.colorIndex))
                         }
                     )
                 }
-                is Route.KitInfo -> NavEntry(key) {
-
+                is Route.KitSettings -> NavEntry(key) {
+                    KitSettingsScreen(
+                        kitId = key.id,
+                        initialName = key.name,
+                        initialLocation = key.location,
+                        initialColorIndex = key.colorIndex,
+                        onNavigateBack = { backStack.removeLastOrNull() },
+                        onSaveSuccess = {
+                            backStack.clear()
+                            backStack.add(Route.Main)
+                        },
+                        onDeleteSuccess = {
+                            backStack.clear()
+                            backStack.add(Route.Main)
+                        }
+                    )
                 }
                 else -> error("Unknown key: $key")
             }
