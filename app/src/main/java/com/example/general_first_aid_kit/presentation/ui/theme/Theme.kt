@@ -38,6 +38,17 @@ private val LightColorScheme = lightColorScheme(
     error = TextRed
 )
 
+val KitColors = listOf(
+    KitColorLavender,
+    KitColorBlueGray,
+    KitColorViolet,
+    KitColorBrown,
+    KitColorPink,
+    KitColorGreen,
+    KitColorRed,
+    KitColorOrange
+)
+
 @Composable
 fun GeneralfirstaidkitTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),

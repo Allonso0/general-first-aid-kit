@@ -23,6 +23,23 @@
     <!--Основной экран (Аптечки)-->
     <string name="add_kit">Добавить аптечку</string>
     <string name="kits">Аптечки</string>
+    <string name="delete">Удалить</string>
+
+    <!--Экран создания аптечки-->
+    <string name="choose_color">Выберите цвет</string>
+    <string name="new_kit">Новая аптечка</string>
+    <string name="disclaimer">Эти параметры можно изменить в любое время в настройках аптечки</string>
+    <string name="cover_color">Цвет обложки</string>
+    <string name="main_info">Основная информация</string>
+    <string name="kit_type">Тип аптечки</string>
+    <string name="kit_name">Название аптечки *</string>
+    <string name="kit_name_placeholder">Например, Кемпинг</string>
+    <string name="location">Местоположение</string>
+    <string name="location_placeholder">Где находится эта аптечка?</string>
+    <string name="personal_kit">Личная аптечка</string>
+    <string name="personal_kit_description">Только вы будете иметь к ней доступ</string>
+    <string name="public_kit">Общая аптечка</string>
+    <string name="public_kit_description">Вы сможете приласить других участников через код</string>
 
     <!--Экран профиля-->
     <string name="profile">Профиль</string>
@@ -41,4 +58,6 @@
     <string name="btn_create_account">Зарегистрироваться</string>
     <string name="back_button_description">Назад</string>
     <string name="visibility_switch">Переключить видимость пароля</string>
+    <string name="save">Сохранить</string>
+    <string name="choose">Выбрать</string>
 </resources>
