@@ -14,13 +14,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -40,29 +38,23 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import com.example.general_first_aid_kit.R
-import com.example.general_first_aid_kit.domain.model.Medication
-import com.example.general_first_aid_kit.presentation.component.MedicationCard
+import com.example.general_first_aid_kit.presentation.component.ExpandableAddMedicationFAB
 import com.example.general_first_aid_kit.presentation.ui.theme.Dimensions
 import com.example.general_first_aid_kit.presentation.ui.theme.GreenPrimary
 import com.example.general_first_aid_kit.presentation.ui.theme.LightGray
 import com.example.general_first_aid_kit.presentation.ui.theme.TextGray
 import com.example.general_first_aid_kit.presentation.ui.theme.White
-import kotlinx.datetime.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun KitScreen(
+    kitId: String,
+    kitName: String,
     onNavigateBack: () -> Unit,
     onNavigateToKitSettings: () -> Unit,
-    kitId: String,
-    kitName: String
+    onNavigateToAddManual: (String) -> Unit
 ) {
     var searchQuery by remember { mutableStateOf("") }
-
-    val dummyMedications = listOf(
-        Medication("1", "Нурофен", "Жаропонижающее", LocalDate(2026, 10, 20), 10, "табл"),
-        Medication("2", "Супрастин", "Антигистаминное", LocalDate(2026, 10, 20), 5, "табл.")
-    )
 
     Scaffold(
         containerColor = White,
@@ -100,18 +92,12 @@ fun KitScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = {  },
-                shape = CircleShape,
-                containerColor = GreenPrimary,
-                contentColor = White
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.baseline_add_24),
-                    contentDescription = "",
-                    tint = White
-                )
-            }
+            ExpandableAddMedicationFAB(
+                onAddManual = { onNavigateToAddManual(kitId) },
+                onScanBarcode = {
+                    // Заглушка
+                }
+            )
         }
     ) { innerPadding ->
         Column(
@@ -175,9 +161,9 @@ fun KitScreen(
                 contentPadding = PaddingValues(Dimensions.PaddingMedium),
                 verticalArrangement = Arrangement.spacedBy(Dimensions.SpacingMedium)
             ) {
-                items(dummyMedications.filter { it.name.contains(searchQuery, ignoreCase = true) }) { med ->
-                    MedicationCard(medication = med, onClick = {})
-                }
+//                items(dummyMedications.filter { it.name.contains(searchQuery, ignoreCase = true) }) { med ->
+//                    MedicationCard(medication = med, onClick = {})
+//                }
             }
 
         }

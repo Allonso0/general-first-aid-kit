@@ -1,13 +1,12 @@
 package com.example.general_first_aid_kit.domain.model
 
-import kotlinx.datetime.LocalDate
-
 data class Medication(
-    val id: String,
-    val name: String,
-    val category: String,
-    val expirationDate: LocalDate,
-    val count: Int,
-    val measureUnit: String,
+    val id: String = "",
+    val name: String = "",
+    val expirationDate: Long = 0L,
+    val quantity: Int = 0,
+    val unit: String = "шт",
+    val category: String = "",
+    val description: String = "",
     val photoUrl: String? = null
 )
