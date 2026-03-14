@@ -39,4 +39,5 @@ object Dimensions {
 
     val MedicationCardHeight = 100.dp
     val MedicationCardElevation = 6.dp
+    val MedicationPhotoSize = 200.dp
 }

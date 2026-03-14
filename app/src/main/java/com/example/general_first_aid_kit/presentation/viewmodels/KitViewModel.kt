@@ -1,0 +1,54 @@
+package com.example.general_first_aid_kit.presentation.viewmodels
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.general_first_aid_kit.domain.model.Medication
+import com.example.general_first_aid_kit.domain.usecase.GetMedicationsUseCase
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.stateIn
+import javax.inject.Inject
+
+@HiltViewModel
+class KitViewModel @Inject constructor(
+    private val getMedicationsUseCase: GetMedicationsUseCase
+) : ViewModel() {
+
+    private val _kitId = MutableStateFlow<String?>(null)
+
+    private val _searchQuery = MutableStateFlow("")
+    val searchQuery = _searchQuery.asStateFlow()
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val medications: StateFlow<List<Medication>> = _kitId
+        .filterNotNull()
+        .flatMapLatest { id ->
+            getMedicationsUseCase(id)
+        }
+        .combine(_searchQuery) { list, query ->
+            if (query.isBlank()) list
+            else list.filter { it.name.contains(query, ignoreCase = true) }
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
+
+    fun loadKit(id: String) {
+        if (_kitId.value != id) {
+            _kitId.value = id
+        }
+    }
+
+    fun onSearchQueryChange(newQuery: String) {
+        _searchQuery.value = newQuery
+    }
+}

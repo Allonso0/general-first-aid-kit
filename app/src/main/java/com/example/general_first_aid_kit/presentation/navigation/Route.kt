@@ -32,4 +32,7 @@ sealed interface Route: NavKey {
 
     @Serializable
     data class KitSettings(val id: String, val name: String, val location: String, val colorIndex: Int): Route
+
+    @Serializable
+    data class AddMedicationManual(val kitId: String) : Route
 }
