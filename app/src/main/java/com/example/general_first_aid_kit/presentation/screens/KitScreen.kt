@@ -20,7 +20,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -30,39 +29,41 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.general_first_aid_kit.R
-import com.example.general_first_aid_kit.domain.model.Medication
+import com.example.general_first_aid_kit.presentation.component.ExpandableAddMedicationFAB
 import com.example.general_first_aid_kit.presentation.component.MedicationCard
 import com.example.general_first_aid_kit.presentation.ui.theme.Dimensions
 import com.example.general_first_aid_kit.presentation.ui.theme.GreenPrimary
 import com.example.general_first_aid_kit.presentation.ui.theme.LightGray
 import com.example.general_first_aid_kit.presentation.ui.theme.TextGray
 import com.example.general_first_aid_kit.presentation.ui.theme.White
-import kotlinx.datetime.LocalDate
+import com.example.general_first_aid_kit.presentation.viewmodels.KitViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun KitScreen(
+    kitId: String,
+    kitName: String,
     onNavigateBack: () -> Unit,
     onNavigateToKitSettings: () -> Unit,
-    kitId: String,
-    kitName: String
+    onNavigateToAddManual: (String) -> Unit,
+    viewModel: KitViewModel = hiltViewModel()
 ) {
-    var searchQuery by remember { mutableStateOf("") }
+    LaunchedEffect(kitId) {
+        viewModel.loadKit(kitId)
+    }
 
-    val dummyMedications = listOf(
-        Medication("1", "Нурофен", "Жаропонижающее", LocalDate(2026, 10, 20), 10, "табл"),
-        Medication("2", "Супрастин", "Антигистаминное", LocalDate(2026, 10, 20), 5, "табл.")
-    )
+    val medications by viewModel.medications.collectAsState()
+    val searchQuery by viewModel.searchQuery.collectAsState()
 
     Scaffold(
         containerColor = White,
@@ -100,18 +101,12 @@ fun KitScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = {  },
-                shape = CircleShape,
-                containerColor = GreenPrimary,
-                contentColor = White
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.baseline_add_24),
-                    contentDescription = "",
-                    tint = White
-                )
-            }
+            ExpandableAddMedicationFAB(
+                onAddManual = { onNavigateToAddManual(kitId) },
+                onScanBarcode = {
+                    // Заглушка
+                }
+            )
         }
     ) { innerPadding ->
         Column(
@@ -127,7 +122,7 @@ fun KitScreen(
             ) {
                 OutlinedTextField(
                     value = searchQuery,
-                    onValueChange = { searchQuery = it },
+                    onValueChange = viewModel::onSearchQueryChange,
                     placeholder = {
                         Text(
                             text = "Введите название лекарства...",
@@ -171,12 +166,21 @@ fun KitScreen(
                 }
             }
 
-            LazyColumn(
-                contentPadding = PaddingValues(Dimensions.PaddingMedium),
-                verticalArrangement = Arrangement.spacedBy(Dimensions.SpacingMedium)
-            ) {
-                items(dummyMedications.filter { it.name.contains(searchQuery, ignoreCase = true) }) { med ->
-                    MedicationCard(medication = med, onClick = {})
+            if (medications.isEmpty()) {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text("В этой аптечке пока пусто", color = TextGray)
+                }
+            } else {
+                LazyColumn(
+                    contentPadding = PaddingValues(Dimensions.PaddingMedium),
+                    verticalArrangement = Arrangement.spacedBy(Dimensions.SpacingMedium)
+                ) {
+                    items(medications, key = { it.id }) { med ->
+                        MedicationCard(
+                            medication = med,
+                            onClick = { /* Переход к деталям позже */ }
+                        )
+                    }
                 }
             }
 

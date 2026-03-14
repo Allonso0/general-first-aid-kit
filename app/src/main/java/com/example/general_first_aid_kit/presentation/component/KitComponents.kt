@@ -64,7 +64,8 @@ fun KitInputField(
             focusedLabelColor = GreenPrimary,
             focusedTextColor = TextBlack,
             unfocusedTextColor = TextGray,
-            unfocusedBorderColor = LightGray
+            unfocusedBorderColor = LightGray,
+            unfocusedLabelColor = LightGray
         ),
         singleLine = true
     )

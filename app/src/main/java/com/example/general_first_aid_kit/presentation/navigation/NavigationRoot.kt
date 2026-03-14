@@ -9,6 +9,7 @@ import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
+import com.example.general_first_aid_kit.presentation.screens.AddMedicationScreen
 import com.example.general_first_aid_kit.presentation.screens.CreateKitScreen
 import com.example.general_first_aid_kit.presentation.screens.GreetingScreen
 import com.example.general_first_aid_kit.presentation.screens.KitScreen
@@ -111,7 +112,8 @@ fun NavigationRoot(
                         onNavigateBack = { backStack.removeLastOrNull() },
                         onNavigateToKitSettings = {
                             backStack.add(Route.KitSettings(key.id, key.name, key.location, key.colorIndex))
-                        }
+                        },
+                        onNavigateToAddManual = { backStack.add(Route.AddMedicationManual(key.id)) }
                     )
                 }
                 is Route.KitSettings -> NavEntry(key) {
@@ -129,6 +131,12 @@ fun NavigationRoot(
                             backStack.clear()
                             backStack.add(Route.Main)
                         }
+                    )
+                }
+                is Route.AddMedicationManual -> NavEntry(key) {
+                    AddMedicationScreen(
+                        kitId = key.kitId,
+                        onNavigateBack = { backStack.removeLastOrNull() }
                     )
                 }
                 else -> error("Unknown key: $key")
