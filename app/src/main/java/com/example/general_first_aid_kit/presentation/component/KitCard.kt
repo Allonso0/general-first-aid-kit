@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -67,6 +68,8 @@ fun KitCard(
                     style = MaterialTheme.typography.titleMedium,
                     color = TextBlack
                 )
+
+                Spacer(modifier = Modifier.height(Dimensions.SpacingExtraSmall))
 
                 val typeText = if (kit.type == KitType.PERSONAL) "Личная" else "${kit.userIds.size} участ."
                 Text(
