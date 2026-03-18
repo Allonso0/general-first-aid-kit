@@ -2,6 +2,7 @@ package com.example.general_first_aid_kit.domain.model
 
 data class Medication(
     val id: String = "",
+    val kitId: String = "",
     val name: String = "",
     val expirationDate: Long = 0L,
     val quantity: Int = 0,

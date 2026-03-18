@@ -27,7 +27,6 @@ import com.example.general_first_aid_kit.presentation.ui.theme.Black
 import com.example.general_first_aid_kit.presentation.ui.theme.Dimensions
 import com.example.general_first_aid_kit.presentation.ui.theme.KitColors
 import com.example.general_first_aid_kit.presentation.ui.theme.TextBlack
-import com.example.general_first_aid_kit.presentation.ui.theme.TextRed
 import com.example.general_first_aid_kit.presentation.ui.theme.White
 
 @Composable
@@ -92,7 +91,6 @@ fun KitCard(
                     MedicineRow(
                         label = "Просроченные:",
                         count = kit.countExpired,
-                        color = if (kit.countExpired > 0) TextRed else TextBlack
                     )
                     MedicineRow(
                         label = "Заканчиваются:",
