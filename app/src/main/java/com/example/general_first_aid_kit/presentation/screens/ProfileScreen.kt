@@ -26,6 +26,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -47,6 +50,7 @@ import com.example.general_first_aid_kit.presentation.ui.theme.TextGreen
 import com.example.general_first_aid_kit.presentation.ui.theme.TextRed
 import com.example.general_first_aid_kit.presentation.ui.theme.White
 import com.example.general_first_aid_kit.presentation.viewmodels.ProfileViewModel
+import com.example.general_first_aid_kit.presentation.utils.shimmerEffect
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -57,6 +61,7 @@ fun ProfileScreen(
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
     val user by viewModel.user.collectAsState()
+    var isImageLoading by remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
         viewModel.reloadUser()
@@ -112,8 +117,12 @@ fun ProfileScreen(
                     AsyncImage(
                         model = user?.avatarURL,
                         contentDescription = null,
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .then(if (isImageLoading) Modifier.shimmerEffect() else Modifier),
+                        contentScale = ContentScale.Crop,
+                        onSuccess = { isImageLoading = false },
+                        onError = { isImageLoading = false }
                     )
                 } else {
                     Icon(

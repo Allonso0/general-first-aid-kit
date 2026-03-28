@@ -41,6 +41,26 @@ class MedicationRepositoryImpl @Inject constructor(
         awaitClose { subscription.remove() }
     }
 
+    override fun getAllMedications(): Flow<List<Medication>> = callbackFlow {
+        val subscription = fireStore.collectionGroup("medications")
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    close(error)
+                    return@addSnapshotListener
+                }
+                val medications = snapshot?.documents?.mapNotNull { doc ->
+                    val kitId = doc.reference.parent.parent?.id ?: ""
+                    doc.toObject(Medication::class.java)?.copy(
+                        id = doc.id,
+                        kitId = kitId
+                    )
+                } ?: emptyList()
+                trySend(medications)
+            }
+
+        awaitClose { subscription.remove() }
+    }
+
     override suspend fun saveMedication(
         kitId: String,
         medication: Medication,

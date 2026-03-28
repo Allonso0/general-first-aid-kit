@@ -49,6 +49,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -90,16 +91,16 @@ fun AddMedicationScreen(
 
     var expanded by remember { mutableStateOf(false) }
     val categories = listOf(
-        "Без категории",
-        "Жаропонижающее",
-        "Обезболивающее",
-        "Антигистаминное",
-        "Спазмолитик",
-        "Антибиотик",
-        "Витамины",
-        "Антисептик"
+        stringResource(R.string.no_category),
+        stringResource(R.string.cat_antipyretic),
+        stringResource(R.string.cat_painkiller),
+        stringResource(R.string.cat_antihistamine),
+        stringResource(R.string.cat_spasmolytic),
+        stringResource(R.string.cat_antibiotic),
+        stringResource(R.string.cat_vitamins),
+        stringResource(R.string.cat_antiseptic)
     )
-    val isNoCategory = state.category.isEmpty() || state.category == "Без категории"
+    val isNoCategory = state.category.isEmpty() || state.category == stringResource(R.string.no_category)
     val displayColor = if (isNoCategory) TextGray else TextBlack
 
     if (showDatePicker) {
@@ -110,12 +111,12 @@ fun AddMedicationScreen(
                     viewModel.updateExpirationDate(datePickerState.selectedDateMillis)
                     showDatePicker = false
                 }) {
-                    Text("Выбрать", color = GreenPrimary)
+                    Text(stringResource(R.string.choose), color = GreenPrimary)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDatePicker = false }) {
-                    Text("Отмена", color = TextGray)
+                    Text(stringResource(R.string.cancel), color = TextGray)
                 }
             }
         ) {
@@ -128,11 +129,11 @@ fun AddMedicationScreen(
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
-                    Text("Новое лекарство", style = MaterialTheme.typography.titleLarge, color = GreenPrimary, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.new_medication), style = MaterialTheme.typography.titleLarge, color = GreenPrimary, fontWeight = FontWeight.Bold)
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(painterResource(R.drawable.baseline_arrow_back_ios_24), contentDescription = "Назад", tint = GreenPrimary)
+                        Icon(painterResource(R.drawable.baseline_arrow_back_ios_24), contentDescription = stringResource(R.string.back_button_description), tint = GreenPrimary)
                     }
                 },
                 actions = {
@@ -147,7 +148,7 @@ fun AddMedicationScreen(
                                 strokeWidth = 2.dp
                             )
                         } else {
-                            Icon(painterResource(R.drawable.baseline_check_24), contentDescription = "Сохранить", tint = GreenPrimary)
+                            Icon(painterResource(R.drawable.baseline_check_24), contentDescription = stringResource(R.string.save), tint = GreenPrimary)
                         }
                     }
                 },
@@ -190,7 +191,7 @@ fun AddMedicationScreen(
                 if (state.photoUri != null) {
                     AsyncImage(
                         model = state.photoUri,
-                        contentDescription = "Фото лекарства",
+                        contentDescription = stringResource(R.string.medication_photo_desc),
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop
                     )
@@ -198,7 +199,7 @@ fun AddMedicationScreen(
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Icon(painterResource(R.drawable.baseline_add_a_photo_24), contentDescription = null, tint = TextGray, modifier = Modifier.size(32.dp))
                         Spacer(modifier = Modifier.height(Dimensions.SpacingExtraSmall))
-                        Text("Добавить фото", style = MaterialTheme.typography.labelSmall, color = TextGray)
+                        Text(stringResource(R.string.add_photo), style = MaterialTheme.typography.labelSmall, color = TextGray)
                     }
                 }
             }
@@ -208,28 +209,40 @@ fun AddMedicationScreen(
             KitInputField(
                 value = state.name,
                 onValueChange = viewModel::updateName,
-                label = "Название*"
+                label = stringResource(R.string.medication_name_label),
+                error = state.nameErrorResId?.let { stringResource(it) }
             )
 
-            Box(modifier = Modifier.clickable { showDatePicker = true }) {
-                OutlinedTextField(
-                    value = state.expirationDateMillis?.let { formatDate(it) } ?: "",
-                    onValueChange = {},
-                    label = { Text("Срок годности*") },
-                    modifier = Modifier.fillMaxWidth(),
-                    enabled = false,
-                    readOnly = true,
-                    shape = RoundedCornerShape(Dimensions.CornerRadiusMedium),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        disabledTextColor = GreenPrimary,
-                        disabledBorderColor = if (state.expirationDateMillis != null) GreenPrimary else LightGray,
-                        disabledLabelColor = if (state.expirationDateMillis != null) GreenPrimary else TextGray,
-                        disabledTrailingIconColor = if (state.expirationDateMillis != null) GreenPrimary else TextGray
-                    ),
-                    trailingIcon = {
-                        Icon(painterResource(R.drawable.baseline_calendar_today_24), contentDescription = "Выбрать дату")
-                    }
-                )
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Box(modifier = Modifier.clickable { showDatePicker = true }) {
+                    OutlinedTextField(
+                        value = state.expirationDateMillis?.let { formatDate(it) } ?: "",
+                        onValueChange = {},
+                        label = { Text(stringResource(R.string.expiration_date_label)) },
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = false,
+                        readOnly = true,
+                        isError = state.expirationDateErrorResId != null,
+                        shape = RoundedCornerShape(Dimensions.CornerRadiusMedium),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            disabledTextColor = TextBlack,
+                            disabledBorderColor = if (state.expirationDateErrorResId != null) MaterialTheme.colorScheme.error else if (state.expirationDateMillis != null) GreenPrimary else LightGray,
+                            disabledLabelColor = if (state.expirationDateErrorResId != null) MaterialTheme.colorScheme.error else if (state.expirationDateMillis != null) GreenPrimary else TextGray,
+                            disabledTrailingIconColor = if (state.expirationDateMillis != null) GreenPrimary else TextGray
+                        ),
+                        trailingIcon = {
+                            Icon(painterResource(R.drawable.baseline_calendar_today_24), contentDescription = stringResource(R.string.expiration_date_label))
+                        }
+                    )
+                }
+                if (state.expirationDateErrorResId != null) {
+                    Text(
+                        text = stringResource(state.expirationDateErrorResId!!),
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.labelSmall,
+                        modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                    )
+                }
             }
 
             ExposedDropdownMenuBox(
@@ -238,10 +251,10 @@ fun AddMedicationScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 OutlinedTextField(
-                    value = state.category.ifEmpty { "Без категории" },
+                    value = state.category.ifEmpty { stringResource(R.string.no_category) },
                     onValueChange = {},
                     readOnly = true,
-                    label = { Text("Категория") },
+                    label = { Text(stringResource(R.string.category_label)) },
                     trailingIcon = {
                         ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
                     },
@@ -270,7 +283,7 @@ fun AddMedicationScreen(
                             text = {
                                 Text(
                                     text = selectionOption,
-                                    color = if (selectionOption == "Без категории") TextGray else TextBlack
+                                    color = if (selectionOption == stringResource(R.string.no_category)) TextGray else TextBlack
                                 )
                             },
                             onClick = {
@@ -287,26 +300,19 @@ fun AddMedicationScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(Dimensions.SpacingMedium)
             ) {
-                OutlinedTextField(
+                KitInputField(
                     value = state.quantity,
                     onValueChange = viewModel::updateQuantity,
-                    label = { Text("Количество*") },
+                    label = stringResource(R.string.quantity_label),
                     modifier = Modifier.weight(1f),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    shape = RoundedCornerShape(Dimensions.CornerRadiusMedium),
-                    singleLine = true,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = GreenPrimary,
-                        focusedLabelColor = GreenPrimary,
-                        cursorColor = Black,
-                        unfocusedLabelColor = LightGray
-                    )
+                    error = state.quantityErrorResId?.let { stringResource(it) },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
 
                 OutlinedTextField(
                     value = state.unit,
                     onValueChange = viewModel::updateUnit,
-                    label = { Text("Ед. изм.") },
+                    label = { Text(stringResource(R.string.unit_label)) },
                     modifier = Modifier.width(100.dp),
                     shape = RoundedCornerShape(Dimensions.CornerRadiusMedium),
                     singleLine = true,
@@ -314,8 +320,8 @@ fun AddMedicationScreen(
                         focusedBorderColor = GreenPrimary,
                         focusedLabelColor = GreenPrimary,
                         cursorColor = Black,
-                        unfocusedLabelColor = LightGray,
-                        unfocusedTextColor = LightGray
+                        unfocusedLabelColor = TextGray,
+                        unfocusedTextColor = TextBlack
                     )
                 )
             }
@@ -323,7 +329,7 @@ fun AddMedicationScreen(
             OutlinedTextField(
                 value = state.description,
                 onValueChange = viewModel::updateDescription,
-                label = { Text("Описание / Инструкция") },
+                label = { Text(stringResource(R.string.description_label)) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(120.dp),
@@ -332,7 +338,8 @@ fun AddMedicationScreen(
                     focusedBorderColor = GreenPrimary,
                     focusedLabelColor = GreenPrimary,
                     cursorColor = Black,
-                    unfocusedLabelColor = LightGray
+                    unfocusedLabelColor = TextGray,
+                    unfocusedTextColor = TextBlack
                 )
             )
         }

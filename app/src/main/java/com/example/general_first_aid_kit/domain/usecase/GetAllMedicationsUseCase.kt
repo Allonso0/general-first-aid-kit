@@ -2,17 +2,13 @@ package com.example.general_first_aid_kit.domain.usecase
 
 import com.example.general_first_aid_kit.domain.model.Medication
 import com.example.general_first_aid_kit.domain.repository.MedicationRepository
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class SaveMedicationUseCase @Inject constructor(
+class GetAllMedicationsUseCase @Inject constructor(
     private val repository: MedicationRepository
 ) {
-
-    suspend operator fun invoke(
-        kitId: String,
-        medication: Medication,
-        localPhotoUri: String?
-    ): Result<Unit> {
-        return repository.saveMedication(kitId, medication, localPhotoUri)
+    operator fun invoke(): Flow<List<Medication>> {
+        return repository.getAllMedications()
     }
 }

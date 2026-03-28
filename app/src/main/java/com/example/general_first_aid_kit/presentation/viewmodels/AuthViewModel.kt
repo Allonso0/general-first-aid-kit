@@ -40,15 +40,15 @@ class AuthViewModel @Inject constructor(
         val emailResult = AuthValidator.validateEmail(email)
         val passwordResult = AuthValidator.validatePassword(password)
 
-        val validationErrorMessage = when {
-            nameResult is ValidationResult.Error -> nameResult.message
-            emailResult is ValidationResult.Error -> emailResult.message
-            passwordResult is ValidationResult.Error -> passwordResult.message
+        val validationErrorResId = when {
+            nameResult is ValidationResult.Error -> nameResult.messageResId
+            emailResult is ValidationResult.Error -> emailResult.messageResId
+            passwordResult is ValidationResult.Error -> passwordResult.messageResId
             else -> null
         }
 
-        if (validationErrorMessage != null) {
-            _uiState.value = AuthState.Error(validationErrorMessage)
+        if (validationErrorResId != null) {
+            _uiState.value = AuthState.ErrorRes(validationErrorResId)
             return
         }
 
@@ -77,4 +77,5 @@ sealed interface AuthState {
     data object Loading : AuthState
     data object Authenticated : AuthState
     data class Error(val message: String) : AuthState
+    data class ErrorRes(val resId: Int) : AuthState
 }

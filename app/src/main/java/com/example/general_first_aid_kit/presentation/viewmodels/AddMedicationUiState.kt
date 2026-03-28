@@ -2,8 +2,11 @@ package com.example.general_first_aid_kit.presentation.viewmodels
 
 data class AddMedicationUiState(
     val name: String = "",
+    val nameErrorResId: Int? = null,
     val expirationDateMillis: Long? = null,
+    val expirationDateErrorResId: Int? = null,
     val quantity: String = "",
+    val quantityErrorResId: Int? = null,
     val unit: String = "шт",
     val category: String = "",
     val description: String = "",

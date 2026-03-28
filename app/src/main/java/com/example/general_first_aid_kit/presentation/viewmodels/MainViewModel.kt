@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.general_first_aid_kit.domain.model.Kit
 import com.example.general_first_aid_kit.domain.usecase.DeleteKitUseCase
+import com.example.general_first_aid_kit.domain.usecase.GetAllMedicationsUseCase
 import com.example.general_first_aid_kit.domain.usecase.GetKitsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,7 +21,8 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val getKitsUseCase: GetKitsUseCase,
-    private val deleteKitUseCase: DeleteKitUseCase
+    private val deleteKitUseCase: DeleteKitUseCase,
+    private val getAllMedicationsUseCase: GetAllMedicationsUseCase
 ) : ViewModel() {
 
     private val _isArchiveMode = MutableStateFlow(false)
@@ -28,10 +30,26 @@ class MainViewModel @Inject constructor(
 
     val uiState: StateFlow<MainUiState> = combine(
         getKitsUseCase(),
+        getAllMedicationsUseCase(),
         _isArchiveMode
-    ) { kits, isArchive ->
-        val filteredKits = kits.filter { it.isArchived == isArchive }
-        MainUiState(kits = filteredKits, isLoading = false, error = null)
+    ) { kits, allMedications, isArchive ->
+        val currentTime = System.currentTimeMillis()
+
+        val enrichedKits = kits
+            .filter { it.isArchived == isArchive }
+            .map { kit ->
+                val kitMedications = allMedications.filter { it.kitId == kit.id }
+
+                kit.copy(
+                    countMedicine = kitMedications.size,
+                    countExpired = kitMedications.count { it.expirationDate < currentTime },
+                    countRunningOut = kitMedications.count {
+                        it.quantity <= 2 // TODO: добавить выбор порога уведомления
+                    }
+                )
+            }
+
+        MainUiState(kits = enrichedKits, isLoading = false, error = null)
     }
     .onStart {
         emit(MainUiState(isLoading = true))

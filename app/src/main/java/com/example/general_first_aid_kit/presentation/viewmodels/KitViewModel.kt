@@ -26,21 +26,25 @@ class KitViewModel @Inject constructor(
     private val _searchQuery = MutableStateFlow("")
     val searchQuery = _searchQuery.asStateFlow()
 
+    private val _selectedCategory = MutableStateFlow<String?>("Все")
+    val selectedCategory = _selectedCategory.asStateFlow()
+
     @OptIn(ExperimentalCoroutinesApi::class)
-    val medications: StateFlow<List<Medication>> = _kitId
-        .filterNotNull()
-        .flatMapLatest { id ->
-            getMedicationsUseCase(id)
+    val medications: StateFlow<List<Medication>> = combine(
+        _kitId.filterNotNull().flatMapLatest { id -> getMedicationsUseCase(id) },
+        _searchQuery,
+        _selectedCategory
+    ) { list, query, category ->
+        list.filter { med ->
+            val matchesQuery = query.isBlank() || med.name.contains(query, ignoreCase = true)
+            val matchesCategory = category == null || category == "Все" || med.category == category
+            matchesQuery && matchesCategory
         }
-        .combine(_searchQuery) { list, query ->
-            if (query.isBlank()) list
-            else list.filter { it.name.contains(query, ignoreCase = true) }
-        }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = emptyList()
-        )
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = emptyList()
+    )
 
     fun loadKit(id: String) {
         if (_kitId.value != id) {
@@ -50,5 +54,9 @@ class KitViewModel @Inject constructor(
 
     fun onSearchQueryChange(newQuery: String) {
         _searchQuery.value = newQuery
+    }
+
+    fun onCategorySelected(category: String) {
+        _selectedCategory.value = category
     }
 }

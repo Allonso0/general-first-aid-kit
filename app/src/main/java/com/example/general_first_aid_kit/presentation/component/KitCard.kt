@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -26,7 +27,6 @@ import com.example.general_first_aid_kit.presentation.ui.theme.Black
 import com.example.general_first_aid_kit.presentation.ui.theme.Dimensions
 import com.example.general_first_aid_kit.presentation.ui.theme.KitColors
 import com.example.general_first_aid_kit.presentation.ui.theme.TextBlack
-import com.example.general_first_aid_kit.presentation.ui.theme.TextRed
 import com.example.general_first_aid_kit.presentation.ui.theme.White
 
 @Composable
@@ -68,6 +68,8 @@ fun KitCard(
                     color = TextBlack
                 )
 
+                Spacer(modifier = Modifier.height(Dimensions.SpacingExtraSmall))
+
                 val typeText = if (kit.type == KitType.PERSONAL) "Личная" else "${kit.userIds.size} участ."
                 Text(
                     text = "$typeText • ${kit.location}",
@@ -89,7 +91,6 @@ fun KitCard(
                     MedicineRow(
                         label = "Просроченные:",
                         count = kit.countExpired,
-                        color = if (kit.countExpired > 0) TextRed else TextBlack
                     )
                     MedicineRow(
                         label = "Заканчиваются:",
