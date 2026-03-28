@@ -21,6 +21,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -38,6 +42,7 @@ import com.example.general_first_aid_kit.presentation.ui.theme.TextRed
 import com.example.general_first_aid_kit.presentation.ui.theme.White
 import com.example.general_first_aid_kit.presentation.utils.formatExpirationDate
 import com.example.general_first_aid_kit.presentation.utils.getCategoryColor
+import com.example.general_first_aid_kit.presentation.utils.shimmerEffect
 
 @Composable
 fun MedicationCard(
@@ -48,6 +53,7 @@ fun MedicationCard(
     val categoryColor = getCategoryColor(categoryName)
 
     val formattedDate = formatExpirationDate(medication.expirationDate)
+    var isImageLoading by remember { mutableStateOf(true) }
 
     Card(
         modifier = Modifier
@@ -75,8 +81,12 @@ fun MedicationCard(
                     AsyncImage(
                         model = medication.photoUrl,
                         contentDescription = "Фото ${medication.name}",
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .then(if (isImageLoading) Modifier.shimmerEffect() else Modifier),
+                        contentScale = ContentScale.Crop,
+                        onSuccess = { isImageLoading = false },
+                        onError = { isImageLoading = false }
                     )
                 } else {
                     Icon(
@@ -142,5 +152,4 @@ fun MedicationCard(
             }
         }
     }
-
 }

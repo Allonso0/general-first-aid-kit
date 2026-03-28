@@ -39,7 +39,11 @@ fun NavigationRoot(
             rememberSaveableStateHolderNavEntryDecorator(),
             rememberViewModelStoreNavEntryDecorator()
         ),
-        onBack = { backStack.removeLastOrNull() },
+        onBack = {
+            if (backStack.size > 1) {
+                backStack.removeAt(backStack.size - 1)
+            }
+        },
         entryProvider = { key ->
             when (key) {
                 is Route.Welcome -> NavEntry(key) {
@@ -54,10 +58,9 @@ fun NavigationRoot(
                 }
                 is Route.Login -> NavEntry(key) {
                     LoginScreen(
-                        onNavigateBack = { backStack.removeLastOrNull() },
+                        onNavigateBack = { backStack.pop() },
                         onSuccess = {
-                            backStack.clear()
-                            backStack.add(Route.Main)
+                            backStack.setStack(Route.Main)
                         },
                         onForgotPasswordClick = {
                             //TODO: экран восстановления пароля
@@ -66,10 +69,9 @@ fun NavigationRoot(
                 }
                 is Route.Register -> NavEntry(key) {
                     RegistrationScreen(
-                        onNavigateBack = { backStack.removeLastOrNull() },
+                        onNavigateBack = { backStack.pop() },
                         onRegistrationClick = {
-                            backStack.clear()
-                            backStack.add(Route.Main)
+                            backStack.setStack(Route.Main)
                         }
                     )
                 }
@@ -84,11 +86,10 @@ fun NavigationRoot(
                 }
                 is Route.Profile -> NavEntry(key) {
                     ProfileScreen(
-                        onNavigateBack = { backStack.removeLastOrNull() },
+                        onNavigateBack = { backStack.pop() },
                         onLogout = {
                             viewModel.onSignOutClick()
-                            backStack.clear()
-                            backStack.add(Route.Welcome)
+                            backStack.setStack(Route.Welcome)
                         },
                         onNavigateToProfileSettings = {
                             backStack.add(Route.ProfileSettings)
@@ -97,19 +98,19 @@ fun NavigationRoot(
                 }
                 is Route.ProfileSettings -> NavEntry(key) {
                     ProfileSettingsScreen(
-                        onNavigateBack = { backStack.removeLastOrNull() }
+                        onNavigateBack = { backStack.pop() }
                     )
                 }
                 is Route.CreateKit -> NavEntry(key) {
                     CreateKitScreen(
-                        onNavigateBack = { backStack.removeLastOrNull() }
+                        onNavigateBack = { backStack.pop() }
                     )
                 }
                 is Route.KitScreen -> NavEntry(key) {
                     KitScreen(
                         kitId = key.id,
                         kitName = key.name,
-                        onNavigateBack = { backStack.removeLastOrNull() },
+                        onNavigateBack = { backStack.pop() },
                         onNavigateToKitSettings = {
                             backStack.add(Route.KitSettings(key.id, key.name, key.location, key.colorIndex))
                         },
@@ -122,25 +123,36 @@ fun NavigationRoot(
                         initialName = key.name,
                         initialLocation = key.location,
                         initialColorIndex = key.colorIndex,
-                        onNavigateBack = { backStack.removeLastOrNull() },
+                        onNavigateBack = { backStack.pop() },
                         onSaveSuccess = {
-                            backStack.clear()
-                            backStack.add(Route.Main)
+                            backStack.setStack(Route.Main)
                         },
                         onDeleteSuccess = {
-                            backStack.clear()
-                            backStack.add(Route.Main)
+                            backStack.setStack(Route.Main)
                         }
                     )
                 }
                 is Route.AddMedicationManual -> NavEntry(key) {
                     AddMedicationScreen(
                         kitId = key.kitId,
-                        onNavigateBack = { backStack.removeLastOrNull() }
+                        onNavigateBack = { backStack.pop() }
                     )
                 }
                 else -> error("Unknown key: $key")
             }
         }
     )
+}
+
+private fun <T> MutableList<T>.pop() {
+    if (size > 1) {
+        removeAt(size - 1)
+    }
+}
+
+private fun <T> MutableList<T>.setStack(route: T) {
+    add(route)
+    while (size > 1) {
+        removeAt(0)
+    }
 }
