@@ -9,6 +9,8 @@ interface MedicationRepository {
 
     fun getAllMedications(): Flow<List<Medication>>
 
+    fun getMedication(kitId: String, medicationId: String): Flow<Medication?>
+
     suspend fun saveMedication(
         kitId: String,
         medication: Medication,

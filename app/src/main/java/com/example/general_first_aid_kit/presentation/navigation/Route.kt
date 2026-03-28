@@ -35,4 +35,10 @@ sealed interface Route: NavKey {
 
     @Serializable
     data class AddMedicationManual(val kitId: String) : Route
+
+    @Serializable
+    data class MedicationInfo(val kitId: String, val medicationId: String) : Route
+
+    @Serializable
+    data class EditMedication(val kitId: String, val medicationId: String) : Route
 }
