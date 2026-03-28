@@ -3,6 +3,7 @@ package com.example.general_first_aid_kit.presentation.screens
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -79,6 +80,9 @@ fun RegistrationScreen(
                     duration = SnackbarDuration.Short
                 )
                 viewModel.resetState()
+            }
+            is AuthState.ErrorRes -> {
+                // Обработка ошибки из ресурсов
             }
             else -> Unit
         }

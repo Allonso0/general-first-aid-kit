@@ -53,12 +53,12 @@ class ProfileSettingsViewModel @Inject constructor(
 
         val isNameValid = AuthValidator.validateName(currentState.name)
         if (isNameValid is ValidationResult.Error) {
-            _uiState.update { it.copy(errorMessage = isNameValid.message) }
+            _uiState.update { it.copy(errorMessageResId = isNameValid.messageResId) }
             return
         }
 
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            _uiState.update { it.copy(isLoading = true, errorMessage = null, errorMessageResId = null) }
 
             val result = updateUserUseCase(
                 name = currentState.name,
@@ -90,5 +90,6 @@ data class ProfileSettingsState(
 
     val isLoading: Boolean = false,
     val isSuccess: Boolean = false,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    val errorMessageResId: Int? = null
 )

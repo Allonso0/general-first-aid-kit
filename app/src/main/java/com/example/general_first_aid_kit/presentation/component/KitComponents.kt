@@ -3,6 +3,7 @@ package com.example.general_first_aid_kit.presentation.component
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -50,25 +52,38 @@ fun KitInputField(
     value: String,
     onValueChange: (String) -> Unit,
     label: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    error: String? = null,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    singleLine: Boolean = true
 ) {
-    OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
-        label = { Text(label) },
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(Dimensions.CornerRadiusMedium),
-        colors = OutlinedTextFieldDefaults.colors(
-            cursorColor = Black,
-            focusedBorderColor = GreenPrimary,
-            focusedLabelColor = GreenPrimary,
-            focusedTextColor = TextBlack,
-            unfocusedTextColor = TextGray,
-            unfocusedBorderColor = LightGray,
-            unfocusedLabelColor = LightGray
-        ),
-        singleLine = true
-    )
+    Column(modifier = modifier.fillMaxWidth()) {
+        OutlinedTextField(
+            value = value,
+            onValueChange = onValueChange,
+            label = { Text(label) },
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(Dimensions.CornerRadiusMedium),
+            isError = error != null,
+            keyboardOptions = keyboardOptions,
+            colors = OutlinedTextFieldDefaults.colors(
+                cursorColor = Black,
+                focusedBorderColor = GreenPrimary,
+                focusedLabelColor = GreenPrimary,
+                focusedTextColor = TextBlack,
+                unfocusedTextColor = TextBlack,
+                unfocusedBorderColor = LightGray,
+                unfocusedLabelColor = TextGray,
+                errorBorderColor = MaterialTheme.colorScheme.error,
+                errorLabelColor = MaterialTheme.colorScheme.error,
+                errorSupportingTextColor = MaterialTheme.colorScheme.error
+            ),
+            singleLine = singleLine,
+            supportingText = if (error != null) {
+                { Text(text = error) }
+            } else null
+        )
+    }
 }
 
 @Composable

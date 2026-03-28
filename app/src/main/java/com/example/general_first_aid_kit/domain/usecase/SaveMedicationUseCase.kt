@@ -13,11 +13,6 @@ class SaveMedicationUseCase @Inject constructor(
         medication: Medication,
         localPhotoUri: String?
     ): Result<Unit> {
-        // TODO: настроить валидацию
-        if (medication.name.isBlank()) {
-            return Result.failure(IllegalArgumentException("Название лекарства не может быть пустым"))
-        }
-
         return repository.saveMedication(kitId, medication, localPhotoUri)
     }
 }
