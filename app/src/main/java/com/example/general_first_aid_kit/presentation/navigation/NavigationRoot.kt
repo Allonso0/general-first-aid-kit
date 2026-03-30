@@ -2,6 +2,7 @@ package com.example.general_first_aid_kit.presentation.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
@@ -11,11 +12,13 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.example.general_first_aid_kit.presentation.screens.AddMedicationScreen
 import com.example.general_first_aid_kit.presentation.screens.CreateKitScreen
+import com.example.general_first_aid_kit.presentation.screens.EditMedicationScreen
 import com.example.general_first_aid_kit.presentation.screens.GreetingScreen
 import com.example.general_first_aid_kit.presentation.screens.KitScreen
 import com.example.general_first_aid_kit.presentation.screens.KitSettingsScreen
 import com.example.general_first_aid_kit.presentation.screens.LoginScreen
 import com.example.general_first_aid_kit.presentation.screens.MainScreen
+import com.example.general_first_aid_kit.presentation.screens.MedicationInfoScreen
 import com.example.general_first_aid_kit.presentation.screens.ProfileScreen
 import com.example.general_first_aid_kit.presentation.screens.ProfileSettingsScreen
 import com.example.general_first_aid_kit.presentation.screens.RegistrationScreen
@@ -40,9 +43,7 @@ fun NavigationRoot(
             rememberViewModelStoreNavEntryDecorator()
         ),
         onBack = {
-            if (backStack.size > 1) {
-                backStack.removeAt(backStack.size - 1)
-            }
+            backStack.pop()
         },
         entryProvider = { key ->
             when (key) {
@@ -114,7 +115,10 @@ fun NavigationRoot(
                         onNavigateToKitSettings = {
                             backStack.add(Route.KitSettings(key.id, key.name, key.location, key.colorIndex))
                         },
-                        onNavigateToAddManual = { backStack.add(Route.AddMedicationManual(key.id)) }
+                        onNavigateToAddManual = { backStack.add(Route.AddMedicationManual(key.id)) },
+                        onNavigateToMedicationInfo = { medId ->
+                            backStack.add(Route.MedicationInfo(key.id, medId))
+                        }
                     )
                 }
                 is Route.KitSettings -> NavEntry(key) {
@@ -138,6 +142,27 @@ fun NavigationRoot(
                         onNavigateBack = { backStack.pop() }
                     )
                 }
+                is Route.MedicationInfo -> NavEntry(key) {
+                    MedicationInfoScreen(
+                        kitId = key.kitId,
+                        medicationId = key.medicationId,
+                        onNavigateBack = { backStack.pop() },
+                        onNavigateToEdit = { kitId, medId ->
+                            backStack.add(Route.EditMedication(kitId, medId))
+                        }
+                    )
+                }
+                is Route.EditMedication -> NavEntry(key) {
+                    EditMedicationScreen(
+                        kitId = key.kitId,
+                        medicationId = key.medicationId,
+                        onNavigateBack = { backStack.pop() },
+                        onDeleteSuccess = {
+                            backStack.pop()
+                            backStack.pop()
+                        }
+                    )
+                }
                 else -> error("Unknown key: $key")
             }
         }
@@ -151,8 +176,10 @@ private fun <T> MutableList<T>.pop() {
 }
 
 private fun <T> MutableList<T>.setStack(route: T) {
-    add(route)
-    while (size > 1) {
-        removeAt(0)
+    Snapshot.withMutableSnapshot {
+        add(route)
+        while (size > 1) {
+            removeAt(0)
+        }
     }
 }

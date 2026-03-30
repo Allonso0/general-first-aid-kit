@@ -1,0 +1,124 @@
+package com.example.general_first_aid_kit.presentation.viewmodels
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.general_first_aid_kit.domain.model.Medication
+import com.example.general_first_aid_kit.domain.usecase.GetMedicationUseCase
+import com.example.general_first_aid_kit.domain.usecase.SaveMedicationUseCase
+import com.example.general_first_aid_kit.domain.usecase.DeleteMedicationUseCase
+import com.example.general_first_aid_kit.domain.util.MedicationValidator
+import com.example.general_first_aid_kit.domain.util.ValidationResult
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import javax.inject.Inject
+
+@HiltViewModel
+class EditMedicationViewModel @Inject constructor(
+    private val getMedicationUseCase: GetMedicationUseCase,
+    private val saveMedicationUseCase: SaveMedicationUseCase,
+    private val deleteMedicationUseCase: DeleteMedicationUseCase
+) : ViewModel() {
+
+    private val _uiState = MutableStateFlow(AddMedicationUiState())
+    val uiState = _uiState.asStateFlow()
+
+    private var originalMedication: Medication? = null
+    private var kitId: String = ""
+
+    fun loadMedication(kitId: String, medicationId: String) {
+        this.kitId = kitId
+        viewModelScope.launch {
+            getMedicationUseCase(kitId, medicationId).collect { med ->
+                med?.let {
+                    originalMedication = it
+                    _uiState.update { state ->
+                        state.copy(
+                            name = it.name,
+                            expirationDateMillis = it.expirationDate,
+                            quantity = it.quantity.toString(),
+                            unit = it.unit,
+                            category = it.category,
+                            description = it.description,
+                            photoUri = it.photoUrl
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    fun updateName(name: String) = _uiState.update { it.copy(name = name, nameErrorResId = null) }
+    fun updateExpirationDate(dateMillis: Long?) = _uiState.update { it.copy(expirationDateMillis = dateMillis, expirationDateErrorResId = null) }
+    fun updateQuantity(quantity: String) = _uiState.update { it.copy(quantity = quantity, quantityErrorResId = null) }
+    fun updateUnit(unit: String) = _uiState.update { it.copy(unit = unit) }
+    fun updateCategory(category: String) = _uiState.update { it.copy(category = category) }
+    fun updateDescription(description: String) = _uiState.update { it.copy(description = description) }
+    fun updatePhotoUri(uri: String?) = _uiState.update { it.copy(photoUri = uri) }
+
+    fun saveMedication(onSuccess: () -> Unit) {
+        if (!validateInputs()) return
+
+        val state = _uiState.value
+        val medId = originalMedication?.id ?: return
+        
+        _uiState.update { it.copy(isLoading = true, error = null) }
+
+        viewModelScope.launch {
+            val updatedMedication = originalMedication!!.copy(
+                name = state.name.trim(),
+                expirationDate = state.expirationDateMillis ?: 0L,
+                quantity = state.quantity.toIntOrNull() ?: 0,
+                unit = state.unit,
+                category = state.category.trim(),
+                description = state.description.trim()
+            )
+
+            val localUri = if (state.photoUri?.startsWith("http") == true) null else state.photoUri
+
+            val result = saveMedicationUseCase(
+                kitId = kitId,
+                medication = updatedMedication,
+                localPhotoUri = localUri
+            )
+
+            _uiState.update { it.copy(isLoading = false) }
+
+            result.onSuccess { onSuccess() }
+                .onFailure { e -> _uiState.update { it.copy(error = e.message) } }
+        }
+    }
+
+    fun deleteMedication(onSuccess: () -> Unit) {
+        val medication = originalMedication ?: return
+        _uiState.update { it.copy(isLoading = true) }
+        
+        viewModelScope.launch {
+            val result = deleteMedicationUseCase(kitId, medication)
+            _uiState.update { it.copy(isLoading = false) }
+            result.onSuccess { onSuccess() }
+                .onFailure { e -> _uiState.update { it.copy(error = e.message) } }
+        }
+    }
+
+    private fun validateInputs(): Boolean {
+        val state = _uiState.value
+        val nameResult = MedicationValidator.validateName(state.name)
+        val dateResult = MedicationValidator.validateExpirationDate(state.expirationDateMillis)
+        val quantityResult = MedicationValidator.validateQuantity(state.quantity)
+
+        val hasError = listOf(nameResult, dateResult, quantityResult).any { it is ValidationResult.Error }
+
+        if (hasError) {
+            _uiState.update { it.copy(
+                nameErrorResId = (nameResult as? ValidationResult.Error)?.messageResId,
+                expirationDateErrorResId = (dateResult as? ValidationResult.Error)?.messageResId,
+                quantityErrorResId = (quantityResult as? ValidationResult.Error)?.messageResId
+            ) }
+            return false
+        }
+        return true
+    }
+}

@@ -65,6 +65,7 @@ fun KitScreen(
     onNavigateBack: () -> Unit,
     onNavigateToKitSettings: () -> Unit,
     onNavigateToAddManual: (String) -> Unit,
+    onNavigateToMedicationInfo: (String) -> Unit,
     viewModel: KitViewModel = hiltViewModel()
 ) {
     LaunchedEffect(kitId) {
@@ -243,7 +244,7 @@ fun KitScreen(
                     items(medications, key = { it.id }) { med ->
                         MedicationCard(
                             medication = med,
-                            onClick = { /* Переход к деталям позже */ }
+                            onClick = { onNavigateToMedicationInfo(med.id) }
                         )
                     }
                 }
