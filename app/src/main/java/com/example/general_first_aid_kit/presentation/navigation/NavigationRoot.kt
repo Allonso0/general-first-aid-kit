@@ -12,6 +12,7 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.example.general_first_aid_kit.presentation.screens.AddMedicationScreen
 import com.example.general_first_aid_kit.presentation.screens.CreateKitScreen
+import com.example.general_first_aid_kit.presentation.screens.EditMedicationScreen
 import com.example.general_first_aid_kit.presentation.screens.GreetingScreen
 import com.example.general_first_aid_kit.presentation.screens.KitScreen
 import com.example.general_first_aid_kit.presentation.screens.KitSettingsScreen
@@ -152,7 +153,15 @@ fun NavigationRoot(
                     )
                 }
                 is Route.EditMedication -> NavEntry(key) {
-                    // TODO: Реализовать экран редактирования
+                    EditMedicationScreen(
+                        kitId = key.kitId,
+                        medicationId = key.medicationId,
+                        onNavigateBack = { backStack.pop() },
+                        onDeleteSuccess = {
+                            backStack.pop()
+                            backStack.pop()
+                        }
+                    )
                 }
                 else -> error("Unknown key: $key")
             }

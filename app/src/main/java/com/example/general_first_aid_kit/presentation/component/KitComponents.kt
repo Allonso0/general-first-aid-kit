@@ -23,6 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.general_first_aid_kit.presentation.ui.theme.Black
@@ -55,7 +56,9 @@ fun KitInputField(
     modifier: Modifier = Modifier,
     error: String? = null,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-    singleLine: Boolean = true
+    singleLine: Boolean = true,
+    focusedTextColor: Color = TextBlack,
+    unfocusedTextColor: Color = TextBlack
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         OutlinedTextField(
@@ -70,8 +73,8 @@ fun KitInputField(
                 cursorColor = Black,
                 focusedBorderColor = GreenPrimary,
                 focusedLabelColor = GreenPrimary,
-                focusedTextColor = TextBlack,
-                unfocusedTextColor = TextBlack,
+                focusedTextColor = focusedTextColor,
+                unfocusedTextColor = unfocusedTextColor,
                 unfocusedBorderColor = LightGray,
                 unfocusedLabelColor = TextGray,
                 errorBorderColor = MaterialTheme.colorScheme.error,
