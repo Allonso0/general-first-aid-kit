@@ -56,6 +56,7 @@ import com.example.general_first_aid_kit.presentation.viewmodels.MainViewModel
 @Composable
 fun MainScreen(
     onProfileClick: () -> Unit,
+    onJoinClick: () -> Unit,
     onAddKitClick: () -> Unit,
     onKitCardClick: (String, String, String, Int) -> Unit,
     viewModel: MainViewModel = hiltViewModel()
@@ -89,7 +90,7 @@ fun MainScreen(
                 },
                 actions = {
                     IconButton(
-                        onClick = { },
+                        onClick = onJoinClick,
                         colors = IconButtonDefaults.iconButtonColors(
                             containerColor = GreenPrimary
                         )

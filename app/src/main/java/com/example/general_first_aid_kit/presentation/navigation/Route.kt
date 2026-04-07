@@ -7,31 +7,41 @@ import kotlinx.serialization.Serializable
 sealed interface Route: NavKey {
 
     @Serializable
-    data object Welcome: Route
+    data object Welcome : Route
 
     @Serializable
-    data object Login: Route
+    data object Login : Route
 
     @Serializable
-    data object Register: Route
+    data object Register : Route
 
     @Serializable
-    data object Main: Route
+    data object Main : Route
 
     @Serializable
-    data object Profile: Route
+    data object Profile : Route
 
     @Serializable
-    data object ProfileSettings: Route
+    data object ProfileSettings : Route
 
     @Serializable
     data object CreateKit : Route
 
     @Serializable
-    data class KitScreen(val id: String, val name: String, val location: String, val colorIndex: Int): Route
+    data class KitScreen(
+        val id: String,
+        val name: String,
+        val location: String,
+        val colorIndex: Int
+    ) : Route
 
     @Serializable
-    data class KitSettings(val id: String, val name: String, val location: String, val colorIndex: Int): Route
+    data class KitSettings(
+        val id: String,
+        val name: String,
+        val location: String,
+        val colorIndex: Int
+    ) : Route
 
     @Serializable
     data class AddMedicationManual(val kitId: String) : Route
@@ -41,4 +51,7 @@ sealed interface Route: NavKey {
 
     @Serializable
     data class EditMedication(val kitId: String, val medicationId: String) : Route
+
+    @Serializable
+    data object JoinKit : Route
 }

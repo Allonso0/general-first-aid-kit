@@ -58,7 +58,9 @@ fun KitInputField(
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     singleLine: Boolean = true,
     focusedTextColor: Color = TextBlack,
-    unfocusedTextColor: Color = TextBlack
+    unfocusedTextColor: Color = TextBlack,
+    enabled: Boolean = true,
+    readOnly: Boolean = false
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         OutlinedTextField(
@@ -69,6 +71,8 @@ fun KitInputField(
             shape = RoundedCornerShape(Dimensions.CornerRadiusMedium),
             isError = error != null,
             keyboardOptions = keyboardOptions,
+            enabled = enabled,
+            readOnly = readOnly,
             colors = OutlinedTextFieldDefaults.colors(
                 cursorColor = Black,
                 focusedBorderColor = GreenPrimary,
@@ -77,6 +81,9 @@ fun KitInputField(
                 unfocusedTextColor = unfocusedTextColor,
                 unfocusedBorderColor = LightGray,
                 unfocusedLabelColor = TextGray,
+                disabledTextColor = TextGray,
+                disabledBorderColor = LightGray,
+                disabledLabelColor = TextGray,
                 errorBorderColor = MaterialTheme.colorScheme.error,
                 errorLabelColor = MaterialTheme.colorScheme.error,
                 errorSupportingTextColor = MaterialTheme.colorScheme.error
@@ -92,7 +99,7 @@ fun KitInputField(
 @Composable
 fun KitColorPreview(
     colorIndex: Int,
-    onChooseClick: () -> Unit
+    onChooseClick: (() -> Unit)? = null
 ) {
     Row(
         modifier = Modifier
@@ -105,28 +112,30 @@ fun KitColorPreview(
                 .fillMaxHeight()
                 .background(
                     color = KitColors.getOrElse(colorIndex) { LightGray },
-                    shape = RoundedCornerShape(
+                    shape = if (onChooseClick != null) RoundedCornerShape(
                         topStart = Dimensions.CornerRadiusMedium,
                         bottomStart = Dimensions.CornerRadiusMedium
-                    )
+                    ) else RoundedCornerShape(Dimensions.CornerRadiusMedium)
                 )
         )
-        Spacer(modifier = Modifier.width(Dimensions.PaddingSmall))
-        Box(
-            modifier = Modifier
-                .fillMaxHeight()
-                .width(Dimensions.LargeButtonWidth)
-                .background(
-                    color = GreenPrimary,
-                    shape = RoundedCornerShape(
-                        topEnd = Dimensions.CornerRadiusMedium,
-                        bottomEnd = Dimensions.CornerRadiusMedium
+        if (onChooseClick != null) {
+            Spacer(modifier = Modifier.width(Dimensions.PaddingSmall))
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .width(Dimensions.LargeButtonWidth)
+                    .background(
+                        color = GreenPrimary,
+                        shape = RoundedCornerShape(
+                            topEnd = Dimensions.CornerRadiusMedium,
+                            bottomEnd = Dimensions.CornerRadiusMedium
+                        )
                     )
-                )
-                .clickable { onChooseClick() },
-            contentAlignment = Alignment.Center
-        ) {
-            Text(text = "Выбрать", color = White, style = MaterialTheme.typography.labelLarge)
+                    .clickable { onChooseClick() },
+                contentAlignment = Alignment.Center
+            ) {
+                Text(text = "Выбрать", color = White, style = MaterialTheme.typography.labelLarge)
+            }
         }
     }
 }

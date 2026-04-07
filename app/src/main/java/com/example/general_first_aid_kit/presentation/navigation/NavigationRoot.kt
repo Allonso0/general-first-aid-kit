@@ -14,6 +14,7 @@ import com.example.general_first_aid_kit.presentation.screens.AddMedicationScree
 import com.example.general_first_aid_kit.presentation.screens.CreateKitScreen
 import com.example.general_first_aid_kit.presentation.screens.EditMedicationScreen
 import com.example.general_first_aid_kit.presentation.screens.GreetingScreen
+import com.example.general_first_aid_kit.presentation.screens.JoinKitScreen
 import com.example.general_first_aid_kit.presentation.screens.KitScreen
 import com.example.general_first_aid_kit.presentation.screens.KitSettingsScreen
 import com.example.general_first_aid_kit.presentation.screens.LoginScreen
@@ -79,6 +80,7 @@ fun NavigationRoot(
                 is Route.Main -> NavEntry(key) {
                     MainScreen(
                         onProfileClick = { backStack.add(Route.Profile) },
+                        onJoinClick = { backStack.add(Route.JoinKit) },
                         onAddKitClick = { backStack.add(Route.CreateKit) },
                         onKitCardClick = { id, name, location, colorIndex ->
                             backStack.add(Route.KitScreen(id, name, location, colorIndex))
@@ -162,6 +164,9 @@ fun NavigationRoot(
                             backStack.pop()
                         }
                     )
+                }
+                is Route.JoinKit -> NavEntry(key) {
+                    JoinKitScreen(onNavigateBack = { backStack.pop() })
                 }
                 else -> error("Unknown key: $key")
             }
