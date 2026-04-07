@@ -53,6 +53,12 @@ fun KitSettingsScreen(
         }
     }
 
+    LaunchedEffect(state.isKitDeleted) {
+        if (state.isKitDeleted && !state.isOwner) {
+            onDeleteSuccess()
+        }
+    }
+
     if (showColorDialog) {
         ColorSelectionDialog(
             onDismiss = { showColorDialog = false },

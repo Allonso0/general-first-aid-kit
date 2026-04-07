@@ -121,4 +121,20 @@ class KitRepositoryImpl @Inject constructor(
             Result.failure(e)
         }
     }
+
+    override fun observeKit(kitId: String): Flow<Kit?> = callbackFlow {
+        val subscription = firestore.collection("kits").document(kitId)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    close(error)
+                    return@addSnapshotListener
+                }
+                if (snapshot != null && snapshot.exists()) {
+                    trySend(snapshot.toObject(Kit::class.java)?.copy(id = snapshot.id))
+                } else {
+                    trySend(null)
+                }
+            }
+        awaitClose { subscription.remove() }
+    }
 }

@@ -1,5 +1,6 @@
 package com.example.general_first_aid_kit.presentation.viewmodels
 
+import androidx.compose.ui.input.key.type
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.general_first_aid_kit.domain.model.KitType
@@ -8,6 +9,7 @@ import com.example.general_first_aid_kit.domain.usecase.DeleteKitUseCase
 import com.example.general_first_aid_kit.domain.usecase.GetKitUseCase
 import com.example.general_first_aid_kit.domain.usecase.GetUserUseCase
 import com.example.general_first_aid_kit.domain.usecase.GetUsersByIdsUseCase
+import com.example.general_first_aid_kit.domain.usecase.ObserveKitUseCase
 import com.example.general_first_aid_kit.domain.usecase.RefreshInviteCodeUseCase
 import com.example.general_first_aid_kit.domain.usecase.UpdateKitUseCase
 import com.example.general_first_aid_kit.domain.usecase.RemoveUserFromKitUseCase
@@ -26,7 +28,8 @@ class KitSettingsViewModel @Inject constructor(
     private val refreshInviteCodeUseCase: RefreshInviteCodeUseCase,
     private val getUsersByIdsUseCase: GetUsersByIdsUseCase,
     private val getUserUseCase: GetUserUseCase,
-    private val removeUserFromKitUseCase: RemoveUserFromKitUseCase
+    private val removeUserFromKitUseCase: RemoveUserFromKitUseCase,
+    private val observeKitUseCase: ObserveKitUseCase
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(KitSettingsUiState())
     val uiState = _uiState.asStateFlow()
@@ -48,14 +51,22 @@ class KitSettingsViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             val currentUser = getUserUseCase()
-            val result = getKitUseCase(currentKitId)
+            val currentUserId = currentUser?.id ?: ""
 
-            result.onSuccess { kit ->
-                val users = if (kit.userIds.isNotEmpty()) {
-                    getUsersByIdsUseCase(kit.userIds)
-                } else {
-                    emptyList()
+            observeKitUseCase(currentKitId).collect { kit ->
+                if (kit == null) {
+                    if (!uiState.value.isLoading) {
+                        _uiState.update { it.copy(isKitDeleted = true) }
+                    }
+                    return@collect
                 }
+
+                if (!kit.userIds.contains(currentUserId)) {
+                    _uiState.update { it.copy(isKitDeleted = true) }
+                    return@collect
+                }
+
+                val users = getUsersByIdsUseCase(kit.userIds)
 
                 _uiState.update { it.copy(
                     name = kit.name,
@@ -69,8 +80,6 @@ class KitSettingsViewModel @Inject constructor(
                     currentUserId = currentUser?.id ?: "",
                     isLoading = false
                 ) }
-            }.onFailure {
-                _uiState.update { it.copy(isLoading = false, error = "Ошибка загрузки данных") }
             }
         }
     }
@@ -160,6 +169,7 @@ data class KitSettingsUiState(
     val location: String = "",
     val selectedColorIndex: Int = 0,
     val isPublic: Boolean = false,
+    val isKitDeleted: Boolean = false,
     val notifyExpiration: Boolean = false,
     val notifyLowStock: Boolean = false,
     val selectedTab: Int = 0,

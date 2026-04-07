@@ -70,6 +70,14 @@ fun KitScreen(
 ) {
     LaunchedEffect(kitId) {
         viewModel.loadKit(kitId)
+        viewModel.startObservingKit(kitId)
+    }
+
+    val isKicked by viewModel.isUserKickedOrDeleted.collectAsState()
+    LaunchedEffect(isKicked) {
+        if (isKicked) {
+            onNavigateBack()
+        }
     }
 
     val medications by viewModel.medications.collectAsState()
@@ -141,7 +149,10 @@ fun KitScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = Dimensions.PaddingMedium, vertical = Dimensions.PaddingSmall),
+                    .padding(
+                        horizontal = Dimensions.PaddingMedium,
+                        vertical = Dimensions.PaddingSmall
+                    ),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 OutlinedTextField(
@@ -197,7 +208,11 @@ fun KitScreen(
                         shape = RoundedCornerShape(Dimensions.CornerRadiusMedium),
                         modifier = Modifier
                             .background(White, RoundedCornerShape(Dimensions.CornerRadiusMedium))
-                            .border(1.dp, LightGray.copy(0.5f), RoundedCornerShape(Dimensions.CornerRadiusMedium))
+                            .border(
+                                1.dp,
+                                LightGray.copy(0.5f),
+                                RoundedCornerShape(Dimensions.CornerRadiusMedium)
+                            )
                     ) {
                         categories.forEach { category ->
                             val isSelected = category == selectedCategory

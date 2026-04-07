@@ -19,4 +19,6 @@ interface KitRepository {
     suspend fun refreshInviteCode(kitId: String): Result<String>
 
     suspend fun removeUserFromKit(kitId: String, userId: String): Result<Unit>
+
+    fun observeKit(kitId: String): Flow<Kit?>
 }
