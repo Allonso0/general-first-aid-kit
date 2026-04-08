@@ -63,7 +63,16 @@ fun MedicationInfoScreen(
 ) {
     LaunchedEffect(kitId, medicationId) {
         viewModel.loadMedication(kitId, medicationId)
+        viewModel.startObservingKit(kitId)
     }
+
+    val isKicked by viewModel.isUserKickedOrDeleted.collectAsState()
+    LaunchedEffect(isKicked) {
+        if (isKicked) {
+            onNavigateBack()
+        }
+    }
+
 
     val medication by viewModel.medication.collectAsState()
 

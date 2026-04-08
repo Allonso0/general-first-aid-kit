@@ -2,7 +2,16 @@ package com.example.general_first_aid_kit.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.general_first_aid_kit.domain.repository.KitRepository
+import com.example.general_first_aid_kit.domain.model.KitType
+import com.example.general_first_aid_kit.domain.model.User
+import com.example.general_first_aid_kit.domain.usecase.DeleteKitUseCase
+import com.example.general_first_aid_kit.domain.usecase.GetKitUseCase
+import com.example.general_first_aid_kit.domain.usecase.GetUserUseCase
+import com.example.general_first_aid_kit.domain.usecase.GetUsersByIdsUseCase
+import com.example.general_first_aid_kit.domain.usecase.ObserveKitUseCase
+import com.example.general_first_aid_kit.domain.usecase.RefreshInviteCodeUseCase
+import com.example.general_first_aid_kit.domain.usecase.UpdateKitUseCase
+import com.example.general_first_aid_kit.domain.usecase.RemoveUserFromKitUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -12,19 +21,64 @@ import javax.inject.Inject
 
 @HiltViewModel
 class KitSettingsViewModel @Inject constructor(
-    private val repository: KitRepository
+    private val getKitUseCase: GetKitUseCase,
+    private val updateKitUseCase: UpdateKitUseCase,
+    private val deleteKitUseCase: DeleteKitUseCase,
+    private val refreshInviteCodeUseCase: RefreshInviteCodeUseCase,
+    private val getUsersByIdsUseCase: GetUsersByIdsUseCase,
+    private val getUserUseCase: GetUserUseCase,
+    private val removeUserFromKitUseCase: RemoveUserFromKitUseCase,
+    private val observeKitUseCase: ObserveKitUseCase
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(KitSettingsUiState())
     val uiState = _uiState.asStateFlow()
 
-    fun initScreen(initialName: String, initialLocation: String, initialColorIndex: Int) {
-        if (_uiState.value.name.isEmpty()) {
-            _uiState.update {
-                it.copy(
-                    name = initialName,
-                    location = initialLocation,
-                    selectedColorIndex = initialColorIndex
-                )
+    private var currentKitId: String = ""
+
+    fun initScreen(kitId: String, initialName: String, initialLocation: String, initialColorIndex: Int) {
+        currentKitId = kitId
+        _uiState.update { it.copy(
+            name = initialName,
+            location = initialLocation,
+            selectedColorIndex = initialColorIndex
+        ) }
+
+        loadKitData()
+    }
+
+    private fun loadKitData() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+            val currentUser = getUserUseCase()
+            val currentUserId = currentUser?.id ?: ""
+
+            observeKitUseCase(currentKitId).collect { kit ->
+                if (kit == null) {
+                    if (!uiState.value.isLoading) {
+                        _uiState.update { it.copy(isKitDeleted = true) }
+                    }
+                    return@collect
+                }
+
+                if (!kit.userIds.contains(currentUserId)) {
+                    _uiState.update { it.copy(isKitDeleted = true) }
+                    return@collect
+                }
+
+                val users = getUsersByIdsUseCase(kit.userIds)
+
+                _uiState.update { it.copy(
+                    name = kit.name,
+                    location = kit.location,
+                    selectedColorIndex = kit.colorIndex,
+                    isPublic = kit.type == KitType.SHARED,
+                    inviteCode = kit.inviteCode,
+                    ownerId = kit.ownerId,
+                    isOwner = kit.ownerId == currentUser?.id,
+                    participants = users,
+                    currentUserId = currentUser?.id ?: "",
+                    isLoading = false
+                ) }
             }
         }
     }
@@ -43,33 +97,75 @@ class KitSettingsViewModel @Inject constructor(
 
     fun saveChanges(kitId: String, onSuccess: () -> Unit) {
         val state = _uiState.value
+        if (!state.isOwner) return
+
         _uiState.update { it.copy(isLoading = true) }
 
         viewModelScope.launch {
-            val result = repository.updateKit(
+            val newUserIds = if (!state.isPublic) {
+                listOf(state.ownerId)
+            } else {
+                state.participants.map { it.id }
+            }
+
+            val result = updateKitUseCase(
                 kitId = kitId,
                 name = state.name,
                 location = state.location,
-                colorIndex = state.selectedColorIndex
+                colorIndex = state.selectedColorIndex,
+                type = if (state.isPublic) KitType.SHARED else KitType.PERSONAL,
+                userIds = newUserIds
             )
 
             _uiState.update { it.copy(isLoading = false) }
-            if (result.isSuccess) {
-                onSuccess()
-            } else {
-                _uiState.update { it.copy(error = "Ошибка при сохранении") }
-            }
+            if (result.isSuccess) onSuccess()
+            else _uiState.update { it.copy(error = "Ошибка при сохранении") }
         }
     }
 
     fun deleteKit(kitId: String, onSuccess: () -> Unit) {
+        val state = _uiState.value
+        if (!state.isOwner) return
+
         _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
-            val result = repository.deleteKit(kitId)
+            val result = deleteKitUseCase(kitId)
             if (result.isSuccess) {
                 onSuccess()
             } else {
                 _uiState.update { it.copy(isLoading = false, error = "Ошибка при удалении") }
+            }
+        }
+    }
+
+    fun leaveKit(onSuccess: () -> Unit) {
+        val state = _uiState.value
+        if (state.isOwner) return
+
+        _uiState.update { it.copy(isLoading = true) }
+        viewModelScope.launch {
+            val result = removeUserFromKitUseCase(currentKitId, state.currentUserId)
+            if (result.isSuccess) {
+                onSuccess()
+            } else {
+                _uiState.update { it.copy(isLoading = false, error = "Ошибка при выходе из аптечки") }
+            }
+        }
+    }
+
+    fun generateInviteCode(kitId: String) {
+        viewModelScope.launch {
+            refreshInviteCodeUseCase(kitId).onSuccess { newCode ->
+                _uiState.update { it.copy(inviteCode = newCode) }
+            }
+        }
+    }
+
+    fun removeParticipant(userId: String) {
+        viewModelScope.launch {
+            val result = removeUserFromKitUseCase(currentKitId, userId)
+            if (result.isSuccess) {
+                loadKitData()
             }
         }
     }
@@ -80,11 +176,17 @@ data class KitSettingsUiState(
     val location: String = "",
     val selectedColorIndex: Int = 0,
     val isPublic: Boolean = false,
+    val isKitDeleted: Boolean = false,
     val notifyExpiration: Boolean = false,
     val notifyLowStock: Boolean = false,
     val selectedTab: Int = 0,
     val isLoading: Boolean = false,
-    val error: String? = null
+    val error: String? = null,
+    val inviteCode: String? = null,
+    val isOwner: Boolean = false,
+    val ownerId: String = "",
+    val currentUserId: String = "",
+    val participants: List<User> = emptyList()
 )
 
 sealed class KitSettingsEvent {

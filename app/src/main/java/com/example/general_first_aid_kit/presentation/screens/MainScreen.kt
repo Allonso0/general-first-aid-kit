@@ -20,12 +20,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SecondaryTabRow
 import androidx.compose.material3.Surface
-import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberSwipeToDismissBoxState
@@ -36,17 +32,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.general_first_aid_kit.R
-import com.example.general_first_aid_kit.presentation.component.DeleteBackground
 import com.example.general_first_aid_kit.presentation.component.GenericTabRow
 import com.example.general_first_aid_kit.presentation.component.KitCard
 import com.example.general_first_aid_kit.presentation.ui.theme.Dimensions
 import com.example.general_first_aid_kit.presentation.ui.theme.GreenPrimary
-import com.example.general_first_aid_kit.presentation.ui.theme.TextGray
 import com.example.general_first_aid_kit.presentation.ui.theme.TextGreen
 import com.example.general_first_aid_kit.presentation.ui.theme.TextRed
 import com.example.general_first_aid_kit.presentation.ui.theme.White
@@ -56,6 +48,7 @@ import com.example.general_first_aid_kit.presentation.viewmodels.MainViewModel
 @Composable
 fun MainScreen(
     onProfileClick: () -> Unit,
+    onJoinClick: () -> Unit,
     onAddKitClick: () -> Unit,
     onKitCardClick: (String, String, String, Int) -> Unit,
     viewModel: MainViewModel = hiltViewModel()
@@ -89,7 +82,7 @@ fun MainScreen(
                 },
                 actions = {
                     IconButton(
-                        onClick = { },
+                        onClick = onJoinClick,
                         colors = IconButtonDefaults.iconButtonColors(
                             containerColor = GreenPrimary
                         )
@@ -181,7 +174,8 @@ fun MainScreen(
                                 key = { it.id }
                             ) { kit ->
 
-                                val dismissState = rememberSwipeToDismissBoxState(
+
+                                /* val dismissState = rememberSwipeToDismissBoxState(
                                     confirmValueChange = { dismissValue ->
                                         when (dismissValue) {
                                             SwipeToDismissBoxValue.EndToStart -> {
@@ -205,6 +199,11 @@ fun MainScreen(
                                             onClick = { onKitCardClick(kit.id, kit.name, kit.location, kit.colorIndex) }
                                         )
                                     }
+                                ) */
+
+                                KitCard(
+                                    kit = kit,
+                                    onClick = { onKitCardClick(kit.id, kit.name, kit.location, kit.colorIndex) }
                                 )
 
                             }

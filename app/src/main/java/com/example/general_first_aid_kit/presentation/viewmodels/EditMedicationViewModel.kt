@@ -6,6 +6,8 @@ import com.example.general_first_aid_kit.domain.model.Medication
 import com.example.general_first_aid_kit.domain.usecase.GetMedicationUseCase
 import com.example.general_first_aid_kit.domain.usecase.SaveMedicationUseCase
 import com.example.general_first_aid_kit.domain.usecase.DeleteMedicationUseCase
+import com.example.general_first_aid_kit.domain.usecase.GetUserUseCase
+import com.example.general_first_aid_kit.domain.usecase.ObserveKitUseCase
 import com.example.general_first_aid_kit.domain.util.MedicationValidator
 import com.example.general_first_aid_kit.domain.util.ValidationResult
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -19,11 +21,16 @@ import javax.inject.Inject
 class EditMedicationViewModel @Inject constructor(
     private val getMedicationUseCase: GetMedicationUseCase,
     private val saveMedicationUseCase: SaveMedicationUseCase,
-    private val deleteMedicationUseCase: DeleteMedicationUseCase
+    private val deleteMedicationUseCase: DeleteMedicationUseCase,
+    private val observeKitUseCase: ObserveKitUseCase,
+    private val getUserUseCase: GetUserUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AddMedicationUiState())
     val uiState = _uiState.asStateFlow()
+
+    private val _isUserKickedOrDeleted = MutableStateFlow(false)
+    val isUserKickedOrDeleted = _isUserKickedOrDeleted.asStateFlow()
 
     private var originalMedication: Medication? = null
     private var kitId: String = ""
@@ -120,5 +127,16 @@ class EditMedicationViewModel @Inject constructor(
             return false
         }
         return true
+    }
+
+    fun startObservingKit(kitId: String) {
+        viewModelScope.launch {
+            val currentUserId = getUserUseCase()?.id ?: ""
+            observeKitUseCase(kitId).collect { kit ->
+                if (kit == null || !kit.userIds.contains(currentUserId)) {
+                    _isUserKickedOrDeleted.value = true
+                }
+            }
+        }
     }
 }

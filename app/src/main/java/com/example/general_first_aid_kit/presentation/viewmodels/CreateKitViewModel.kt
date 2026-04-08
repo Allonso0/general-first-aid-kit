@@ -52,6 +52,9 @@ class CreateKitViewModel @Inject constructor(
                 location = currentState.location,
                 colorIndex = currentState.colorIndex,
                 type = if (currentState.isShared) KitType.SHARED else KitType.PERSONAL,
+                inviteCode = if (currentState.isShared)
+                    java.util.UUID.randomUUID().toString().substring(0, 8).uppercase()
+                    else null,
                 ownerId = currentUserId,
                 userIds = listOf(currentUserId)
             )
