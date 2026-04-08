@@ -1,6 +1,5 @@
 package com.example.general_first_aid_kit.presentation.viewmodels
 
-import androidx.activity.result.launch
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.general_first_aid_kit.domain.model.Medication

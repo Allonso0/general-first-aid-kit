@@ -1,5 +1,6 @@
 package com.example.general_first_aid_kit.presentation.screens
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -13,7 +14,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -45,6 +45,9 @@ fun KitSettingsScreen(
     val state by viewModel.uiState.collectAsState()
     var showToPublicDialog by remember { mutableStateOf(false) }
     var showToPersonalDialog by remember { mutableStateOf(false) }
+
+    var showDeleteConfirm by remember { mutableStateOf(false) }
+    var showLeaveConfirm by remember { mutableStateOf(false) }
 
     var showColorDialog by remember { mutableStateOf(false) }
 
@@ -91,6 +94,26 @@ fun KitSettingsScreen(
                 showToPersonalDialog = false
             },
             onDismiss = { showToPersonalDialog = false }
+        )
+    }
+
+    if (showDeleteConfirm) {
+        DeleteKitConfirmationDialog(
+            onConfirm = {
+                viewModel.deleteKit(kitId, onSuccess = onDeleteSuccess)
+                showDeleteConfirm = false
+            },
+            onDismiss = { showDeleteConfirm = false }
+        )
+    }
+
+    if (showLeaveConfirm) {
+        LeaveKitConfirmationDialog(
+            onConfirm = {
+                viewModel.leaveKit(onSuccess = onDeleteSuccess)
+                showLeaveConfirm = false
+            },
+            onDismiss = { showLeaveConfirm = false }
         )
     }
 
@@ -147,8 +170,8 @@ fun KitSettingsScreen(
                     state = state,
                     onEvent = viewModel::onEvent,
                     onShowColorDialog = { showColorDialog = true },
-                    onDeleteClick = { viewModel.deleteKit(kitId, onSuccess = onDeleteSuccess) },
-                    onLeaveClick = { viewModel.leaveKit(onSuccess = onDeleteSuccess) },
+                    onDeleteClick = { showDeleteConfirm = true },
+                    onLeaveClick = { showLeaveConfirm = true },
                     onToggleTypeClick = { isPublicTarget ->
                         if (isPublicTarget) showToPublicDialog = true
                         else showToPersonalDialog = true
@@ -222,39 +245,38 @@ fun SettingsTabContent(
         )
 
         Spacer(modifier = Modifier.height(Dimensions.PaddingMedium))
-        
-        Button(
+
+        OutlinedButton(
             onClick = { /* Archive */ },
-            modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(containerColor = GreenPrimary.copy(alpha = 0.1f), contentColor = GreenPrimary),
-            shape = RoundedCornerShape(Dimensions.CornerRadiusMedium)
+            modifier = Modifier.fillMaxWidth().height(Dimensions.MediumButtonHeight),
+            border = BorderStroke(1.dp, GreenPrimary),
+            shape = RoundedCornerShape(Dimensions.CornerRadiusMedium),
+            colors = ButtonDefaults.outlinedButtonColors(contentColor = GreenPrimary)
         ) {
-            Text("Архивировать аптечку")
+            Text("Архивировать аптечку", fontWeight = FontWeight.SemiBold)
         }
 
         if (state.isOwner) {
-            Button(
+            OutlinedButton(
                 onClick = onDeleteClick,
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFFFFEBEE),
-                    contentColor = TextRed
-                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(Dimensions.MediumButtonHeight),
+                border = BorderStroke(1.dp, TextRed),
                 shape = RoundedCornerShape(Dimensions.CornerRadiusMedium),
-                enabled = !state.isLoading
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = TextRed)
             ) {
                 Text("Удалить аптечку", fontWeight = FontWeight.Bold)
             }
         } else {
-            Button(
+            OutlinedButton(
                 onClick = onLeaveClick,
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFFFFEBEE),
-                    contentColor = TextRed
-                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(Dimensions.MediumButtonHeight),
+                border = BorderStroke(1.dp, TextRed),
                 shape = RoundedCornerShape(Dimensions.CornerRadiusMedium),
-                enabled = !state.isLoading
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = TextRed)
             ) {
                 Text("Покинуть аптечку", fontWeight = FontWeight.Bold)
             }
@@ -290,7 +312,7 @@ fun ParticipantsTabContent(
                     text = "Это личная аптечка",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = TextBlack
+                    color = TextGray
                 )
                 Spacer(modifier = Modifier.height(Dimensions.PaddingSmall))
                 Text(
@@ -303,7 +325,9 @@ fun ParticipantsTabContent(
         } else {
             Column(modifier = Modifier.fillMaxSize()) {
                 if (state.isLoading && state.participants.isEmpty()) {
-                    Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    Box(Modifier
+                        .weight(1f)
+                        .fillMaxWidth(), contentAlignment = Alignment.Center) {
                         CircularProgressIndicator(color = GreenPrimary)
                     }
                 } else {
@@ -333,7 +357,9 @@ fun ParticipantsTabContent(
                                             AsyncImage(
                                                 model = user.avatarURL,
                                                 contentDescription = null,
-                                                modifier = Modifier.fillMaxSize().shimmerEffect(),
+                                                modifier = Modifier
+                                                    .fillMaxSize()
+                                                    .shimmerEffect(),
                                                 contentScale = ContentScale.Crop
                                             )
                                         } else {
@@ -382,19 +408,27 @@ fun ParticipantsTabContent(
                 }
 
                 if (state.isOwner) {
-                    Box(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+                    Box(modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)) {
                         Button(
                             onClick = {
                                 if (state.inviteCode == null) onGenerateCode()
                                 showInviteDialog = true
                             },
-                            modifier = Modifier.fillMaxWidth().height(56.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(56.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = GreenPrimary),
                             shape = RoundedCornerShape(Dimensions.CornerRadiusMedium)
                         ) {
                             Icon(painterResource(R.drawable.baseline_group_24), null, tint = White)
                             Spacer(Modifier.width(8.dp))
-                            Text("Пригласить участника", fontWeight = FontWeight.Bold)
+                            Text(
+                                text = "Пригласить участника",
+                                fontWeight = FontWeight.Bold,
+                                color = TextWhite
+                            )
                         }
                     }
                 }
@@ -408,10 +442,11 @@ fun ParticipantsTabContent(
             containerColor = White,
             title = {
                 Text(
-                    "Код приглашения",
+                    text = "Код приглашения",
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.Center,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    color = GreenPrimary
                 )
             },
             text = {
@@ -463,7 +498,11 @@ fun ParticipantsTabContent(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(Dimensions.CornerRadiusMedium)
                 ) {
-                    Text("Готово", fontWeight = FontWeight.Bold)
+                    Text(
+                        text = "Готово",
+                        fontWeight = FontWeight.Bold,
+                        color = TextWhite
+                    )
                 }
             }
         )

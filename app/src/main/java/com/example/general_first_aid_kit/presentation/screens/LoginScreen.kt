@@ -26,6 +26,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -98,7 +99,10 @@ fun LoginScreen(
                             contentDescription = stringResource(R.string.back_button_description)
                         )
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = White
+                )
             )
         },
         containerColor = White
@@ -120,7 +124,8 @@ fun LoginScreen(
                 Text(
                     text = stringResource(R.string.login_greeting_title),
                     style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    color = TextBlack
                 )
 
                 Spacer(modifier = Modifier.height(Dimensions.SpacingMedium))
@@ -128,7 +133,8 @@ fun LoginScreen(
                 Text(
                     text = stringResource(R.string.login_description_title),
                     style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    color = TextBlack
                 )
 
                 Spacer(modifier = Modifier.height(Dimensions.SpacingLarge))
