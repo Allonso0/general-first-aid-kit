@@ -1,6 +1,5 @@
 package com.example.general_first_aid_kit.presentation.viewmodels
 
-import androidx.compose.ui.input.key.type
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.general_first_aid_kit.domain.model.KitType
@@ -103,11 +102,19 @@ class KitSettingsViewModel @Inject constructor(
         _uiState.update { it.copy(isLoading = true) }
 
         viewModelScope.launch {
+            val newUserIds = if (!state.isPublic) {
+                listOf(state.ownerId)
+            } else {
+                state.participants.map { it.id }
+            }
+
             val result = updateKitUseCase(
                 kitId = kitId,
                 name = state.name,
                 location = state.location,
-                colorIndex = state.selectedColorIndex
+                colorIndex = state.selectedColorIndex,
+                type = if (state.isPublic) KitType.SHARED else KitType.PERSONAL,
+                userIds = newUserIds
             )
 
             _uiState.update { it.copy(isLoading = false) }

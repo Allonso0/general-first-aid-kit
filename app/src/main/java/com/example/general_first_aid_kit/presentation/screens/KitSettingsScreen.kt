@@ -9,6 +9,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -41,6 +43,9 @@ fun KitSettingsScreen(
     viewModel: KitSettingsViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
+    var showToPublicDialog by remember { mutableStateOf(false) }
+    var showToPersonalDialog by remember { mutableStateOf(false) }
+
     var showColorDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(kitId) {
@@ -66,6 +71,26 @@ fun KitSettingsScreen(
                 viewModel.onEvent(KitSettingsEvent.ColorSelected(it))
                 showColorDialog = false
             }
+        )
+    }
+
+    if (showToPublicDialog) {
+        ChangeToPublicDialog(
+            onConfirm = {
+                viewModel.onEvent(KitSettingsEvent.TogglePublic(true))
+                showToPublicDialog = false
+            },
+            onDismiss = { showToPublicDialog = false }
+        )
+    }
+
+    if (showToPersonalDialog) {
+        ChangeToPersonalDialog(
+            onConfirm = {
+                viewModel.onEvent(KitSettingsEvent.TogglePublic(false))
+                showToPersonalDialog = false
+            },
+            onDismiss = { showToPersonalDialog = false }
         )
     }
 
@@ -123,7 +148,11 @@ fun KitSettingsScreen(
                     onEvent = viewModel::onEvent,
                     onShowColorDialog = { showColorDialog = true },
                     onDeleteClick = { viewModel.deleteKit(kitId, onSuccess = onDeleteSuccess) },
-                    onLeaveClick = { viewModel.leaveKit(onSuccess = onDeleteSuccess) }
+                    onLeaveClick = { viewModel.leaveKit(onSuccess = onDeleteSuccess) },
+                    onToggleTypeClick = { isPublicTarget ->
+                        if (isPublicTarget) showToPublicDialog = true
+                        else showToPersonalDialog = true
+                    }
                 )
             } else {
                 ParticipantsTabContent(
@@ -142,7 +171,8 @@ fun SettingsTabContent(
     onEvent: (KitSettingsEvent) -> Unit,
     onShowColorDialog: () -> Unit,
     onDeleteClick: () -> Unit,
-    onLeaveClick: () -> Unit
+    onLeaveClick: () -> Unit,
+    onToggleTypeClick: (Boolean) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -178,13 +208,17 @@ fun SettingsTabContent(
             selected = !state.isPublic,
             title = "Личная аптечка",
             subtitle = "Только вы видите содержимое",
-            onClick = { if (state.isOwner) onEvent(KitSettingsEvent.TogglePublic(false)) }
+            onClick = {
+                if (state.isOwner && state.isPublic) onToggleTypeClick(false)
+            }
         )
         KitTypeRadioButton(
             selected = state.isPublic,
             title = "Общая аптечка",
             subtitle = "Доступ по приглашению",
-            onClick = { if (state.isOwner) onEvent(KitSettingsEvent.TogglePublic(true)) }
+            onClick = {
+                if (state.isOwner && !state.isPublic) onToggleTypeClick(true)
+            }
         )
 
         Spacer(modifier = Modifier.height(Dimensions.PaddingMedium))
