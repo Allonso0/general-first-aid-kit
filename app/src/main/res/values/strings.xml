@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">general-first-aid-kit</string>
+    <string name="app_name">Общая аптечка</string>
 
     <!--Экран приветствия-->
     <string name="welcome_title">Все аптечки в одном приложении</string>

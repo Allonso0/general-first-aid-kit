@@ -9,6 +9,7 @@ import com.example.general_first_aid_kit.domain.usecase.SignUpUseCase
 import com.example.general_first_aid_kit.domain.util.AuthValidator
 import com.example.general_first_aid_kit.domain.util.ValidationResult
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,6 +26,22 @@ class AuthViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow<AuthState>(AuthState.Idle)
     val uiState: StateFlow<AuthState> = _uiState.asStateFlow()
+
+    private val _isLoading = MutableStateFlow(true)
+    val isLoading = _isLoading.asStateFlow()
+
+    init {
+        checkInitialAuth()
+    }
+
+    private fun checkInitialAuth() {
+        viewModelScope.launch {
+            // Имитируем загрузку (проверка токена, БД и т.д.)
+            delay(1500)
+            checkAuthUseCase()
+            _isLoading.value = false
+        }
+    }
 
     fun onLoginClick(email: String, password: String) {
         viewModelScope.launch {

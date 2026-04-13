@@ -62,6 +62,8 @@ android {
 }
 
 dependencies {
+    implementation(libs.androidx.core.splashscreen)
+
     implementation(platform(libs.supabase.bom))
     implementation(libs.supabase.storage)
     implementation(libs.ktor.client.cio)
@@ -73,6 +75,8 @@ dependencies {
 
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.hilt.android)
+    implementation(libs.androidx.core.animation)
+    implementation(libs.androidx.compose.animation.graphics)
     ksp(libs.hilt.android.compiler)
     implementation(libs.androidx.navigation3.ui)
     implementation(libs.androidx.navigation3.runtime)
