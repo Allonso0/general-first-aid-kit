@@ -74,6 +74,7 @@ import java.util.Locale
 @Composable
 fun AddMedicationScreen(
     kitId: String,
+    scannedBarcode: String? = null,
     onNavigateBack: () -> Unit,
     viewModel: AddMedicationViewModel = hiltViewModel()
 ) {
