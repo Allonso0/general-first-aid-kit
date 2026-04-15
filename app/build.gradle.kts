@@ -17,6 +17,15 @@ android {
     namespace = "com.example.general_first_aid_kit"
     compileSdk = 36
 
+    packaging {
+        resources {
+            excludes += "/META-INF/versions/9/OSGI-INF/MANIFEST.MF"
+            excludes += "/META-INF/DEPENDENCIES"
+            excludes += "/META-INF/LICENSE*"
+            excludes += "/META-INF/NOTICE*"
+        }
+    }
+
     defaultConfig {
         applicationId = "com.example.general_first_aid_kit"
         minSdk = 24
@@ -34,9 +43,13 @@ android {
 
         val sbUrl = properties.getProperty("SUPABASE_URL") ?: ""
         val sbKey = properties.getProperty("SUPABASE_KEY") ?: ""
+        val gigachatCreds = properties.getProperty("GIGACHAT_CREDENTIALS") ?: ""
+        val eandbToken = properties.getProperty("EANDB_TOKEN") ?: ""
 
         buildConfigField("String", "SUPABASE_URL", "\"$sbUrl\"")
         buildConfigField("String", "SUPABASE_KEY", "\"$sbKey\"")
+        buildConfigField("String", "GIGACHAT_CREDENTIALS", "\"$gigachatCreds\"")
+        buildConfigField("String", "EANDB_TOKEN", "\"$eandbToken\"")
     }
 
     buildTypes {
@@ -64,6 +77,7 @@ android {
 dependencies {
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
+    implementation(libs.logging.interceptor)
 
     implementation(libs.androidx.camera.camera2)
     implementation(libs.androidx.camera.lifecycle)

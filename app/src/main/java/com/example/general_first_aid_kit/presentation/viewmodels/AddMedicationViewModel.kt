@@ -2,6 +2,7 @@ package com.example.general_first_aid_kit.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.general_first_aid_kit.data.repository.GigaChatRepository
 import com.example.general_first_aid_kit.domain.model.Medication
 import com.example.general_first_aid_kit.domain.usecase.SaveMedicationUseCase
 import com.example.general_first_aid_kit.domain.util.MedicationValidator
@@ -15,7 +16,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AddMedicationViewModel @Inject constructor(
-    private val saveMedicationUseCase: SaveMedicationUseCase
+    private val saveMedicationUseCase: SaveMedicationUseCase,
+    private val gigaChatRepository: GigaChatRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AddMedicationUiState())
@@ -88,5 +90,28 @@ class AddMedicationViewModel @Inject constructor(
             return false
         }
         return true
+    }
+
+    fun loadDetailsByBarcode(barcode: String) {
+        _uiState.update { it.copy(isLoading = true, error = null) }
+
+        viewModelScope.launch {
+            gigaChatRepository.getMedicationByBarcode(barcode)
+                .onSuccess { info ->
+                    _uiState.update { it.copy(
+                        name = info.name,
+                        category = info.category,
+                        quantity = info.quantity.toString(),
+                        unit = info.unit,
+                        isLoading = false
+                    ) }
+                }
+                .onFailure { exception ->
+                    _uiState.update { it.copy(
+                        isLoading = false,
+                        error = "Не удалось распознать: ${exception.localizedMessage}"
+                    ) }
+                }
+        }
     }
 }
