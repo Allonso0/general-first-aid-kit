@@ -41,12 +41,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.general_first_aid_kit.R
+import com.example.general_first_aid_kit.domain.util.NetworkUtils
 import com.example.general_first_aid_kit.presentation.component.ExpandableAddMedicationFAB
 import com.example.general_first_aid_kit.presentation.component.MedicationCard
 import com.example.general_first_aid_kit.presentation.ui.theme.Dimensions
@@ -65,9 +67,12 @@ fun KitScreen(
     onNavigateBack: () -> Unit,
     onNavigateToKitSettings: () -> Unit,
     onNavigateToAddManual: (String) -> Unit,
+    onScanBarcode: (String) -> Unit,
     onNavigateToMedicationInfo: (String) -> Unit,
     viewModel: KitViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
+
     LaunchedEffect(kitId) {
         viewModel.loadKit(kitId)
         viewModel.startObservingKit(kitId)
@@ -136,7 +141,15 @@ fun KitScreen(
             ExpandableAddMedicationFAB(
                 onAddManual = { onNavigateToAddManual(kitId) },
                 onScanBarcode = {
-                    // Заглушка
+                    if (NetworkUtils.isInternetAvailable(context)) {
+                        onScanBarcode(kitId)
+                    } else {
+                        android.widget.Toast.makeText(
+                            context,
+                            "Для сканирования требуется интернет",
+                            android.widget.Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
             )
         }

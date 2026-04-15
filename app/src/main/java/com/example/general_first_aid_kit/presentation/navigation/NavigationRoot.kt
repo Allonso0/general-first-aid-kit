@@ -23,6 +23,7 @@ import com.example.general_first_aid_kit.presentation.screens.MedicationInfoScre
 import com.example.general_first_aid_kit.presentation.screens.ProfileScreen
 import com.example.general_first_aid_kit.presentation.screens.ProfileSettingsScreen
 import com.example.general_first_aid_kit.presentation.screens.RegistrationScreen
+import com.example.general_first_aid_kit.presentation.screens.ScanBarcodeScreen
 import com.example.general_first_aid_kit.presentation.viewmodels.AuthViewModel
 
 @Composable
@@ -118,6 +119,7 @@ fun NavigationRoot(
                             backStack.add(Route.KitSettings(key.id, key.name, key.location, key.colorIndex))
                         },
                         onNavigateToAddManual = { backStack.add(Route.AddMedicationManual(key.id)) },
+                        onScanBarcode = { backStack.add(Route.ScanBarcode(key.id)) },
                         onNavigateToMedicationInfo = { medId ->
                             backStack.add(Route.MedicationInfo(key.id, medId))
                         }
@@ -141,6 +143,7 @@ fun NavigationRoot(
                 is Route.AddMedicationManual -> NavEntry(key) {
                     AddMedicationScreen(
                         kitId = key.kitId,
+                        scannedBarcode = key.scannedBarcode,
                         onNavigateBack = { backStack.pop() }
                     )
                 }
@@ -167,6 +170,16 @@ fun NavigationRoot(
                 }
                 is Route.JoinKit -> NavEntry(key) {
                     JoinKitScreen(onNavigateBack = { backStack.pop() })
+                }
+                is Route.ScanBarcode -> NavEntry(key) {
+                    ScanBarcodeScreen(
+                        kitId = key.kitId,
+                        onNavigateBack = { backStack.pop() },
+                        onBarcodeScanned = { barcode ->
+                            backStack.pop()
+                            backStack.add(Route.AddMedicationManual(key.kitId, barcode))
+                        }
+                    )
                 }
                 else -> error("Unknown key: $key")
             }
