@@ -2,8 +2,8 @@ package com.example.general_first_aid_kit.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.general_first_aid_kit.data.repository.GigaChatRepository
 import com.example.general_first_aid_kit.domain.model.Medication
+import com.example.general_first_aid_kit.domain.usecase.GetMedicationByBarcodeUseCase
 import com.example.general_first_aid_kit.domain.usecase.SaveMedicationUseCase
 import com.example.general_first_aid_kit.domain.util.MedicationValidator
 import com.example.general_first_aid_kit.domain.util.ValidationResult
@@ -17,7 +17,7 @@ import javax.inject.Inject
 @HiltViewModel
 class AddMedicationViewModel @Inject constructor(
     private val saveMedicationUseCase: SaveMedicationUseCase,
-    private val gigaChatRepository: GigaChatRepository
+    private val getMedicationByBarcodeUseCase: GetMedicationByBarcodeUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AddMedicationUiState())
@@ -39,6 +39,8 @@ class AddMedicationViewModel @Inject constructor(
     fun updateCategory(category: String) = _uiState.update { it.copy(category = category) }
     fun updateDescription(description: String) = _uiState.update { it.copy(description = description) }
     fun updatePhotoUri(uri: String?) = _uiState.update { it.copy(photoUri = uri) }
+
+    fun clearError() = _uiState.update { it.copy(error = null) }
 
     fun saveMedication(kitId: String, onSuccess: () -> Unit) {
         if (!validateInputs()) return
@@ -74,7 +76,7 @@ class AddMedicationViewModel @Inject constructor(
 
     private fun validateInputs(): Boolean {
         val state = _uiState.value
-        
+
         val nameResult = MedicationValidator.validateName(state.name)
         val dateResult = MedicationValidator.validateExpirationDate(state.expirationDateMillis)
         val quantityResult = MedicationValidator.validateQuantity(state.quantity)
@@ -82,11 +84,13 @@ class AddMedicationViewModel @Inject constructor(
         val hasError = listOf(nameResult, dateResult, quantityResult).any { it is ValidationResult.Error }
 
         if (hasError) {
-            _uiState.update { it.copy(
-                nameErrorResId = (nameResult as? ValidationResult.Error)?.messageResId,
-                expirationDateErrorResId = (dateResult as? ValidationResult.Error)?.messageResId,
-                quantityErrorResId = (quantityResult as? ValidationResult.Error)?.messageResId
-            ) }
+            _uiState.update {
+                it.copy(
+                    nameErrorResId = (nameResult as? ValidationResult.Error)?.messageResId,
+                    expirationDateErrorResId = (dateResult as? ValidationResult.Error)?.messageResId,
+                    quantityErrorResId = (quantityResult as? ValidationResult.Error)?.messageResId
+                )
+            }
             return false
         }
         return true
@@ -96,22 +100,41 @@ class AddMedicationViewModel @Inject constructor(
         _uiState.update { it.copy(isLoading = true, error = null) }
 
         viewModelScope.launch {
-            gigaChatRepository.getMedicationByBarcode(barcode)
-                .onSuccess { info ->
-                    _uiState.update { it.copy(
-                        name = info.name,
-                        category = info.category,
-                        quantity = info.quantity.toString(),
-                        unit = info.unit,
-                        isLoading = false
-                    ) }
+            getMedicationByBarcodeUseCase(barcode)
+                .onSuccess { suggestion ->
+                    _uiState.update {
+                        it.copy(
+                            name = suggestion.name,
+                            category = suggestion.category,
+                            quantity = suggestion.quantity.toString(),
+                            unit = suggestion.unit,
+                            isLoading = false
+                        )
+                    }
                 }
                 .onFailure { exception ->
-                    _uiState.update { it.copy(
-                        isLoading = false,
-                        error = "Не удалось распознать: ${exception.localizedMessage}"
-                    ) }
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            error = "Не удалось распознать: ${exception.localizedMessage}"
+                        )
+                    }
                 }
         }
     }
 }
+
+data class AddMedicationUiState(
+    val name: String = "",
+    val nameErrorResId: Int? = null,
+    val expirationDateMillis: Long? = null,
+    val expirationDateErrorResId: Int? = null,
+    val quantity: String = "",
+    val quantityErrorResId: Int? = null,
+    val unit: String = "шт",
+    val category: String = "",
+    val description: String = "",
+    val photoUri: String? = null,
+    val isLoading: Boolean = false,
+    val error: String? = null
+)

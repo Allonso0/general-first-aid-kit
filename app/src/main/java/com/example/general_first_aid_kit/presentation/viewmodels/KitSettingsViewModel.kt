@@ -95,7 +95,7 @@ class KitSettingsViewModel @Inject constructor(
         }
     }
 
-    fun saveChanges(kitId: String, onSuccess: () -> Unit) {
+    fun saveChanges(onSuccess: () -> Unit) {
         val state = _uiState.value
         if (!state.isOwner) return
 
@@ -109,7 +109,7 @@ class KitSettingsViewModel @Inject constructor(
             }
 
             val result = updateKitUseCase(
-                kitId = kitId,
+                kitId = currentKitId,
                 name = state.name,
                 location = state.location,
                 colorIndex = state.selectedColorIndex,
@@ -123,13 +123,13 @@ class KitSettingsViewModel @Inject constructor(
         }
     }
 
-    fun deleteKit(kitId: String, onSuccess: () -> Unit) {
+    fun deleteKit(onSuccess: () -> Unit) {
         val state = _uiState.value
         if (!state.isOwner) return
 
         _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
-            val result = deleteKitUseCase(kitId)
+            val result = deleteKitUseCase(currentKitId)
             if (result.isSuccess) {
                 onSuccess()
             } else {
@@ -153,9 +153,9 @@ class KitSettingsViewModel @Inject constructor(
         }
     }
 
-    fun generateInviteCode(kitId: String) {
+    fun generateInviteCode() {
         viewModelScope.launch {
-            refreshInviteCodeUseCase(kitId).onSuccess { newCode ->
+            refreshInviteCodeUseCase(currentKitId).onSuccess { newCode ->
                 _uiState.update { it.copy(inviteCode = newCode) }
             }
         }
@@ -163,10 +163,7 @@ class KitSettingsViewModel @Inject constructor(
 
     fun removeParticipant(userId: String) {
         viewModelScope.launch {
-            val result = removeUserFromKitUseCase(currentKitId, userId)
-            if (result.isSuccess) {
-                loadKitData()
-            }
+            removeUserFromKitUseCase(currentKitId, userId)
         }
     }
 }

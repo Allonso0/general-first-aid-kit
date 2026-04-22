@@ -51,7 +51,7 @@ class UserRepositoryImpl @Inject constructor(
                     upsert = true
                 }
 
-                val urlString = bucket.publicUrl(fileName)
+                val urlString = bucket.publicUrl(fileName) + "?t=${System.currentTimeMillis()}"
                 finalPhotoUri = urlString.toUri()
             }
 
@@ -73,8 +73,6 @@ class UserRepositoryImpl @Inject constructor(
                 ),
                 com.google.firebase.firestore.SetOptions.merge()
             ).await()
-
-            user.reload().await()
 
             Result.success(Unit)
         } catch (e: Exception) {

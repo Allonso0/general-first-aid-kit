@@ -2,10 +2,8 @@ package com.example.general_first_aid_kit.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.general_first_aid_kit.domain.model.Kit
 import com.example.general_first_aid_kit.domain.model.KitType
 import com.example.general_first_aid_kit.domain.usecase.CreateKitUseCase
-import com.example.general_first_aid_kit.domain.usecase.GetUserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,8 +14,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CreateKitViewModel @Inject constructor(
-    private val createKitUseCase: CreateKitUseCase,
-    private val getUserUseCase: GetUserUseCase
+    private val createKitUseCase: CreateKitUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CreateKitState())
@@ -40,36 +37,23 @@ class CreateKitViewModel @Inject constructor(
     }
 
     fun createKit(onSuccess: () -> Unit) {
-        val currentState = _uiState.value
+        val state = _uiState.value
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
 
-            val user = getUserUseCase()
-            val currentUserId = user?.id ?: ""
-
-            val newKit = Kit(
-                name = currentState.name,
-                location = currentState.location,
-                colorIndex = currentState.colorIndex,
-                type = if (currentState.isShared) KitType.SHARED else KitType.PERSONAL,
-                inviteCode = if (currentState.isShared)
-                    java.util.UUID.randomUUID().toString().substring(0, 8).uppercase()
-                    else null,
-                ownerId = currentUserId,
-                userIds = listOf(currentUserId)
+            val result = createKitUseCase(
+                name = state.name,
+                location = state.location,
+                colorIndex = state.colorIndex,
+                type = if (state.isShared) KitType.SHARED else KitType.PERSONAL
             )
-
-            val result = createKitUseCase(newKit)
 
             if (result.isSuccess) {
                 _uiState.update { it.copy(isLoading = false) }
                 onSuccess()
             } else {
                 _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        error = result.exceptionOrNull()?.message ?: "Ошибка"
-                    )
+                    it.copy(isLoading = false, error = result.exceptionOrNull()?.message ?: "Ошибка")
                 }
             }
         }

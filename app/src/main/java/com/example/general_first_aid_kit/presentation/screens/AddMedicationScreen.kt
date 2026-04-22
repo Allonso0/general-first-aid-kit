@@ -20,6 +20,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
@@ -64,7 +65,6 @@ import com.example.general_first_aid_kit.presentation.ui.theme.GreenPrimary
 import com.example.general_first_aid_kit.presentation.ui.theme.LightGray
 import com.example.general_first_aid_kit.presentation.ui.theme.TextBlack
 import com.example.general_first_aid_kit.presentation.ui.theme.TextGray
-import com.example.general_first_aid_kit.presentation.ui.theme.TextRed
 import com.example.general_first_aid_kit.presentation.ui.theme.White
 import com.example.general_first_aid_kit.presentation.viewmodels.AddMedicationViewModel
 import java.text.SimpleDateFormat
@@ -110,6 +110,19 @@ fun AddMedicationScreen(
     )
     val isNoCategory = state.category.isEmpty() || state.category == stringResource(R.string.no_category)
     val displayColor = if (isNoCategory) TextGray else TextBlack
+
+    if (state.error != null) {
+        AlertDialog(
+            onDismissRequest = { viewModel.clearError() },
+            title = { Text(stringResource(R.string.error_dialog_title)) },
+            text = { Text(state.error!!) },
+            confirmButton = {
+                TextButton(onClick = { viewModel.clearError() }) {
+                    Text(stringResource(R.string.ok), color = GreenPrimary)
+                }
+            }
+        )
+    }
 
     if (showDatePicker) {
         DatePickerDialog(
@@ -184,15 +197,6 @@ fun AddMedicationScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(Dimensions.SpacingMedium)
             ) {
-                if (state.error != null) {
-                    Text(
-                        text = state.error!!,
-                        color = TextRed,
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-
                 Box(
                     modifier = Modifier
                         .size(Dimensions.MedicationPhotoSize)

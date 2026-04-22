@@ -36,7 +36,6 @@ class AuthViewModel @Inject constructor(
 
     private fun checkInitialAuth() {
         viewModelScope.launch {
-            // Имитируем загрузку (проверка токена, БД и т.д.)
             delay(1500)
             checkAuthUseCase()
             _isLoading.value = false

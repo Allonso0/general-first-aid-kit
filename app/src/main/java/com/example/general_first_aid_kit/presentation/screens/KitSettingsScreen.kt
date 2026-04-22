@@ -100,7 +100,7 @@ fun KitSettingsScreen(
     if (showDeleteConfirm) {
         DeleteKitConfirmationDialog(
             onConfirm = {
-                viewModel.deleteKit(kitId, onSuccess = onDeleteSuccess)
+                viewModel.deleteKit(onSuccess = onDeleteSuccess)
                 showDeleteConfirm = false
             },
             onDismiss = { showDeleteConfirm = false }
@@ -139,7 +139,7 @@ fun KitSettingsScreen(
                 actions = {
                     if (state.selectedTab == 0 && state.isOwner) {
                         IconButton(
-                            onClick = { viewModel.saveChanges(kitId, onSuccess = onSaveSuccess) },
+                            onClick = { viewModel.saveChanges(onSuccess = onSaveSuccess) },
                             enabled = !state.isLoading
                         ) {
                             Icon(
@@ -180,7 +180,7 @@ fun KitSettingsScreen(
             } else {
                 ParticipantsTabContent(
                     state = state,
-                    onGenerateCode = { viewModel.generateInviteCode(kitId) },
+                    onGenerateCode = { viewModel.generateInviteCode() },
                     onRemoveParticipant = viewModel::removeParticipant
                 )
             }

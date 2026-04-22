@@ -91,6 +91,8 @@
     <string name="error_long_username">Имя должно быть не длиннее 20 символов</string>
 
     <!--Общие-->
+    <string name="ok">Понятно</string>
+    <string name="error_dialog_title">Ошибка</string>
     <string name="settings">Настройки</string>
     <string name="btn_login">Войти</string>
     <string name="btn_create_account">Зарегистрироваться</string>

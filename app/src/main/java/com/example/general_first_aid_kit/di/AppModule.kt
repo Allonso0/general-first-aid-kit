@@ -4,6 +4,7 @@ import com.example.general_first_aid_kit.BuildConfig
 import com.example.general_first_aid_kit.data.api.EanDbApi
 import com.example.general_first_aid_kit.data.api.GigaChatApi
 import com.example.general_first_aid_kit.data.repository.GigaChatRepository
+import com.example.general_first_aid_kit.domain.repository.AiMedicationRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
@@ -78,6 +79,10 @@ object AppModule {
             eanDbApi = eanDbApi
         )
     }
+
+    @Provides
+    @Singleton
+    fun provideAiMedicationRepository(impl: GigaChatRepository): AiMedicationRepository = impl
 
     @Provides
     @Singleton

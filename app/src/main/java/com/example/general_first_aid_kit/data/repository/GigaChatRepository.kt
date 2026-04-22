@@ -8,6 +8,8 @@ import com.example.general_first_aid_kit.data.api.GigaChatRequest
 import com.example.general_first_aid_kit.data.api.Message
 import com.example.general_first_aid_kit.data.api.MedicationInfoJson
 import com.example.general_first_aid_kit.data.api.ResponseFormat
+import com.example.general_first_aid_kit.domain.model.MedicationSuggestion
+import com.example.general_first_aid_kit.domain.repository.AiMedicationRepository
 import com.google.gson.Gson
 import javax.inject.Inject
 
@@ -15,7 +17,7 @@ class GigaChatRepository @Inject constructor(
     private val api: GigaChatApi,
     private val eanDbApi: EanDbApi,
     private val credentials: String
-) {
+) : AiMedicationRepository {
     private var cachedToken: String? = null
     private var tokenExpiresAt: Long = 0
     private val gson = Gson()
@@ -36,7 +38,7 @@ class GigaChatRepository @Inject constructor(
         return "Bearer $cachedToken"
     }
 
-    suspend fun getMedicationByBarcode(barcode: String): Result<MedicationInfoJson> {
+    override suspend fun getMedicationByBarcode(barcode: String): Result<MedicationSuggestion> {
         return try {
 
             val eanResponse = try {
@@ -86,13 +88,15 @@ class GigaChatRepository @Inject constructor(
 
             Log.d("GigaChat", "GigaChat Structured Response: $jsonContent")
 
-            val info = gson.fromJson(jsonContent, MedicationInfoJson::class.java)
+            val json = gson.fromJson(jsonContent, MedicationInfoJson::class.java)
+            val suggestion = MedicationSuggestion(
+                name = if (json.name.isBlank() || json.name == "..") productTitle else json.name,
+                category = json.category,
+                quantity = json.quantity,
+                unit = json.unit
+            )
 
-            val finalInfo = if (info.name.isBlank() || info.name == "..") {
-                info.copy(name = productTitle)
-            } else info
-
-            Result.success(finalInfo)
+            Result.success(suggestion)
         } catch (e: Exception) {
             Log.e("GigaChat", "Error in pipeline", e)
             Result.failure(e)
