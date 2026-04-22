@@ -100,4 +100,7 @@
     <string name="visibility_switch">Переключить видимость пароля</string>
     <string name="save">Сохранить</string>
     <string name="choose">Выбрать</string>
+    <string name="take_photo">Сделать фото</string>
+    <string name="choose_from_gallery">Выбрать из галереи</string>
+    <string name="photo_source_title">Добавить фото</string>
 </resources>

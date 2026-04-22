@@ -1,5 +1,8 @@
 package com.example.general_first_aid_kit.presentation.screens
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -21,6 +24,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
@@ -50,11 +55,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.example.general_first_aid_kit.R
@@ -65,8 +74,11 @@ import com.example.general_first_aid_kit.presentation.ui.theme.GreenPrimary
 import com.example.general_first_aid_kit.presentation.ui.theme.LightGray
 import com.example.general_first_aid_kit.presentation.ui.theme.TextBlack
 import com.example.general_first_aid_kit.presentation.ui.theme.TextGray
+import com.example.general_first_aid_kit.presentation.ui.theme.TextRed
+import com.example.general_first_aid_kit.presentation.ui.theme.TextWhite
 import com.example.general_first_aid_kit.presentation.ui.theme.White
 import com.example.general_first_aid_kit.presentation.viewmodels.AddMedicationViewModel
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -80,6 +92,7 @@ fun AddMedicationScreen(
     viewModel: AddMedicationViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
 
     LaunchedEffect(scannedBarcode) {
         if (!scannedBarcode.isNullOrBlank()) {
@@ -88,6 +101,9 @@ fun AddMedicationScreen(
     }
 
     var showDatePicker by remember { mutableStateOf(false) }
+    var showPhotoSourceDialog by remember { mutableStateOf(false) }
+    var cameraUri by remember { mutableStateOf<Uri?>(null) }
+
     val datePickerState = rememberDatePickerState(
         initialSelectedDateMillis = System.currentTimeMillis()
     )
@@ -95,6 +111,16 @@ fun AddMedicationScreen(
     val photoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
         onResult = { uri -> viewModel.updatePhotoUri(uri?.toString()) }
+    )
+
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicture(),
+        onResult = { success -> if (success) viewModel.updatePhotoUri(cameraUri?.toString()) }
+    )
+
+    val cameraPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { granted -> if (granted) cameraUri?.let { cameraLauncher.launch(it) } }
     )
 
     var expanded by remember { mutableStateOf(false) }
@@ -110,6 +136,69 @@ fun AddMedicationScreen(
     )
     val isNoCategory = state.category.isEmpty() || state.category == stringResource(R.string.no_category)
     val displayColor = if (isNoCategory) TextGray else TextBlack
+
+    if (showPhotoSourceDialog) {
+        AlertDialog(
+            onDismissRequest = { showPhotoSourceDialog = false },
+            containerColor = White,
+            title = {
+                Text(
+                    text = stringResource(R.string.photo_source_title),
+                    color = TextBlack,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center
+                )
+            },
+            text = {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(Dimensions.SpacingSmall)
+                ) {
+                    Button(
+                        onClick = {
+                            showPhotoSourceDialog = false
+                            val photoDir = File(context.cacheDir, "camera_photos").also { it.mkdirs() }
+                            val photoFile = File(photoDir, "camera_${System.currentTimeMillis()}.jpg")
+                            val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", photoFile)
+                            cameraUri = uri
+                            if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                                cameraLauncher.launch(uri)
+                            } else {
+                                cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(Dimensions.CornerRadiusMedium),
+                        colors = ButtonDefaults.buttonColors(containerColor = GreenPrimary)
+                    ) {
+                        Text(stringResource(R.string.take_photo), color = TextWhite)
+                    }
+                    Button(
+                        onClick = {
+                            showPhotoSourceDialog = false
+                            photoPickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(Dimensions.CornerRadiusMedium),
+                        colors = ButtonDefaults.buttonColors(containerColor = GreenPrimary)
+                    ) {
+                        Text(stringResource(R.string.choose_from_gallery), color = TextWhite)
+                    }
+                    Button(
+                        onClick = { showPhotoSourceDialog = false },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(containerColor = White),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, TextRed),
+                        shape = RoundedCornerShape(Dimensions.CornerRadiusMedium)
+                    ) {
+                        Text(stringResource(R.string.cancel), color = TextRed)
+                    }
+                }
+            },
+            confirmButton = {}
+        )
+    }
 
     if (state.error != null) {
         AlertDialog(
@@ -202,11 +291,7 @@ fun AddMedicationScreen(
                         .size(Dimensions.MedicationPhotoSize)
                         .clip(RoundedCornerShape(Dimensions.CornerRadiusMedium))
                         .background(LightGray.copy(alpha = 0.3f))
-                        .clickable {
-                            photoPickerLauncher.launch(
-                                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                            )
-                        },
+                        .clickable { showPhotoSourceDialog = true },
                     contentAlignment = Alignment.Center
                 ) {
                     if (state.photoUri != null) {
