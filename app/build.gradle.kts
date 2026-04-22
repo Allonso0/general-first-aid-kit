@@ -95,6 +95,8 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.storage)
+    implementation(libs.firebase.messaging)
+    implementation(libs.androidx.work.runtime.ktx)
 
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.hilt.android)
