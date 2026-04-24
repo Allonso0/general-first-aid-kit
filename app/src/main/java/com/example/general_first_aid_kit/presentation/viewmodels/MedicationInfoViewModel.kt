@@ -41,14 +41,22 @@ class MedicationInfoViewModel @Inject constructor(
     fun updateQuantity(delta: Int) {
         val currentMed = _medication.value ?: return
         val newQuantity = (currentMed.quantity + delta).coerceAtLeast(0)
-        
+
         if (newQuantity == currentMed.quantity) return
 
         val updatedMed = currentMed.copy(quantity = newQuantity)
-        
+
         viewModelScope.launch {
             _medication.value = updatedMed
-            val result = saveMedicationUseCase(currentKitId, updatedMed, null)
+            val user = getUserUseCase()
+            val result = saveMedicationUseCase(
+                kitId = currentKitId,
+                medication = updatedMed,
+                localPhotoUri = null,
+                actorUserId = user?.id ?: "",
+                actorName = user?.name ?: "",
+                isNew = false
+            )
             if (result.isFailure) {
                 _medication.value = currentMed
             }

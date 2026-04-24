@@ -58,6 +58,7 @@ fun ProfileScreen(
     onNavigateBack: () -> Unit,
     onLogout: () -> Unit,
     onNavigateToProfileSettings: () -> Unit,
+    onNavigateToNotificationLog: () -> Unit,
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
     val user by viewModel.user.collectAsState()
@@ -166,7 +167,7 @@ fun ProfileScreen(
             ProfileMenuItem(
                 icon = painterResource(R.drawable.baseline_notifications_24),
                 text = stringResource(R.string.notifications_log),
-                onClick = { }
+                onClick = { onNavigateToNotificationLog() }
             )
 
             ProfileMenuItem(

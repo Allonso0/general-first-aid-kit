@@ -30,6 +30,8 @@ storageKt = "3.3.0"
 coreAnimation = "1.0.0"
 animationGraphics = "1.10.6"
 guava = "32.1.3-android"
+workManager = "2.10.1"
+hiltWork = "1.2.0"
 
 [libraries]
 androidx-camera-lifecycle = { module = "androidx.camera:camera-lifecycle", version.ref = "cameraLifecycle" }
@@ -74,6 +76,10 @@ supabase-storage = { module = "io.github.jan-tennert.supabase:storage-kt" }
 androidx-core-animation = { group = "androidx.core", name = "core-animation", version.ref = "coreAnimation" }
 androidx-compose-animation-graphics = { group = "androidx.compose.animation", name = "animation-graphics", version.ref = "animationGraphics" }
 guava = { module = "com.google.guava:guava", version.ref = "guava" }
+firebase-messaging = { module = "com.google.firebase:firebase-messaging" }
+androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workManager" }
+androidx-hilt-work = { module = "androidx.hilt:hilt-work", version.ref = "hiltWork" }
+androidx-hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "hiltWork" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

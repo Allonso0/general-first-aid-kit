@@ -85,7 +85,7 @@ class KitRepositoryImpl @Inject constructor(
         Result.failure(e)
     }
 
-    override suspend fun joinKitByCode(userId: String, inviteCode: String): Result<Unit> {
+    override suspend fun joinKitByCode(userId: String, inviteCode: String): Result<Kit> {
         return try {
             val snapshot = firestore.collection("kits")
                 .whereEqualTo("inviteCode", inviteCode)
@@ -100,7 +100,10 @@ class KitRepositoryImpl @Inject constructor(
                 .update("userIds", com.google.firebase.firestore.FieldValue.arrayUnion(userId))
                 .await()
 
-            Result.success(Unit)
+            val kit = document.toObject(Kit::class.java)?.copy(id = document.id)
+                ?: return Result.failure(Exception("Не удалось прочитать данные аптечки"))
+
+            Result.success(kit)
         } catch (e: Exception) {
             Result.failure(e)
         }

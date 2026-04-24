@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.general_first_aid_kit.domain.model.Medication
 import com.example.general_first_aid_kit.domain.usecase.GetMedicationByBarcodeUseCase
+import com.example.general_first_aid_kit.domain.usecase.GetUserUseCase
 import com.example.general_first_aid_kit.domain.usecase.SaveMedicationUseCase
 import com.example.general_first_aid_kit.domain.util.MedicationValidator
 import com.example.general_first_aid_kit.domain.util.ValidationResult
@@ -12,12 +13,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
 class AddMedicationViewModel @Inject constructor(
     private val saveMedicationUseCase: SaveMedicationUseCase,
-    private val getMedicationByBarcodeUseCase: GetMedicationByBarcodeUseCase
+    private val getMedicationByBarcodeUseCase: GetMedicationByBarcodeUseCase,
+    private val getUserUseCase: GetUserUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AddMedicationUiState())
@@ -49,7 +52,10 @@ class AddMedicationViewModel @Inject constructor(
         _uiState.update { it.copy(isLoading = true, error = null) }
 
         viewModelScope.launch {
+            val user = getUserUseCase()
+            val medicationId = UUID.randomUUID().toString()
             val medication = Medication(
+                id = medicationId,
                 name = state.name.trim(),
                 expirationDate = state.expirationDateMillis ?: 0L,
                 quantity = state.quantity.toIntOrNull() ?: 0,
@@ -61,16 +67,18 @@ class AddMedicationViewModel @Inject constructor(
             val result = saveMedicationUseCase(
                 kitId = kitId,
                 medication = medication,
-                localPhotoUri = state.photoUri
+                localPhotoUri = state.photoUri,
+                actorUserId = user?.id ?: "",
+                actorName = user?.name ?: "",
+                isNew = true
             )
 
             _uiState.update { it.copy(isLoading = false) }
 
-            result.onSuccess {
-                onSuccess()
-            }.onFailure { exception ->
-                _uiState.update { it.copy(error = exception.message) }
-            }
+            result.onSuccess { onSuccess() }
+                .onFailure { exception ->
+                    _uiState.update { it.copy(error = exception.message) }
+                }
         }
     }
 

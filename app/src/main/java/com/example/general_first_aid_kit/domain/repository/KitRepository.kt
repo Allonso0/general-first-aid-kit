@@ -22,7 +22,7 @@ interface KitRepository {
 
     suspend fun deleteKit(kitId: String): Result<Unit>
 
-    suspend fun joinKitByCode(userId: String, inviteCode: String): Result<Unit>
+    suspend fun joinKitByCode(userId: String, inviteCode: String): Result<Kit>
 
     suspend fun refreshInviteCode(kitId: String): Result<String>
 

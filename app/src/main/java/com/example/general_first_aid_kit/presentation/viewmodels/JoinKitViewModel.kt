@@ -30,7 +30,7 @@ class JoinKitViewModel @Inject constructor(
                 return@launch
             }
 
-            val result = joinKitByCodeUseCase(user.id, inviteCode)
+            val result = joinKitByCodeUseCase(user.id, inviteCode, user.name)
 
             if (result.isSuccess) {
                 _uiState.update { it.copy(isLoading = false) }
