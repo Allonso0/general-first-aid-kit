@@ -23,6 +23,7 @@ import com.example.general_first_aid_kit.presentation.screens.MedicationInfoScre
 import com.example.general_first_aid_kit.presentation.screens.ProfileScreen
 import com.example.general_first_aid_kit.presentation.screens.ProfileSettingsScreen
 import com.example.general_first_aid_kit.presentation.screens.RegistrationScreen
+import com.example.general_first_aid_kit.presentation.screens.NotificationLogScreen
 import com.example.general_first_aid_kit.presentation.screens.ScanBarcodeScreen
 import com.example.general_first_aid_kit.presentation.viewmodels.AuthViewModel
 
@@ -97,6 +98,9 @@ fun NavigationRoot(
                         },
                         onNavigateToProfileSettings = {
                             backStack.add(Route.ProfileSettings)
+                        },
+                        onNavigateToNotificationLog = {
+                            backStack.add(Route.NotificationLog)
                         }
                     )
                 }
@@ -167,6 +171,9 @@ fun NavigationRoot(
                             backStack.pop()
                         }
                     )
+                }
+                is Route.NotificationLog -> NavEntry(key) {
+                    NotificationLogScreen(onNavigateBack = { backStack.pop() })
                 }
                 is Route.JoinKit -> NavEntry(key) {
                     JoinKitScreen(onNavigateBack = { backStack.pop() })
