@@ -144,7 +144,8 @@ class KitSettingsViewModel @Inject constructor(
 
         _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
-            val result = removeUserFromKitUseCase(currentKitId, state.currentUserId)
+            val actorName = getUserUseCase()?.name ?: ""
+            val result = removeUserFromKitUseCase(currentKitId, state.currentUserId, actorName)
             if (result.isSuccess) {
                 onSuccess()
             } else {
@@ -163,7 +164,8 @@ class KitSettingsViewModel @Inject constructor(
 
     fun removeParticipant(userId: String) {
         viewModelScope.launch {
-            removeUserFromKitUseCase(currentKitId, userId)
+            val actorName = _uiState.value.participants.find { it.id == userId }?.name ?: ""
+            removeUserFromKitUseCase(currentKitId, userId, actorName)
         }
     }
 }

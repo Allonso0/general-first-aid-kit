@@ -8,6 +8,7 @@ import androidx.work.workDataOf
 import com.example.general_first_aid_kit.data.worker.LowStockCheckWorker
 import com.example.general_first_aid_kit.domain.model.Medication
 import com.example.general_first_aid_kit.domain.usecase.GetMedicationByBarcodeUseCase
+import com.example.general_first_aid_kit.domain.usecase.GetUserUseCase
 import com.example.general_first_aid_kit.domain.usecase.SaveMedicationUseCase
 import com.example.general_first_aid_kit.domain.util.MedicationValidator
 import com.example.general_first_aid_kit.domain.util.ValidationResult
@@ -23,6 +24,7 @@ import javax.inject.Inject
 class AddMedicationViewModel @Inject constructor(
     private val saveMedicationUseCase: SaveMedicationUseCase,
     private val getMedicationByBarcodeUseCase: GetMedicationByBarcodeUseCase,
+    private val getUserUseCase: GetUserUseCase,
     private val workManager: WorkManager
 ) : ViewModel() {
 
@@ -55,6 +57,7 @@ class AddMedicationViewModel @Inject constructor(
         _uiState.update { it.copy(isLoading = true, error = null) }
 
         viewModelScope.launch {
+            val user = getUserUseCase()
             val medicationId = UUID.randomUUID().toString()
             val medication = Medication(
                 id = medicationId,
@@ -69,7 +72,10 @@ class AddMedicationViewModel @Inject constructor(
             val result = saveMedicationUseCase(
                 kitId = kitId,
                 medication = medication,
-                localPhotoUri = state.photoUri
+                localPhotoUri = state.photoUri,
+                actorUserId = user?.id ?: "",
+                actorName = user?.name ?: "",
+                isNew = true
             )
 
             _uiState.update { it.copy(isLoading = false) }

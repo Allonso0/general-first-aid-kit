@@ -74,11 +74,12 @@ class EditMedicationViewModel @Inject constructor(
         if (!validateInputs()) return
 
         val state = _uiState.value
-        val medId = originalMedication?.id ?: return
+        originalMedication?.id ?: return
 
         _uiState.update { it.copy(isLoading = true, error = null) }
 
         viewModelScope.launch {
+            val user = getUserUseCase()
             val updatedMedication = originalMedication!!.copy(
                 name = state.name.trim(),
                 expirationDate = state.expirationDateMillis ?: 0L,
@@ -93,7 +94,10 @@ class EditMedicationViewModel @Inject constructor(
             val result = saveMedicationUseCase(
                 kitId = kitId,
                 medication = updatedMedication,
-                localPhotoUri = localUri
+                localPhotoUri = localUri,
+                actorUserId = user?.id ?: "",
+                actorName = user?.name ?: "",
+                isNew = false
             )
 
             _uiState.update { it.copy(isLoading = false) }
@@ -110,7 +114,13 @@ class EditMedicationViewModel @Inject constructor(
         _uiState.update { it.copy(isLoading = true) }
 
         viewModelScope.launch {
-            val result = deleteMedicationUseCase(kitId, medication)
+            val user = getUserUseCase()
+            val result = deleteMedicationUseCase(
+                kitId = kitId,
+                medication = medication,
+                actorUserId = user?.id ?: "",
+                actorName = user?.name ?: ""
+            )
             _uiState.update { it.copy(isLoading = false) }
             result.onSuccess { onSuccess() }
                 .onFailure { e -> _uiState.update { it.copy(error = e.message) } }
