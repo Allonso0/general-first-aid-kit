@@ -2,6 +2,7 @@ package com.example.general_first_aid_kit.presentation.service
 
 import android.content.Context
 import com.example.general_first_aid_kit.domain.model.NotificationType
+import com.example.general_first_aid_kit.domain.usecase.GetKitNotificationSettingsUseCase
 import com.example.general_first_aid_kit.domain.usecase.GetNotificationsUseCase
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -21,11 +22,14 @@ private val memberActivityTypes = setOf(
     NotificationType.MEMBER_EDITED_MEDICATION
 )
 
+private val pushEligibleTypes = memberActivityTypes + NotificationType.LOW_STOCK
+
 @Singleton
 class NotificationPushObserver @Inject constructor(
     @ApplicationContext private val context: Context,
     private val auth: FirebaseAuth,
-    private val getNotifications: GetNotificationsUseCase
+    private val getNotifications: GetNotificationsUseCase,
+    private val getSettings: GetKitNotificationSettingsUseCase
 ) {
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private var observationJob: Job? = null
@@ -48,15 +52,23 @@ class NotificationPushObserver @Inject constructor(
                 return@collect
             }
             notifications
-                .filter { it.id !in seenIds && !it.isRead && it.type in memberActivityTypes }
+                .filter { it.id !in seenIds && !it.isRead && it.type in pushEligibleTypes }
                 .forEach { notification ->
                     seenIds.add(notification.id)
-                    NotificationHelper.showNotification(
-                        context,
-                        notification.type,
-                        "Аптечка",
-                        notification.message
-                    )
+                    val settings = runCatching {
+                        getSettings(userId, notification.kitId)
+                    }.getOrNull() ?: return@forEach
+
+                    val shouldPush = when (notification.type) {
+                        in memberActivityTypes -> settings.notifyMemberActivity
+                        NotificationType.LOW_STOCK -> settings.notifyLowStock
+                        else -> false
+                    }
+                    if (shouldPush) {
+                        NotificationHelper.showNotification(
+                            context, notification.type, "Аптечка", notification.message
+                        )
+                    }
                 }
         }
     }

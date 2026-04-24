@@ -2,10 +2,6 @@ package com.example.general_first_aid_kit.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
-import androidx.work.workDataOf
-import com.example.general_first_aid_kit.data.worker.LowStockCheckWorker
 import com.example.general_first_aid_kit.domain.model.Medication
 import com.example.general_first_aid_kit.domain.usecase.GetMedicationByBarcodeUseCase
 import com.example.general_first_aid_kit.domain.usecase.GetUserUseCase
@@ -24,8 +20,7 @@ import javax.inject.Inject
 class AddMedicationViewModel @Inject constructor(
     private val saveMedicationUseCase: SaveMedicationUseCase,
     private val getMedicationByBarcodeUseCase: GetMedicationByBarcodeUseCase,
-    private val getUserUseCase: GetUserUseCase,
-    private val workManager: WorkManager
+    private val getUserUseCase: GetUserUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AddMedicationUiState())
@@ -80,29 +75,11 @@ class AddMedicationViewModel @Inject constructor(
 
             _uiState.update { it.copy(isLoading = false) }
 
-            result.onSuccess {
-                enqueueLowStockCheck(kitId, medicationId, medication.name, medication.quantity)
-                onSuccess()
-            }.onFailure { exception ->
-                _uiState.update { it.copy(error = exception.message) }
-            }
+            result.onSuccess { onSuccess() }
+                .onFailure { exception ->
+                    _uiState.update { it.copy(error = exception.message) }
+                }
         }
-    }
-
-    private fun enqueueLowStockCheck(
-        kitId: String,
-        medicationId: String,
-        medicationName: String,
-        quantity: Int
-    ) {
-        if (quantity > LowStockCheckWorker.LOW_STOCK_THRESHOLD) return
-        val data = workDataOf(
-            LowStockCheckWorker.KEY_KIT_ID to kitId,
-            LowStockCheckWorker.KEY_MEDICATION_ID to medicationId,
-            LowStockCheckWorker.KEY_MEDICATION_NAME to medicationName,
-            LowStockCheckWorker.KEY_QUANTITY to quantity
-        )
-        workManager.enqueue(OneTimeWorkRequestBuilder<LowStockCheckWorker>().setInputData(data).build())
     }
 
     private fun validateInputs(): Boolean {
