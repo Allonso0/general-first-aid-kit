@@ -2,6 +2,10 @@ package com.example.general_first_aid_kit.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.workDataOf
+import com.example.general_first_aid_kit.data.worker.LowStockCheckWorker
 import com.example.general_first_aid_kit.domain.model.Medication
 import com.example.general_first_aid_kit.domain.usecase.GetMedicationUseCase
 import com.example.general_first_aid_kit.domain.usecase.GetUserUseCase
@@ -18,7 +22,8 @@ class MedicationInfoViewModel @Inject constructor(
     private val getMedicationUseCase: GetMedicationUseCase,
     private val saveMedicationUseCase: SaveMedicationUseCase,
     private val observeKitUseCase: ObserveKitUseCase,
-    private val getUserUseCase: GetUserUseCase
+    private val getUserUseCase: GetUserUseCase,
+    private val workManager: WorkManager
 ) : ViewModel() {
 
     private val _medication = MutableStateFlow<Medication?>(null)
@@ -59,8 +64,21 @@ class MedicationInfoViewModel @Inject constructor(
             )
             if (result.isFailure) {
                 _medication.value = currentMed
+            } else {
+                enqueueLowStockCheck(currentKitId, updatedMed.id, updatedMed.name, newQuantity)
             }
         }
+    }
+
+    private fun enqueueLowStockCheck(kitId: String, medicationId: String, name: String, quantity: Int) {
+        if (quantity > LowStockCheckWorker.LOW_STOCK_THRESHOLD) return
+        val data = workDataOf(
+            LowStockCheckWorker.KEY_KIT_ID to kitId,
+            LowStockCheckWorker.KEY_MEDICATION_ID to medicationId,
+            LowStockCheckWorker.KEY_MEDICATION_NAME to name,
+            LowStockCheckWorker.KEY_QUANTITY to quantity
+        )
+        workManager.enqueue(OneTimeWorkRequestBuilder<LowStockCheckWorker>().setInputData(data).build())
     }
 
     fun startObservingKit(kitId: String) {

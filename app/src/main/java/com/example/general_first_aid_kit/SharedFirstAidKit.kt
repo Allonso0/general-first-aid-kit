@@ -8,6 +8,7 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.example.general_first_aid_kit.data.worker.ExpiryCheckWorker
 import com.example.general_first_aid_kit.presentation.service.NotificationHelper
+import com.example.general_first_aid_kit.presentation.service.NotificationPushObserver
 import dagger.hilt.android.HiltAndroidApp
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -16,6 +17,7 @@ import javax.inject.Inject
 class SharedFirstAidKit : Application(), Configuration.Provider {
 
     @Inject lateinit var workerFactory: HiltWorkerFactory
+    @Inject lateinit var notificationPushObserver: NotificationPushObserver
 
     override val workManagerConfiguration: Configuration
         get() = Configuration.Builder()
@@ -25,6 +27,7 @@ class SharedFirstAidKit : Application(), Configuration.Provider {
     override fun onCreate() {
         super.onCreate()
         NotificationHelper.createChannels(this)
+        notificationPushObserver.start()
         scheduleExpiryCheck()
     }
 

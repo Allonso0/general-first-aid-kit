@@ -3,6 +3,7 @@ package com.example.general_first_aid_kit.presentation.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.general_first_aid_kit.domain.model.AppNotification
+import com.example.general_first_aid_kit.domain.usecase.DeleteAllNotificationsUseCase
 import com.example.general_first_aid_kit.domain.usecase.GetNotificationsUseCase
 import com.example.general_first_aid_kit.domain.usecase.GetUserUseCase
 import com.example.general_first_aid_kit.domain.usecase.MarkNotificationsReadUseCase
@@ -18,6 +19,7 @@ import javax.inject.Inject
 class NotificationLogViewModel @Inject constructor(
     private val getNotifications: GetNotificationsUseCase,
     private val markAllRead: MarkNotificationsReadUseCase,
+    private val deleteAll: DeleteAllNotificationsUseCase,
     private val getUser: GetUserUseCase
 ) : ViewModel() {
 
@@ -44,6 +46,13 @@ class NotificationLogViewModel @Inject constructor(
         viewModelScope.launch {
             val userId = getUser()?.id ?: return@launch
             markAllRead(userId)
+        }
+    }
+
+    fun onDeleteAll() {
+        viewModelScope.launch {
+            val userId = getUser()?.id ?: return@launch
+            deleteAll(userId)
         }
     }
 }

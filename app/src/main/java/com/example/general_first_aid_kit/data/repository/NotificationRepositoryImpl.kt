@@ -3,6 +3,7 @@ package com.example.general_first_aid_kit.data.repository
 import com.example.general_first_aid_kit.domain.model.AppNotification
 import com.example.general_first_aid_kit.domain.model.NotificationType
 import com.example.general_first_aid_kit.domain.repository.NotificationRepository
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import kotlinx.coroutines.Dispatchers
@@ -32,7 +33,12 @@ class NotificationRepositoryImpl @Inject constructor(
                             kitName = doc.getString("kitName") ?: "",
                             type = NotificationType.valueOf(doc.getString("type") ?: "EXPIRED"),
                             message = doc.getString("message") ?: "",
-                            timestamp = doc.getLong("timestamp") ?: 0L,
+                            timestamp = when (val raw = doc.get("timestamp")) {
+                                is Long -> raw
+                                is Double -> raw.toLong()
+                                is Timestamp -> raw.toDate().time
+                                else -> 0L
+                            },
                             isRead = doc.getBoolean("isRead") ?: false
                         )
                     }.getOrNull()
@@ -66,6 +72,17 @@ class NotificationRepositoryImpl @Inject constructor(
             if (unread.isEmpty) return@withContext
             val batch = firestore.batch()
             unread.documents.forEach { batch.update(it.reference, "isRead", true) }
+            batch.commit().await()
+        }
+    }
+
+    override suspend fun deleteAllNotifications(userId: String) {
+        withContext(Dispatchers.IO) {
+            val col = firestore.collection("users").document(userId).collection("notifications")
+            val all = col.get().await()
+            if (all.isEmpty) return@withContext
+            val batch = firestore.batch()
+            all.documents.forEach { batch.delete(it.reference) }
             batch.commit().await()
         }
     }

@@ -25,7 +25,7 @@ object NotificationHelper {
             NotificationChannel(CHANNEL_STOCK, "Остаток", NotificationManager.IMPORTANCE_DEFAULT)
         )
         manager.createNotificationChannel(
-            NotificationChannel(CHANNEL_ACTIVITY, "Активность участников", NotificationManager.IMPORTANCE_LOW)
+            NotificationChannel(CHANNEL_ACTIVITY, "Активность участников", NotificationManager.IMPORTANCE_DEFAULT)
         )
     }
 

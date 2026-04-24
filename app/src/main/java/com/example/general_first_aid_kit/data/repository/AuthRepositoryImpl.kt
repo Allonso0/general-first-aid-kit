@@ -4,6 +4,11 @@ import com.example.general_first_aid_kit.domain.repository.AuthRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
+import com.google.firebase.messaging.FirebaseMessaging
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
@@ -22,6 +27,7 @@ class AuthRepositoryImpl @Inject constructor(
 
     override suspend fun signIn(email: String, password: String): Result<Unit> = try {
         firebaseAuth.signInWithEmailAndPassword(email, password).await()
+        saveFcmToken(firebaseAuth.currentUser?.uid)
         Result.success(Unit)
     } catch (e: Exception) {
         Result.failure(e)
@@ -44,9 +50,22 @@ class AuthRepositoryImpl @Inject constructor(
             )
         ).await()
 
+        saveFcmToken(user.uid)
         Result.success(Unit)
     } catch (e: Exception) {
         Result.failure(e)
+    }
+
+    private fun saveFcmToken(userId: String?) {
+        if (userId == null) return
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val token = FirebaseMessaging.getInstance().token.await()
+                firestore.collection("users").document(userId)
+                    .set(mapOf("fcmToken" to token), SetOptions.merge())
+                    .await()
+            } catch (_: Exception) { }
+        }
     }
 
     override fun signOut() {

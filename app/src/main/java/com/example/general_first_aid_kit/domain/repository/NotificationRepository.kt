@@ -7,4 +7,5 @@ interface NotificationRepository {
     fun observeNotifications(userId: String): Flow<List<AppNotification>>
     suspend fun saveNotification(userId: String, notification: AppNotification)
     suspend fun markAllAsRead(userId: String)
+    suspend fun deleteAllNotifications(userId: String)
 }
