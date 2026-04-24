@@ -1,6 +1,7 @@
 package com.example.general_first_aid_kit.presentation.screens
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -29,6 +30,7 @@ import com.example.general_first_aid_kit.presentation.utils.shimmerEffect
 import com.example.general_first_aid_kit.presentation.viewmodels.KitSettingsEvent
 import com.example.general_first_aid_kit.presentation.viewmodels.KitSettingsUiState
 import com.example.general_first_aid_kit.presentation.viewmodels.KitSettingsViewModel
+import com.example.general_first_aid_kit.presentation.viewmodels.NotificationSetting
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -161,12 +163,12 @@ fun KitSettingsScreen(
         ) {
             GenericTabRow(
                 selectedTabIndex = state.selectedTab,
-                tabs = listOf("Настройки", "Участники"),
+                tabs = listOf("Настройки", "Участники", "Уведомления"),
                 onTabSelected = { viewModel.onEvent(KitSettingsEvent.TabChanged(it)) }
             )
 
-            if (state.selectedTab == 0) {
-                SettingsTabContent(
+            when (state.selectedTab) {
+                0 -> SettingsTabContent(
                     state = state,
                     onEvent = viewModel::onEvent,
                     onShowColorDialog = { showColorDialog = true },
@@ -177,11 +179,14 @@ fun KitSettingsScreen(
                         else showToPersonalDialog = true
                     }
                 )
-            } else {
-                ParticipantsTabContent(
+                1 -> ParticipantsTabContent(
                     state = state,
                     onGenerateCode = { viewModel.generateInviteCode() },
                     onRemoveParticipant = viewModel::removeParticipant
+                )
+                else -> NotificationsTabContent(
+                    state = state,
+                    onEvent = viewModel::onEvent
                 )
             }
         }
@@ -437,6 +442,7 @@ fun ParticipantsTabContent(
     }
 
     if (showInviteDialog) {
+
         AlertDialog(
             onDismissRequest = { showInviteDialog = false },
             containerColor = White,
@@ -505,6 +511,86 @@ fun ParticipantsTabContent(
                     )
                 }
             }
+        )
+    }
+}
+
+@Composable
+fun NotificationsTabContent(
+    state: KitSettingsUiState,
+    onEvent: (KitSettingsEvent) -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(Dimensions.PaddingMedium),
+        verticalArrangement = Arrangement.spacedBy(Dimensions.SpacingExtraSmall)
+    ) {
+        KitSectionTitle("Уведомления для этой аптечки")
+
+        NotificationCheckboxItem(
+            checked = state.notifyExpiry,
+            text = "Уведомлять об истечении срока годности",
+            onCheckedChange = {
+                onEvent(KitSettingsEvent.NotificationSettingChanged(NotificationSetting.EXPIRY, it))
+            }
+        )
+
+        NotificationCheckboxItem(
+            checked = state.notifyLowStock,
+            text = "Уведомлять о низком остатке",
+            onCheckedChange = {
+                onEvent(KitSettingsEvent.NotificationSettingChanged(NotificationSetting.LOW_STOCK, it))
+            }
+        )
+
+        if (state.isPublic) {
+            NotificationCheckboxItem(
+                checked = state.notifyMemberActivity,
+                text = "Уведомлять об активности участников",
+                onCheckedChange = {
+                    onEvent(KitSettingsEvent.NotificationSettingChanged(NotificationSetting.MEMBER_ACTIVITY, it))
+                }
+            )
+        }
+
+        Spacer(modifier = Modifier.height(Dimensions.SpacingMedium))
+
+        Text(
+            text = "Настройки применяются только к этой аптечке. Даже отключённые уведомления сохраняются в журнале.",
+            style = MaterialTheme.typography.labelSmall,
+            color = TextGray
+        )
+    }
+}
+
+@Composable
+private fun NotificationCheckboxItem(
+    checked: Boolean,
+    text: String,
+    onCheckedChange: (Boolean) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onCheckedChange(!checked) }
+            .padding(vertical = Dimensions.PaddingExtraSmall),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Checkbox(
+            checked = checked,
+            onCheckedChange = onCheckedChange,
+            colors = CheckboxDefaults.colors(
+                checkedColor = GreenPrimary,
+                checkmarkColor = White
+            )
+        )
+        Spacer(modifier = Modifier.width(Dimensions.SpacingSmall))
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodyMedium,
+            color = TextBlack
         )
     }
 }
