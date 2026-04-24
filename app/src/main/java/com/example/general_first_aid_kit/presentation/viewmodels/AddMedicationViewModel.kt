@@ -2,6 +2,10 @@ package com.example.general_first_aid_kit.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.workDataOf
+import com.example.general_first_aid_kit.data.worker.LowStockCheckWorker
 import com.example.general_first_aid_kit.domain.model.Medication
 import com.example.general_first_aid_kit.domain.usecase.GetMedicationByBarcodeUseCase
 import com.example.general_first_aid_kit.domain.usecase.SaveMedicationUseCase
@@ -12,12 +16,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
 class AddMedicationViewModel @Inject constructor(
     private val saveMedicationUseCase: SaveMedicationUseCase,
-    private val getMedicationByBarcodeUseCase: GetMedicationByBarcodeUseCase
+    private val getMedicationByBarcodeUseCase: GetMedicationByBarcodeUseCase,
+    private val workManager: WorkManager
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AddMedicationUiState())
@@ -49,7 +55,9 @@ class AddMedicationViewModel @Inject constructor(
         _uiState.update { it.copy(isLoading = true, error = null) }
 
         viewModelScope.launch {
+            val medicationId = UUID.randomUUID().toString()
             val medication = Medication(
+                id = medicationId,
                 name = state.name.trim(),
                 expirationDate = state.expirationDateMillis ?: 0L,
                 quantity = state.quantity.toIntOrNull() ?: 0,
@@ -67,11 +75,28 @@ class AddMedicationViewModel @Inject constructor(
             _uiState.update { it.copy(isLoading = false) }
 
             result.onSuccess {
+                enqueueLowStockCheck(kitId, medicationId, medication.name, medication.quantity)
                 onSuccess()
             }.onFailure { exception ->
                 _uiState.update { it.copy(error = exception.message) }
             }
         }
+    }
+
+    private fun enqueueLowStockCheck(
+        kitId: String,
+        medicationId: String,
+        medicationName: String,
+        quantity: Int
+    ) {
+        if (quantity > LowStockCheckWorker.LOW_STOCK_THRESHOLD) return
+        val data = workDataOf(
+            LowStockCheckWorker.KEY_KIT_ID to kitId,
+            LowStockCheckWorker.KEY_MEDICATION_ID to medicationId,
+            LowStockCheckWorker.KEY_MEDICATION_NAME to medicationName,
+            LowStockCheckWorker.KEY_QUANTITY to quantity
+        )
+        workManager.enqueue(OneTimeWorkRequestBuilder<LowStockCheckWorker>().setInputData(data).build())
     }
 
     private fun validateInputs(): Boolean {

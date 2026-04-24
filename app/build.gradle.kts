@@ -28,7 +28,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.general_first_aid_kit"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -97,6 +97,8 @@ dependencies {
     implementation(libs.firebase.storage)
     implementation(libs.firebase.messaging)
     implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.androidx.hilt.work)
+    ksp(libs.androidx.hilt.compiler)
 
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.hilt.android)

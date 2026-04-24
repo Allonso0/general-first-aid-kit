@@ -2,6 +2,10 @@ package com.example.general_first_aid_kit.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.workDataOf
+import com.example.general_first_aid_kit.data.worker.LowStockCheckWorker
 import com.example.general_first_aid_kit.domain.model.Medication
 import com.example.general_first_aid_kit.domain.usecase.GetMedicationUseCase
 import com.example.general_first_aid_kit.domain.usecase.SaveMedicationUseCase
@@ -23,7 +27,8 @@ class EditMedicationViewModel @Inject constructor(
     private val saveMedicationUseCase: SaveMedicationUseCase,
     private val deleteMedicationUseCase: DeleteMedicationUseCase,
     private val observeKitUseCase: ObserveKitUseCase,
-    private val getUserUseCase: GetUserUseCase
+    private val getUserUseCase: GetUserUseCase,
+    private val workManager: WorkManager
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AddMedicationUiState())
@@ -70,7 +75,7 @@ class EditMedicationViewModel @Inject constructor(
 
         val state = _uiState.value
         val medId = originalMedication?.id ?: return
-        
+
         _uiState.update { it.copy(isLoading = true, error = null) }
 
         viewModelScope.launch {
@@ -93,21 +98,39 @@ class EditMedicationViewModel @Inject constructor(
 
             _uiState.update { it.copy(isLoading = false) }
 
-            result.onSuccess { onSuccess() }
-                .onFailure { e -> _uiState.update { it.copy(error = e.message) } }
+            result.onSuccess {
+                enqueueLowStockCheck(kitId, updatedMedication.id, updatedMedication.name, updatedMedication.quantity)
+                onSuccess()
+            }.onFailure { e -> _uiState.update { it.copy(error = e.message) } }
         }
     }
 
     fun deleteMedication(onSuccess: () -> Unit) {
         val medication = originalMedication ?: return
         _uiState.update { it.copy(isLoading = true) }
-        
+
         viewModelScope.launch {
             val result = deleteMedicationUseCase(kitId, medication)
             _uiState.update { it.copy(isLoading = false) }
             result.onSuccess { onSuccess() }
                 .onFailure { e -> _uiState.update { it.copy(error = e.message) } }
         }
+    }
+
+    private fun enqueueLowStockCheck(
+        kitId: String,
+        medicationId: String,
+        medicationName: String,
+        quantity: Int
+    ) {
+        if (quantity > LowStockCheckWorker.LOW_STOCK_THRESHOLD) return
+        val data = workDataOf(
+            LowStockCheckWorker.KEY_KIT_ID to kitId,
+            LowStockCheckWorker.KEY_MEDICATION_ID to medicationId,
+            LowStockCheckWorker.KEY_MEDICATION_NAME to medicationName,
+            LowStockCheckWorker.KEY_QUANTITY to quantity
+        )
+        workManager.enqueue(OneTimeWorkRequestBuilder<LowStockCheckWorker>().setInputData(data).build())
     }
 
     private fun validateInputs(): Boolean {
