@@ -115,3 +115,61 @@ fun LeaveKitConfirmationDialog(
         containerColor = White
     )
 }
+
+@Composable
+fun ArchiveKitConfirmationDialog(
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(text = "Архивировать аптечку?", color = TextBlack) },
+        text = { Text(
+            text = "Аптечка будет скрыта из основного списка и перемещена во вкладку «Архивные». Уведомления из этой аптечки поступать не будут.",
+            color = TextBlack
+        ) },
+        confirmButton = {
+            Button(
+                onClick = onConfirm,
+                colors = ButtonDefaults.buttonColors(containerColor = GreenPrimary)
+            ) {
+                Text("Архивировать", color = White)
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Отмена", color = TextGray)
+            }
+        },
+        containerColor = White
+    )
+}
+
+@Composable
+fun UnarchiveKitConfirmationDialog(
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(text = "Активировать аптечку?", color = TextBlack) },
+        text = { Text(
+            text = "Аптечка вернётся в основной список активных аптечек. Уведомления из неё возобновятся.",
+            color = TextBlack
+        ) },
+        confirmButton = {
+            Button(
+                onClick = onConfirm,
+                colors = ButtonDefaults.buttonColors(containerColor = GreenPrimary)
+            ) {
+                Text("Активировать", color = White)
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Отмена", color = TextGray)
+            }
+        },
+        containerColor = White
+    )
+}

@@ -31,8 +31,8 @@ class FanOutNotificationUseCase @Inject constructor(
 
         if (kit.type == KitType.PERSONAL && type in memberActivityTypes) return
 
-        val recipients = if (includeActor) kit.userIds
-                         else kit.userIds.filter { it != actorUserId }
+        val recipients = (if (includeActor) kit.userIds else kit.userIds.filter { it != actorUserId })
+            .filter { it !in kit.archivedUserIds }
         val timestamp = System.currentTimeMillis()
 
         recipients.forEach { userId ->

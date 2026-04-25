@@ -132,6 +132,18 @@ class KitRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun setArchived(kitId: String, userId: String, archived: Boolean): Result<Unit> = try {
+        val fieldValue = if (archived)
+            com.google.firebase.firestore.FieldValue.arrayUnion(userId)
+        else
+            com.google.firebase.firestore.FieldValue.arrayRemove(userId)
+        firestore.collection("kits").document(kitId)
+            .update("archivedUserIds", fieldValue).await()
+        Result.success(Unit)
+    } catch (e: Exception) {
+        Result.failure(e)
+    }
+
     override fun observeKit(kitId: String): Flow<Kit?> = callbackFlow {
         val subscription = firestore.collection("kits").document(kitId)
             .addSnapshotListener { snapshot, error ->

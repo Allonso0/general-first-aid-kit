@@ -13,6 +13,7 @@ import com.example.general_first_aid_kit.domain.usecase.GetUsersByIdsUseCase
 import com.example.general_first_aid_kit.domain.usecase.ObserveKitUseCase
 import com.example.general_first_aid_kit.domain.usecase.RefreshInviteCodeUseCase
 import com.example.general_first_aid_kit.domain.usecase.RemoveUserFromKitUseCase
+import com.example.general_first_aid_kit.domain.usecase.SetKitArchivedUseCase
 import com.example.general_first_aid_kit.domain.usecase.UpdateKitNotificationSettingsUseCase
 import com.example.general_first_aid_kit.domain.usecase.UpdateKitUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -33,7 +34,8 @@ class KitSettingsViewModel @Inject constructor(
     private val removeUserFromKitUseCase: RemoveUserFromKitUseCase,
     private val observeKitUseCase: ObserveKitUseCase,
     private val getKitNotificationSettings: GetKitNotificationSettingsUseCase,
-    private val updateKitNotificationSettings: UpdateKitNotificationSettingsUseCase
+    private val updateKitNotificationSettings: UpdateKitNotificationSettingsUseCase,
+    private val setKitArchivedUseCase: SetKitArchivedUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(KitSettingsUiState())
@@ -91,6 +93,7 @@ class KitSettingsViewModel @Inject constructor(
                         location = kit.location,
                         selectedColorIndex = kit.colorIndex,
                         isPublic = kit.type == KitType.SHARED,
+                        isArchived = currentUserId in kit.archivedUserIds,
                         inviteCode = kit.inviteCode,
                         ownerId = kit.ownerId,
                         isOwner = kit.ownerId == currentUser?.id,
@@ -221,6 +224,17 @@ class KitSettingsViewModel @Inject constructor(
             removeUserFromKitUseCase(currentKitId, userId, actorName)
         }
     }
+
+    fun setArchived(archived: Boolean, onSuccess: () -> Unit) {
+        val userId = _uiState.value.currentUserId
+        if (userId.isEmpty()) return
+        _uiState.update { it.copy(isLoading = true) }
+        viewModelScope.launch {
+            val result = setKitArchivedUseCase(currentKitId, userId, archived)
+            if (result.isSuccess) onSuccess()
+            else _uiState.update { it.copy(isLoading = false, error = "Ошибка при изменении статуса аптечки") }
+        }
+    }
 }
 
 enum class NotificationSetting { EXPIRY, LOW_STOCK, MEMBER_ACTIVITY }
@@ -230,6 +244,7 @@ data class KitSettingsUiState(
     val location: String = "",
     val selectedColorIndex: Int = 0,
     val isPublic: Boolean = false,
+    val isArchived: Boolean = false,
     val isKitDeleted: Boolean = false,
     val notifyExpiry: Boolean = true,
     val notifyLowStock: Boolean = true,

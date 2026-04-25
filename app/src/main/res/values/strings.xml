@@ -90,6 +90,14 @@
     <string name="error_short_username">Имя слишком короткое</string>
     <string name="error_long_username">Имя должно быть не длиннее 20 символов</string>
 
+    <!--Архивирование аптечки-->
+    <string name="kit_archive">Архивировать аптечку</string>
+    <string name="kit_unarchive">Активировать аптечку</string>
+    <string name="kit_archive_dialog_title">Архивировать аптечку?</string>
+    <string name="kit_archive_dialog_text">Аптечка будет скрыта из основного списка и перемещена во вкладку «Архивные». Уведомления из этой аптечки поступать не будут.</string>
+    <string name="kit_unarchive_dialog_title">Активировать аптечку?</string>
+    <string name="kit_unarchive_dialog_text">Аптечка вернётся в основной список активных аптечек. Уведомления из неё возобновятся.</string>
+
     <!--Экран настроек-->
     <string name="settings_notifications_section">Уведомления</string>
     <string name="low_stock_threshold_label">Порог низкого остатка (шт.)</string>
