@@ -132,6 +132,14 @@ class KitRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun setArchived(kitId: String, archived: Boolean): Result<Unit> = try {
+        firestore.collection("kits").document(kitId)
+            .update("isArchived", archived).await()
+        Result.success(Unit)
+    } catch (e: Exception) {
+        Result.failure(e)
+    }
+
     override fun observeKit(kitId: String): Flow<Kit?> = callbackFlow {
         val subscription = firestore.collection("kits").document(kitId)
             .addSnapshotListener { snapshot, error ->

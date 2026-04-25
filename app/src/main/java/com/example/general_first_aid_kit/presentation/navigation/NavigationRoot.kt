@@ -148,6 +148,9 @@ fun NavigationRoot(
                         },
                         onDeleteSuccess = {
                             backStack.setStack(Route.Main)
+                        },
+                        onArchiveSuccess = {
+                            backStack.setStack(Route.Main)
                         }
                     )
                 }

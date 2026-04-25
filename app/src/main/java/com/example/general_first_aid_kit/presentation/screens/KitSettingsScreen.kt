@@ -42,6 +42,7 @@ fun KitSettingsScreen(
     onNavigateBack: () -> Unit,
     onSaveSuccess: () -> Unit,
     onDeleteSuccess: () -> Unit,
+    onArchiveSuccess: () -> Unit,
     viewModel: KitSettingsViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
@@ -50,6 +51,7 @@ fun KitSettingsScreen(
 
     var showDeleteConfirm by remember { mutableStateOf(false) }
     var showLeaveConfirm by remember { mutableStateOf(false) }
+    var showArchiveConfirm by remember { mutableStateOf(false) }
 
     var showColorDialog by remember { mutableStateOf(false) }
 
@@ -119,6 +121,26 @@ fun KitSettingsScreen(
         )
     }
 
+    if (showArchiveConfirm) {
+        if (state.isArchived) {
+            UnarchiveKitConfirmationDialog(
+                onConfirm = {
+                    viewModel.setArchived(false, onArchiveSuccess)
+                    showArchiveConfirm = false
+                },
+                onDismiss = { showArchiveConfirm = false }
+            )
+        } else {
+            ArchiveKitConfirmationDialog(
+                onConfirm = {
+                    viewModel.setArchived(true, onArchiveSuccess)
+                    showArchiveConfirm = false
+                },
+                onDismiss = { showArchiveConfirm = false }
+            )
+        }
+    }
+
     Scaffold(
         containerColor = White,
         topBar = {
@@ -174,6 +196,7 @@ fun KitSettingsScreen(
                     onShowColorDialog = { showColorDialog = true },
                     onDeleteClick = { showDeleteConfirm = true },
                     onLeaveClick = { showLeaveConfirm = true },
+                    onArchiveClick = { showArchiveConfirm = true },
                     onToggleTypeClick = { isPublicTarget ->
                         if (isPublicTarget) showToPublicDialog = true
                         else showToPersonalDialog = true
@@ -200,6 +223,7 @@ fun SettingsTabContent(
     onShowColorDialog: () -> Unit,
     onDeleteClick: () -> Unit,
     onLeaveClick: () -> Unit,
+    onArchiveClick: () -> Unit,
     onToggleTypeClick: (Boolean) -> Unit
 ) {
     Column(
@@ -252,13 +276,16 @@ fun SettingsTabContent(
         Spacer(modifier = Modifier.height(Dimensions.PaddingMedium))
 
         OutlinedButton(
-            onClick = { /* Archive */ },
+            onClick = onArchiveClick,
             modifier = Modifier.fillMaxWidth().height(Dimensions.MediumButtonHeight),
             border = BorderStroke(1.dp, GreenPrimary),
             shape = RoundedCornerShape(Dimensions.CornerRadiusMedium),
             colors = ButtonDefaults.outlinedButtonColors(contentColor = GreenPrimary)
         ) {
-            Text("Архивировать аптечку", fontWeight = FontWeight.SemiBold)
+            Text(
+                text = if (state.isArchived) "Активировать аптечку" else "Архивировать аптечку",
+                fontWeight = FontWeight.SemiBold
+            )
         }
 
         if (state.isOwner) {

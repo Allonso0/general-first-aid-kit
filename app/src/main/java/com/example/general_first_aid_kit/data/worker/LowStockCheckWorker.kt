@@ -37,7 +37,9 @@ class LowStockCheckWorker @AssistedInject constructor(
         val threshold = getAppSettings().lowStockThreshold
         if (quantity < 0 || quantity > threshold) return Result.success()
 
-        val kitName = getKit(kitId).getOrNull()?.name ?: kitId
+        val kit = getKit(kitId).getOrNull()
+        if (kit?.isArchived == true) return Result.success()
+        val kitName = kit?.name ?: kitId
         val now = System.currentTimeMillis()
         val message = "В аптечке «$kitName» заканчивается «$medicationName»: осталось $quantity шт."
 

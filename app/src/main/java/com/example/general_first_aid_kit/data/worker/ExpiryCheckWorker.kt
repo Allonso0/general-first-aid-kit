@@ -53,9 +53,9 @@ class ExpiryCheckWorker @AssistedInject constructor(
                 else -> continue
             }
 
-            val kitName = kitNameCache.getOrPut(medication.kitId) {
-                getKit(medication.kitId).getOrNull()?.name ?: medication.kitId
-            }
+            val kit = getKit(medication.kitId).getOrNull()
+            if (kit?.isArchived == true) continue
+            val kitName = kitNameCache.getOrPut(medication.kitId) { kit?.name ?: medication.kitId }
 
             val message = when (type) {
                 NotificationType.EXPIRED ->

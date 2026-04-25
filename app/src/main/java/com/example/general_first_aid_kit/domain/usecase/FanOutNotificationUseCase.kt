@@ -29,6 +29,7 @@ class FanOutNotificationUseCase @Inject constructor(
     ) {
         val kit = kitRepository.getKitById(kitId).getOrNull() ?: return
 
+        if (kit.isArchived) return
         if (kit.type == KitType.PERSONAL && type in memberActivityTypes) return
 
         val recipients = if (includeActor) kit.userIds
