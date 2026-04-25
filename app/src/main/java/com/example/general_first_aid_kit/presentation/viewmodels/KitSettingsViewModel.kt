@@ -93,7 +93,7 @@ class KitSettingsViewModel @Inject constructor(
                         location = kit.location,
                         selectedColorIndex = kit.colorIndex,
                         isPublic = kit.type == KitType.SHARED,
-                        isArchived = kit.isArchived,
+                        isArchived = currentUserId in kit.archivedUserIds,
                         inviteCode = kit.inviteCode,
                         ownerId = kit.ownerId,
                         isOwner = kit.ownerId == currentUser?.id,
@@ -226,9 +226,11 @@ class KitSettingsViewModel @Inject constructor(
     }
 
     fun setArchived(archived: Boolean, onSuccess: () -> Unit) {
+        val userId = _uiState.value.currentUserId
+        if (userId.isEmpty()) return
         _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
-            val result = setKitArchivedUseCase(currentKitId, archived)
+            val result = setKitArchivedUseCase(currentKitId, userId, archived)
             if (result.isSuccess) onSuccess()
             else _uiState.update { it.copy(isLoading = false, error = "Ошибка при изменении статуса аптечки") }
         }

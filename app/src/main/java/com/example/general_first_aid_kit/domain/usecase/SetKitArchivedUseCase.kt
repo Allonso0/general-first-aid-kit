@@ -6,6 +6,6 @@ import javax.inject.Inject
 class SetKitArchivedUseCase @Inject constructor(
     private val repository: KitRepository
 ) {
-    suspend operator fun invoke(kitId: String, archived: Boolean): Result<Unit> =
-        repository.setArchived(kitId, archived)
+    suspend operator fun invoke(kitId: String, userId: String, archived: Boolean): Result<Unit> =
+        repository.setArchived(kitId, userId, archived)
 }

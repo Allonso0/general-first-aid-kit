@@ -8,7 +8,7 @@ data class Kit(
     val ownerId: String = "",
     val userIds: List<String> = emptyList(),
     val type: KitType = KitType.PERSONAL,
-    val isArchived: Boolean = false,
+    val archivedUserIds: List<String> = emptyList(),
     val inviteCode: String? = null,
     val countMedicine: Int = 0,
     val countExpired: Int = 0,

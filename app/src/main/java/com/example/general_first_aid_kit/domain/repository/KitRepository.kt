@@ -28,7 +28,7 @@ interface KitRepository {
 
     suspend fun removeUserFromKit(kitId: String, userId: String): Result<Unit>
 
-    suspend fun setArchived(kitId: String, archived: Boolean): Result<Unit>
+    suspend fun setArchived(kitId: String, userId: String, archived: Boolean): Result<Unit>
 
     fun observeKit(kitId: String): Flow<Kit?>
 }

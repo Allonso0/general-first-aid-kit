@@ -132,9 +132,13 @@ class KitRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun setArchived(kitId: String, archived: Boolean): Result<Unit> = try {
+    override suspend fun setArchived(kitId: String, userId: String, archived: Boolean): Result<Unit> = try {
+        val fieldValue = if (archived)
+            com.google.firebase.firestore.FieldValue.arrayUnion(userId)
+        else
+            com.google.firebase.firestore.FieldValue.arrayRemove(userId)
         firestore.collection("kits").document(kitId)
-            .update("isArchived", archived).await()
+            .update("archivedUserIds", fieldValue).await()
         Result.success(Unit)
     } catch (e: Exception) {
         Result.failure(e)

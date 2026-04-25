@@ -6,6 +6,7 @@ import com.example.general_first_aid_kit.domain.model.Kit
 import com.example.general_first_aid_kit.domain.usecase.DeleteKitUseCase
 import com.example.general_first_aid_kit.domain.usecase.GetAllMedicationsUseCase
 import com.example.general_first_aid_kit.domain.usecase.GetKitsUseCase
+import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -22,7 +23,8 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(
     private val getKitsUseCase: GetKitsUseCase,
     private val deleteKitUseCase: DeleteKitUseCase,
-    private val getAllMedicationsUseCase: GetAllMedicationsUseCase
+    private val getAllMedicationsUseCase: GetAllMedicationsUseCase,
+    private val auth: FirebaseAuth
 ) : ViewModel() {
 
     private val _isArchiveMode = MutableStateFlow(false)
@@ -34,9 +36,10 @@ class MainViewModel @Inject constructor(
         _isArchiveMode
     ) { kits, allMedications, isArchive ->
         val currentTime = System.currentTimeMillis()
+        val currentUserId = auth.currentUser?.uid ?: ""
 
         val enrichedKits = kits
-            .filter { it.isArchived == isArchive }
+            .filter { (currentUserId in it.archivedUserIds) == isArchive }
             .map { kit ->
                 val kitMedications = allMedications.filter { it.kitId == kit.id }
 
