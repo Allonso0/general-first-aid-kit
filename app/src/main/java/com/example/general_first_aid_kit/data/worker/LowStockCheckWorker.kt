@@ -6,6 +6,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.example.general_first_aid_kit.domain.model.AppNotification
 import com.example.general_first_aid_kit.domain.model.NotificationType
+import com.example.general_first_aid_kit.domain.usecase.GetAppSettingsUseCase
 import com.example.general_first_aid_kit.domain.usecase.GetKitNotificationSettingsUseCase
 import com.example.general_first_aid_kit.domain.usecase.GetKitUseCase
 import com.example.general_first_aid_kit.domain.usecase.SaveNotificationUseCase
@@ -21,7 +22,8 @@ class LowStockCheckWorker @AssistedInject constructor(
     private val auth: FirebaseAuth,
     private val saveNotification: SaveNotificationUseCase,
     private val getSettings: GetKitNotificationSettingsUseCase,
-    private val getKit: GetKitUseCase
+    private val getKit: GetKitUseCase,
+    private val getAppSettings: GetAppSettingsUseCase
 ) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
@@ -32,7 +34,8 @@ class LowStockCheckWorker @AssistedInject constructor(
         val medicationName = inputData.getString(KEY_MEDICATION_NAME) ?: return Result.failure()
         val quantity = inputData.getInt(KEY_QUANTITY, -1)
 
-        if (quantity < 0 || quantity > LOW_STOCK_THRESHOLD) return Result.success()
+        val threshold = getAppSettings().lowStockThreshold
+        if (quantity < 0 || quantity > threshold) return Result.success()
 
         val kitName = getKit(kitId).getOrNull()?.name ?: kitId
         val now = System.currentTimeMillis()
@@ -66,7 +69,6 @@ class LowStockCheckWorker @AssistedInject constructor(
     }
 
     companion object {
-        const val LOW_STOCK_THRESHOLD = 2
         const val KEY_KIT_ID = "kit_id"
         const val KEY_MEDICATION_ID = "medication_id"
         const val KEY_MEDICATION_NAME = "medication_name"

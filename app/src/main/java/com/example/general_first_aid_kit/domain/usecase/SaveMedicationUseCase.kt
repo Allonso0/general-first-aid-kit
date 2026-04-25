@@ -5,12 +5,11 @@ import com.example.general_first_aid_kit.domain.model.NotificationType
 import com.example.general_first_aid_kit.domain.repository.MedicationRepository
 import javax.inject.Inject
 
-private const val LOW_STOCK_THRESHOLD = 2
-
 class SaveMedicationUseCase @Inject constructor(
     private val repository: MedicationRepository,
     private val getKit: GetKitUseCase,
-    private val fanOutNotification: FanOutNotificationUseCase
+    private val fanOutNotification: FanOutNotificationUseCase,
+    private val getAppSettings: GetAppSettingsUseCase
 ) {
     suspend operator fun invoke(
         kitId: String,
@@ -32,7 +31,7 @@ class SaveMedicationUseCase @Inject constructor(
                 "$actorName изменил(а) «${medication.name}» в аптечке «$kitName»"
             fanOutNotification(kitId, actorUserId, activityType, activityMessage)
 
-            if (medication.quantity in 0..LOW_STOCK_THRESHOLD) {
+            if (medication.quantity in 0..getAppSettings().lowStockThreshold) {
                 val stockMessage = "В аптечке «$kitName» заканчивается «${medication.name}»: осталось ${medication.quantity} шт."
                 fanOutNotification(
                     kitId, actorUserId,
