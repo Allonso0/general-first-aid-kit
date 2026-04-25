@@ -90,6 +90,13 @@
     <string name="error_short_username">Имя слишком короткое</string>
     <string name="error_long_username">Имя должно быть не длиннее 20 символов</string>
 
+    <!--Экран настроек-->
+    <string name="settings_notifications_section">Уведомления</string>
+    <string name="low_stock_threshold_label">Порог низкого остатка (шт.)</string>
+    <string name="low_stock_threshold_hint">Уведомлять, когда количество лекарства не превышает это значение</string>
+    <string name="expiry_warning_days_label">Предупреждать о сроке годности (дней)</string>
+    <string name="expiry_warning_days_hint">Уведомлять за указанное количество дней до истечения срока годности</string>
+
     <!--Общие-->
     <string name="ok">Понятно</string>
     <string name="error_dialog_title">Ошибка</string>

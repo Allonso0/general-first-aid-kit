@@ -1,11 +1,13 @@
 package com.example.general_first_aid_kit.di
 
+import com.example.general_first_aid_kit.data.repository.AppSettingsRepositoryImpl
 import com.example.general_first_aid_kit.data.repository.AuthRepositoryImpl
 import com.example.general_first_aid_kit.data.repository.KitNotificationSettingsRepositoryImpl
 import com.example.general_first_aid_kit.data.repository.KitRepositoryImpl
 import com.example.general_first_aid_kit.data.repository.MedicationRepositoryImpl
 import com.example.general_first_aid_kit.data.repository.NotificationRepositoryImpl
 import com.example.general_first_aid_kit.data.repository.UserRepositoryImpl
+import com.example.general_first_aid_kit.domain.repository.AppSettingsRepository
 import com.example.general_first_aid_kit.domain.repository.AuthRepository
 import com.example.general_first_aid_kit.domain.repository.KitNotificationSettingsRepository
 import com.example.general_first_aid_kit.domain.repository.KitRepository
@@ -21,6 +23,12 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class RepositoryModule {
+
+    @Binds
+    @Singleton
+    abstract fun bindAppSettingsRepository(
+        appSettingsRepositoryImpl: AppSettingsRepositoryImpl
+    ): AppSettingsRepository
 
     @Binds
     @Singleton

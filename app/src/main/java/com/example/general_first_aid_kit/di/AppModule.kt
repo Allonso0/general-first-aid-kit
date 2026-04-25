@@ -1,6 +1,7 @@
 package com.example.general_first_aid_kit.di
 
 import android.content.Context
+import android.content.SharedPreferences
 import androidx.work.WorkManager
 import com.example.general_first_aid_kit.BuildConfig
 import com.example.general_first_aid_kit.data.api.EanDbApi
@@ -23,6 +24,11 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
+
+    @Provides
+    @Singleton
+    fun provideSharedPreferences(@ApplicationContext context: Context): SharedPreferences =
+        context.getSharedPreferences("app_settings", Context.MODE_PRIVATE)
 
     @Provides
     @Singleton

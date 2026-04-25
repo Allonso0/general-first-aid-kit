@@ -7,6 +7,7 @@ import androidx.work.WorkerParameters
 import com.example.general_first_aid_kit.domain.model.AppNotification
 import com.example.general_first_aid_kit.domain.model.NotificationType
 import com.example.general_first_aid_kit.domain.usecase.GetAllMedicationsUseCase
+import com.example.general_first_aid_kit.domain.usecase.GetAppSettingsUseCase
 import com.example.general_first_aid_kit.domain.usecase.GetKitNotificationSettingsUseCase
 import com.example.general_first_aid_kit.domain.usecase.GetKitUseCase
 import com.example.general_first_aid_kit.domain.usecase.SaveNotificationUseCase
@@ -19,7 +20,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-private const val EXPIRY_THRESHOLD_MS = 7 * 24 * 60 * 60 * 1000L
+private const val MS_PER_DAY = 24 * 60 * 60 * 1000L
 
 @HiltWorker
 class ExpiryCheckWorker @AssistedInject constructor(
@@ -29,7 +30,8 @@ class ExpiryCheckWorker @AssistedInject constructor(
     private val getAllMedications: GetAllMedicationsUseCase,
     private val getKit: GetKitUseCase,
     private val saveNotification: SaveNotificationUseCase,
-    private val getSettings: GetKitNotificationSettingsUseCase
+    private val getSettings: GetKitNotificationSettingsUseCase,
+    private val getAppSettings: GetAppSettingsUseCase
 ) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
@@ -37,7 +39,7 @@ class ExpiryCheckWorker @AssistedInject constructor(
         val now = System.currentTimeMillis()
         val dayFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val today = dayFormat.format(Date(now))
-        val warningDeadline = now + EXPIRY_THRESHOLD_MS
+        val warningDeadline = now + getAppSettings().expiryWarningDays * MS_PER_DAY
 
         val medications = getAllMedications().first()
         val kitNameCache = mutableMapOf<String, String>()

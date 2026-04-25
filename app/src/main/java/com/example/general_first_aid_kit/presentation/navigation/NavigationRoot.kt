@@ -10,6 +10,7 @@ import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
+import com.example.general_first_aid_kit.presentation.screens.AppSettingsScreen
 import com.example.general_first_aid_kit.presentation.screens.AddMedicationScreen
 import com.example.general_first_aid_kit.presentation.screens.CreateKitScreen
 import com.example.general_first_aid_kit.presentation.screens.EditMedicationScreen
@@ -99,10 +100,16 @@ fun NavigationRoot(
                         onNavigateToProfileSettings = {
                             backStack.add(Route.ProfileSettings)
                         },
+                        onNavigateToAppSettings = {
+                            backStack.add(Route.AppSettings)
+                        },
                         onNavigateToNotificationLog = {
                             backStack.add(Route.NotificationLog)
                         }
                     )
+                }
+                is Route.AppSettings -> NavEntry(key) {
+                    AppSettingsScreen(onNavigateBack = { backStack.pop() })
                 }
                 is Route.ProfileSettings -> NavEntry(key) {
                     ProfileSettingsScreen(

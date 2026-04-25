@@ -58,6 +58,7 @@ fun ProfileScreen(
     onNavigateBack: () -> Unit,
     onLogout: () -> Unit,
     onNavigateToProfileSettings: () -> Unit,
+    onNavigateToAppSettings: () -> Unit,
     onNavigateToNotificationLog: () -> Unit,
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
@@ -161,7 +162,7 @@ fun ProfileScreen(
             ProfileMenuItem(
                 icon = painterResource(R.drawable.baseline_settings_24),
                 text = stringResource(R.string.settings),
-                onClick = { }
+                onClick = { onNavigateToAppSettings() }
             )
 
             ProfileMenuItem(
