@@ -13,11 +13,13 @@ import com.example.general_first_aid_kit.domain.usecase.GetUsersByIdsUseCase
 import com.example.general_first_aid_kit.domain.usecase.ObserveKitUseCase
 import com.example.general_first_aid_kit.domain.usecase.RefreshInviteCodeUseCase
 import com.example.general_first_aid_kit.domain.usecase.RemoveUserFromKitUseCase
+import com.example.general_first_aid_kit.data.connectivity.ConnectivityMonitor
 import com.example.general_first_aid_kit.domain.usecase.SetKitArchivedUseCase
 import com.example.general_first_aid_kit.domain.usecase.UpdateKitNotificationSettingsUseCase
 import com.example.general_first_aid_kit.domain.usecase.UpdateKitUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -35,8 +37,11 @@ class KitSettingsViewModel @Inject constructor(
     private val observeKitUseCase: ObserveKitUseCase,
     private val getKitNotificationSettings: GetKitNotificationSettingsUseCase,
     private val updateKitNotificationSettings: UpdateKitNotificationSettingsUseCase,
-    private val setKitArchivedUseCase: SetKitArchivedUseCase
+    private val setKitArchivedUseCase: SetKitArchivedUseCase,
+    private val connectivityMonitor: ConnectivityMonitor
 ) : ViewModel() {
+
+    val isOnline: StateFlow<Boolean> = connectivityMonitor.isOnline
 
     private val _uiState = MutableStateFlow(KitSettingsUiState())
     val uiState = _uiState.asStateFlow()
@@ -151,7 +156,20 @@ class KitSettingsViewModel @Inject constructor(
         }
     }
 
+    private fun isSharedAndOffline() =
+        _uiState.value.isPublic && !connectivityMonitor.isOnline.value
+
+    private fun blockIfSharedOffline(): Boolean {
+        return if (isSharedAndOffline()) {
+            _uiState.update { it.copy(error = "Это действие недоступно без подключения к интернету") }
+            true
+        } else false
+    }
+
+    fun clearError() = _uiState.update { it.copy(error = null) }
+
     fun saveChanges(onSuccess: () -> Unit) {
+        if (blockIfSharedOffline()) return
         val state = _uiState.value
         if (!state.isOwner) return
 
@@ -180,6 +198,7 @@ class KitSettingsViewModel @Inject constructor(
     }
 
     fun deleteKit(onSuccess: () -> Unit) {
+        if (blockIfSharedOffline()) return
         val state = _uiState.value
         if (!state.isOwner) return
 
@@ -195,6 +214,7 @@ class KitSettingsViewModel @Inject constructor(
     }
 
     fun leaveKit(onSuccess: () -> Unit) {
+        if (blockIfSharedOffline()) return
         val state = _uiState.value
         if (state.isOwner) return
 
@@ -211,6 +231,10 @@ class KitSettingsViewModel @Inject constructor(
     }
 
     fun generateInviteCode() {
+        if (!connectivityMonitor.isOnline.value) {
+            _uiState.update { it.copy(error = "Это действие недоступно без подключения к интернету") }
+            return
+        }
         viewModelScope.launch {
             refreshInviteCodeUseCase(currentKitId).onSuccess { newCode ->
                 _uiState.update { it.copy(inviteCode = newCode) }
@@ -219,6 +243,10 @@ class KitSettingsViewModel @Inject constructor(
     }
 
     fun removeParticipant(userId: String) {
+        if (!connectivityMonitor.isOnline.value) {
+            _uiState.update { it.copy(error = "Это действие недоступно без подключения к интернету") }
+            return
+        }
         viewModelScope.launch {
             val actorName = _uiState.value.participants.find { it.id == userId }?.name ?: ""
             removeUserFromKitUseCase(currentKitId, userId, actorName)

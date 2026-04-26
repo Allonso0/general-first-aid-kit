@@ -3,6 +3,7 @@ package com.example.general_first_aid_kit.presentation.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.general_first_aid_kit.domain.model.Kit
+import com.example.general_first_aid_kit.data.connectivity.ConnectivityMonitor
 import com.example.general_first_aid_kit.domain.usecase.DeleteKitUseCase
 import com.example.general_first_aid_kit.domain.usecase.GetAllMedicationsUseCase
 import com.example.general_first_aid_kit.domain.usecase.GetKitsUseCase
@@ -24,8 +25,11 @@ class MainViewModel @Inject constructor(
     private val getKitsUseCase: GetKitsUseCase,
     private val deleteKitUseCase: DeleteKitUseCase,
     private val getAllMedicationsUseCase: GetAllMedicationsUseCase,
-    private val auth: FirebaseAuth
+    private val auth: FirebaseAuth,
+    private val connectivityMonitor: ConnectivityMonitor
 ) : ViewModel() {
+
+    val isOnline: StateFlow<Boolean> = connectivityMonitor.isOnline
 
     private val _isArchiveMode = MutableStateFlow(false)
     val isArchiveMode = _isArchiveMode.asStateFlow()

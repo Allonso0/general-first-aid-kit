@@ -2,6 +2,9 @@ package com.example.general_first_aid_kit.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.general_first_aid_kit.data.connectivity.ConnectivityMonitor
+import com.example.general_first_aid_kit.domain.model.Kit
+import com.example.general_first_aid_kit.domain.model.KitType
 import com.example.general_first_aid_kit.domain.model.Medication
 import com.example.general_first_aid_kit.domain.usecase.GetMedicationsUseCase
 import com.example.general_first_aid_kit.domain.usecase.GetUserUseCase
@@ -23,8 +26,11 @@ import javax.inject.Inject
 class KitViewModel @Inject constructor(
     private val getMedicationsUseCase: GetMedicationsUseCase,
     private val observeKitUseCase: ObserveKitUseCase,
-    private val getUserUseCase: GetUserUseCase
+    private val getUserUseCase: GetUserUseCase,
+    private val connectivityMonitor: ConnectivityMonitor
 ) : ViewModel() {
+
+    val isOnline: StateFlow<Boolean> = connectivityMonitor.isOnline
 
     private val _kitId = MutableStateFlow<String?>(null)
 
@@ -36,6 +42,15 @@ class KitViewModel @Inject constructor(
 
     private val _isUserKickedOrDeleted = MutableStateFlow(false)
     val isUserKickedOrDeleted = _isUserKickedOrDeleted.asStateFlow()
+
+    private val _currentKit = MutableStateFlow<Kit?>(null)
+    val currentKit: StateFlow<Kit?> = _currentKit.asStateFlow()
+
+    val isSharedAndOffline: StateFlow<Boolean> = combine(
+        connectivityMonitor.isOnline,
+        _currentKit
+    ) { online, kit -> !online && kit?.type == KitType.SHARED }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val medications: StateFlow<List<Medication>> = combine(
@@ -72,6 +87,7 @@ class KitViewModel @Inject constructor(
         viewModelScope.launch {
             val currentUserId = getUserUseCase()?.id ?: ""
             observeKitUseCase(kitId).collect { kit ->
+                _currentKit.value = kit
                 if (kit == null || !kit.userIds.contains(currentUserId)) {
                     _isUserKickedOrDeleted.value = true
                 }

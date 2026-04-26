@@ -37,6 +37,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.general_first_aid_kit.R
 import com.example.general_first_aid_kit.presentation.component.GenericTabRow
 import com.example.general_first_aid_kit.presentation.component.KitCard
+import com.example.general_first_aid_kit.presentation.component.OfflineBanner
 import com.example.general_first_aid_kit.presentation.ui.theme.Dimensions
 import com.example.general_first_aid_kit.presentation.ui.theme.GreenPrimary
 import com.example.general_first_aid_kit.presentation.ui.theme.TextGreen
@@ -55,6 +56,7 @@ fun MainScreen(
 ) {
     val state by viewModel.uiState.collectAsState()
     val isArchiveMode by viewModel.isArchiveMode.collectAsState()
+    val isOnline by viewModel.isOnline.collectAsState()
 
     Scaffold(
         topBar = {
@@ -122,6 +124,10 @@ fun MainScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
+            if (!isOnline) {
+                OfflineBanner("Нет подключения к интернету")
+            }
+
             GenericTabRow(
                 selectedTabIndex = if (isArchiveMode) 1 else 0,
                 tabs = listOf("Активные", "Архивные"),

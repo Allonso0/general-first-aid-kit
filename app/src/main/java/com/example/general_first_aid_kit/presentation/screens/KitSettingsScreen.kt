@@ -46,6 +46,17 @@ fun KitSettingsScreen(
     viewModel: KitSettingsViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
+    val isOnline by viewModel.isOnline.collectAsState()
+    val isSharedAndOffline = state.isPublic && !isOnline
+
+    val snackbarHostState = remember { SnackbarHostState() }
+    LaunchedEffect(state.error) {
+        state.error?.let {
+            snackbarHostState.showSnackbar(it)
+            viewModel.clearError()
+        }
+    }
+
     var showToPublicDialog by remember { mutableStateOf(false) }
     var showToPersonalDialog by remember { mutableStateOf(false) }
 
@@ -143,6 +154,7 @@ fun KitSettingsScreen(
 
     Scaffold(
         containerColor = White,
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text(
@@ -183,6 +195,10 @@ fun KitSettingsScreen(
                 .padding(innerPadding)
                 .fillMaxSize()
         ) {
+            if (isSharedAndOffline) {
+                OfflineBanner("Режим просмотра: изменения в общей аптечке недоступны без интернета")
+            }
+
             GenericTabRow(
                 selectedTabIndex = state.selectedTab,
                 tabs = listOf("Настройки", "Участники", "Уведомления"),

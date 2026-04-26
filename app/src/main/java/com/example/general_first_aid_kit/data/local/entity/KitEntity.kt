@@ -2,7 +2,9 @@ package com.example.general_first_aid_kit.data.local.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import kotlinx.serialization.Serializable
 
+@Serializable
 @Entity(tableName = "kits")
 data class KitEntity(
     @PrimaryKey val id: String,

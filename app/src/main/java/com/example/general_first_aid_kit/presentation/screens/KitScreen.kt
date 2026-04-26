@@ -51,6 +51,7 @@ import com.example.general_first_aid_kit.R
 import com.example.general_first_aid_kit.domain.util.NetworkUtils
 import com.example.general_first_aid_kit.presentation.component.ExpandableAddMedicationFAB
 import com.example.general_first_aid_kit.presentation.component.MedicationCard
+import com.example.general_first_aid_kit.presentation.component.OfflineBanner
 import com.example.general_first_aid_kit.presentation.ui.theme.Dimensions
 import com.example.general_first_aid_kit.presentation.ui.theme.GreenPrimary
 import com.example.general_first_aid_kit.presentation.ui.theme.LightGray
@@ -87,6 +88,7 @@ fun KitScreen(
 
     val medications by viewModel.medications.collectAsState()
     val searchQuery by viewModel.searchQuery.collectAsState()
+    val isSharedAndOffline by viewModel.isSharedAndOffline.collectAsState()
 
     var showFilterMenu by remember { mutableStateOf(false) }
     val selectedCategory by viewModel.selectedCategory.collectAsState()
@@ -138,20 +140,22 @@ fun KitScreen(
             )
         },
         floatingActionButton = {
-            ExpandableAddMedicationFAB(
-                onAddManual = { onNavigateToAddManual(kitId) },
-                onScanBarcode = {
-                    if (NetworkUtils.isInternetAvailable(context)) {
-                        onScanBarcode(kitId)
-                    } else {
-                        android.widget.Toast.makeText(
-                            context,
-                            "Для сканирования требуется интернет",
-                            android.widget.Toast.LENGTH_SHORT
-                        ).show()
+            if (!isSharedAndOffline) {
+                ExpandableAddMedicationFAB(
+                    onAddManual = { onNavigateToAddManual(kitId) },
+                    onScanBarcode = {
+                        if (NetworkUtils.isInternetAvailable(context)) {
+                            onScanBarcode(kitId)
+                        } else {
+                            android.widget.Toast.makeText(
+                                context,
+                                "Для сканирования требуется интернет",
+                                android.widget.Toast.LENGTH_SHORT
+                            ).show()
+                        }
                     }
-                }
-            )
+                )
+            }
         }
     ) { innerPadding ->
         Column(
@@ -159,6 +163,10 @@ fun KitScreen(
                 .padding(innerPadding)
                 .fillMaxSize()
         ) {
+            if (isSharedAndOffline) {
+                OfflineBanner("Режим просмотра: изменения в общей аптечке недоступны без интернета")
+            }
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()

@@ -2,6 +2,8 @@ package com.example.general_first_aid_kit.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.general_first_aid_kit.data.connectivity.ConnectivityMonitor
+import com.example.general_first_aid_kit.domain.model.KitType
 import com.example.general_first_aid_kit.domain.model.Medication
 import com.example.general_first_aid_kit.domain.usecase.GetMedicationUseCase
 import com.example.general_first_aid_kit.domain.usecase.SaveMedicationUseCase
@@ -12,6 +14,7 @@ import com.example.general_first_aid_kit.domain.util.MedicationValidator
 import com.example.general_first_aid_kit.domain.util.ValidationResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -23,14 +26,20 @@ class EditMedicationViewModel @Inject constructor(
     private val saveMedicationUseCase: SaveMedicationUseCase,
     private val deleteMedicationUseCase: DeleteMedicationUseCase,
     private val observeKitUseCase: ObserveKitUseCase,
-    private val getUserUseCase: GetUserUseCase
+    private val getUserUseCase: GetUserUseCase,
+    private val connectivityMonitor: ConnectivityMonitor
 ) : ViewModel() {
+
+    val isOnline: StateFlow<Boolean> = connectivityMonitor.isOnline
 
     private val _uiState = MutableStateFlow(AddMedicationUiState())
     val uiState = _uiState.asStateFlow()
 
     private val _isUserKickedOrDeleted = MutableStateFlow(false)
     val isUserKickedOrDeleted = _isUserKickedOrDeleted.asStateFlow()
+
+    private val _isKitShared = MutableStateFlow(false)
+    val isKitShared: StateFlow<Boolean> = _isKitShared.asStateFlow()
 
     private var originalMedication: Medication? = null
     private var kitId: String = ""
@@ -66,6 +75,10 @@ class EditMedicationViewModel @Inject constructor(
     fun updatePhotoUri(uri: String?) = _uiState.update { it.copy(photoUri = uri) }
 
     fun saveMedication(onSuccess: () -> Unit) {
+        if (_isKitShared.value && !connectivityMonitor.isOnline.value) {
+            _uiState.update { it.copy(error = "Редактирование общей аптечки недоступно без подключения к интернету") }
+            return
+        }
         if (!validateInputs()) return
 
         val state = _uiState.value
@@ -103,6 +116,10 @@ class EditMedicationViewModel @Inject constructor(
     }
 
     fun deleteMedication(onSuccess: () -> Unit) {
+        if (_isKitShared.value && !connectivityMonitor.isOnline.value) {
+            _uiState.update { it.copy(error = "Удаление в общей аптечке недоступно без подключения к интернету") }
+            return
+        }
         val medication = originalMedication ?: return
         _uiState.update { it.copy(isLoading = true) }
 
@@ -143,6 +160,7 @@ class EditMedicationViewModel @Inject constructor(
         viewModelScope.launch {
             val currentUserId = getUserUseCase()?.id ?: ""
             observeKitUseCase(kitId).collect { kit ->
+                _isKitShared.value = kit?.type == KitType.SHARED
                 if (kit == null || !kit.userIds.contains(currentUserId)) {
                     _isUserKickedOrDeleted.value = true
                 }

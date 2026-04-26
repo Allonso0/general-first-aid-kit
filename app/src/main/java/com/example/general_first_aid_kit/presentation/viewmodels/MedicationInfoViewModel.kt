@@ -2,6 +2,8 @@ package com.example.general_first_aid_kit.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.general_first_aid_kit.data.connectivity.ConnectivityMonitor
+import com.example.general_first_aid_kit.domain.model.KitType
 import com.example.general_first_aid_kit.domain.model.Medication
 import com.example.general_first_aid_kit.domain.usecase.GetMedicationUseCase
 import com.example.general_first_aid_kit.domain.usecase.GetUserUseCase
@@ -9,6 +11,7 @@ import com.example.general_first_aid_kit.domain.usecase.ObserveKitUseCase
 import com.example.general_first_aid_kit.domain.usecase.SaveMedicationUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -18,14 +21,20 @@ class MedicationInfoViewModel @Inject constructor(
     private val getMedicationUseCase: GetMedicationUseCase,
     private val saveMedicationUseCase: SaveMedicationUseCase,
     private val observeKitUseCase: ObserveKitUseCase,
-    private val getUserUseCase: GetUserUseCase
+    private val getUserUseCase: GetUserUseCase,
+    private val connectivityMonitor: ConnectivityMonitor
 ) : ViewModel() {
+
+    val isOnline: StateFlow<Boolean> = connectivityMonitor.isOnline
 
     private val _medication = MutableStateFlow<Medication?>(null)
     val medication = _medication.asStateFlow()
 
     private val _isUserKickedOrDeleted = MutableStateFlow(false)
     val isUserKickedOrDeleted = _isUserKickedOrDeleted.asStateFlow()
+
+    private val _isKitShared = MutableStateFlow(false)
+    val isKitShared: StateFlow<Boolean> = _isKitShared.asStateFlow()
 
     private var currentKitId: String = ""
 
@@ -39,6 +48,7 @@ class MedicationInfoViewModel @Inject constructor(
     }
 
     fun updateQuantity(delta: Int) {
+        if (_isKitShared.value && !connectivityMonitor.isOnline.value) return
         val currentMed = _medication.value ?: return
         val newQuantity = (currentMed.quantity + delta).coerceAtLeast(0)
 
@@ -67,6 +77,7 @@ class MedicationInfoViewModel @Inject constructor(
         viewModelScope.launch {
             val currentUserId = getUserUseCase()?.id ?: ""
             observeKitUseCase(kitId).collect { kit ->
+                _isKitShared.value = kit?.type == KitType.SHARED
                 if (kit == null || !kit.userIds.contains(currentUserId)) {
                     _isUserKickedOrDeleted.value = true
                 }
