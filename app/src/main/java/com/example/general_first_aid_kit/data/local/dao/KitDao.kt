@@ -21,7 +21,7 @@ interface KitDao {
     @Query("SELECT * FROM kits WHERE id = :kitId")
     suspend fun getById(kitId: String): KitEntity?
 
-    @Query("SELECT * FROM kits WHERE userIds LIKE '%' || :userId || '%'")
+    @Query("SELECT * FROM kits WHERE userIds LIKE '%\"' || :userId || '\"%'")
     fun observeByUserId(userId: String): Flow<List<KitEntity>>
 
     @Query("DELETE FROM kits WHERE id = :kitId")
