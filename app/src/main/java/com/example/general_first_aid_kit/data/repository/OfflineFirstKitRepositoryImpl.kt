@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.util.Collections
@@ -69,7 +70,10 @@ class OfflineFirstKitRepositoryImpl @Inject constructor(
                             when (change.type) {
                                 DocumentChange.Type.ADDED,
                                 DocumentChange.Type.MODIFIED -> kitDao.upsert(kit.toKitEntity())
-                                DocumentChange.Type.REMOVED -> kitDao.deleteById(change.document.id)
+                                DocumentChange.Type.REMOVED -> {
+                                    kitDao.deleteById(change.document.id)
+                                    syncOperationDao.deleteAllForKit(change.document.id)
+                                }
                             }
                         } catch (_: Exception) { /* Room error — skip this change */ }
                     }
@@ -101,6 +105,7 @@ class OfflineFirstKitRepositoryImpl @Inject constructor(
                                 ?.let { kitDao.upsert(it.toKitEntity()) }
                         } else if (snapshot != null) {
                             kitDao.deleteById(kitId)
+                            syncOperationDao.deleteAllForKit(kitId)
                         }
                     } catch (_: Exception) {}
                 }
@@ -109,12 +114,12 @@ class OfflineFirstKitRepositoryImpl @Inject constructor(
 
     // ── Reads ────────────────────────────────────────────────────────────────
 
-    override suspend fun getKitById(kitId: String): Result<Kit> {
-        kitDao.getById(kitId)?.let { return Result.success(it.toKit()) }
-        return try {
+    override suspend fun getKitById(kitId: String): Result<Kit> = withContext(Dispatchers.IO) {
+        kitDao.getById(kitId)?.let { return@withContext Result.success(it.toKit()) }
+        try {
             val doc = firestore.collection("kits").document(kitId).get().await()
             val kit = doc.toObject(Kit::class.java)?.copy(id = doc.id)
-                ?: return Result.failure(Exception("Аптечка не найдена"))
+                ?: return@withContext Result.failure(Exception("Аптечка не найдена"))
             kitDao.upsert(kit.toKitEntity())
             Result.success(kit)
         } catch (e: Exception) {
@@ -124,8 +129,8 @@ class OfflineFirstKitRepositoryImpl @Inject constructor(
 
     // ── Writes ───────────────────────────────────────────────────────────────
 
-    override suspend fun createKit(kit: Kit): Result<Unit> {
-        return try {
+    override suspend fun createKit(kit: Kit): Result<Unit> = withContext(Dispatchers.IO) {
+        try {
             val collection = firestore.collection("kits")
             val document = if (kit.id.isEmpty()) collection.document() else collection.document(kit.id)
             val kitToSave = kit.copy(id = document.id)
@@ -144,9 +149,9 @@ class OfflineFirstKitRepositoryImpl @Inject constructor(
         colorIndex: Int,
         type: KitType,
         userIds: List<String>
-    ): Result<Unit> {
+    ): Result<Unit> = withContext(Dispatchers.IO) {
         val existing = kitDao.getById(kitId)
-            ?: return Result.failure(Exception("Аптечка не найдена"))
+            ?: return@withContext Result.failure(Exception("Аптечка не найдена"))
         val updated = existing.copy(
             name = name,
             location = location,
@@ -157,11 +162,16 @@ class OfflineFirstKitRepositoryImpl @Inject constructor(
         )
         kitDao.upsert(updated)
 
-        return if (connectivityMonitor.isOnline.value) {
+        if (connectivityMonitor.isOnline.value) {
             try {
                 firestore.collection("kits").document(kitId)
-                    .update("name", name, "location", location, "colorIndex", colorIndex)
-                    .await()
+                    .update(
+                        "name", name,
+                        "location", location,
+                        "colorIndex", colorIndex,
+                        "type", type.name,
+                        "userIds", userIds
+                    ).await()
                 Result.success(Unit)
             } catch (e: Exception) {
                 Result.failure(e)
@@ -172,9 +182,9 @@ class OfflineFirstKitRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun deleteKit(kitId: String): Result<Unit> {
+    override suspend fun deleteKit(kitId: String): Result<Unit> = withContext(Dispatchers.IO) {
         kitDao.deleteById(kitId)
-        return if (connectivityMonitor.isOnline.value) {
+        if (connectivityMonitor.isOnline.value) {
             try {
                 firestore.collection("kits").document(kitId).delete().await()
                 Result.success(Unit)
@@ -187,9 +197,9 @@ class OfflineFirstKitRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun setArchived(kitId: String, userId: String, archived: Boolean): Result<Unit> {
+    override suspend fun setArchived(kitId: String, userId: String, archived: Boolean): Result<Unit> = withContext(Dispatchers.IO) {
         val existing = kitDao.getById(kitId)
-            ?: return Result.failure(Exception("Аптечка не найдена"))
+            ?: return@withContext Result.failure(Exception("Аптечка не найдена"))
         val newArchivedIds = if (archived) {
             (existing.archivedUserIds + userId).distinct()
         } else {
@@ -201,7 +211,7 @@ class OfflineFirstKitRepositoryImpl @Inject constructor(
         )
         kitDao.upsert(updated)
 
-        return if (connectivityMonitor.isOnline.value) {
+        if (connectivityMonitor.isOnline.value) {
             try {
                 val fieldValue = if (archived) FieldValue.arrayUnion(userId) else FieldValue.arrayRemove(userId)
                 firestore.collection("kits").document(kitId)
@@ -217,18 +227,18 @@ class OfflineFirstKitRepositoryImpl @Inject constructor(
     }
 
     // Always requires internet — invite codes and member management are server-side operations
-    override suspend fun joinKitByCode(userId: String, inviteCode: String): Result<Kit> {
-        return try {
+    override suspend fun joinKitByCode(userId: String, inviteCode: String): Result<Kit> = withContext(Dispatchers.IO) {
+        try {
             val snapshot = firestore.collection("kits")
                 .whereEqualTo("inviteCode", inviteCode)
                 .whereEqualTo("type", "SHARED")
                 .get().await()
             val document = snapshot.documents.firstOrNull()
-                ?: return Result.failure(Exception("Неверный код приглашения"))
+                ?: return@withContext Result.failure(Exception("Неверный код приглашения"))
             firestore.collection("kits").document(document.id)
                 .update("userIds", FieldValue.arrayUnion(userId)).await()
             val kit = document.toObject(Kit::class.java)?.copy(id = document.id)
-                ?: return Result.failure(Exception("Не удалось прочитать данные аптечки"))
+                ?: return@withContext Result.failure(Exception("Не удалось прочитать данные аптечки"))
             kitDao.upsert(kit.toKitEntity())
             Result.success(kit)
         } catch (e: Exception) {
@@ -236,8 +246,8 @@ class OfflineFirstKitRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun refreshInviteCode(kitId: String): Result<String> {
-        return try {
+    override suspend fun refreshInviteCode(kitId: String): Result<String> = withContext(Dispatchers.IO) {
+        try {
             val newCode = UUID.randomUUID().toString().substring(0, 8).uppercase()
             firestore.collection("kits").document(kitId).update("inviteCode", newCode).await()
             kitDao.getById(kitId)?.let { kitDao.upsert(it.copy(inviteCode = newCode)) }
@@ -247,8 +257,8 @@ class OfflineFirstKitRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun removeUserFromKit(kitId: String, userId: String): Result<Unit> {
-        return try {
+    override suspend fun removeUserFromKit(kitId: String, userId: String): Result<Unit> = withContext(Dispatchers.IO) {
+        try {
             firestore.collection("kits").document(kitId)
                 .update("userIds", FieldValue.arrayRemove(userId)).await()
             Result.success(Unit)
