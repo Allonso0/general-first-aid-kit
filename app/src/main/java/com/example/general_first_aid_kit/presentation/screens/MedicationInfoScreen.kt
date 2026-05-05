@@ -35,12 +35,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.example.general_first_aid_kit.R
 import com.example.general_first_aid_kit.presentation.component.GreenSemiCircle
+import com.example.general_first_aid_kit.presentation.component.OfflineBanner
 import com.example.general_first_aid_kit.presentation.ui.theme.Dimensions
 import com.example.general_first_aid_kit.presentation.ui.theme.GreenPrimary
 import com.example.general_first_aid_kit.presentation.ui.theme.LightGray
@@ -75,6 +77,9 @@ fun MedicationInfoScreen(
 
 
     val medication by viewModel.medication.collectAsState()
+    val isOnline by viewModel.isOnline.collectAsState()
+    val isKitShared by viewModel.isKitShared.collectAsState()
+    val canModify = !(isKitShared && !isOnline)
 
     Scaffold(
         containerColor = White,
@@ -98,11 +103,14 @@ fun MedicationInfoScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { onNavigateToEdit(kitId, medicationId) }) {
+                    IconButton(
+                        onClick = { onNavigateToEdit(kitId, medicationId) },
+                        enabled = canModify
+                    ) {
                         Icon(
                             painter = painterResource(R.drawable.baseline_edit_note_24),
                             contentDescription = "Редактировать",
-                            tint = GreenPrimary
+                            tint = if (canModify) GreenPrimary else LightGray
                         )
                     }
                 },
@@ -110,10 +118,14 @@ fun MedicationInfoScreen(
             )
         }
     ) { innerPadding ->
-        Box(modifier = Modifier
+        Column(modifier = Modifier
             .fillMaxSize()
             .padding(innerPadding)
         ) {
+            if (!canModify) {
+                OfflineBanner(stringResource(R.string.offline_banner_read_only))
+            }
+            Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
 
             GreenSemiCircle(
                 modifier = Modifier
@@ -250,7 +262,8 @@ fun MedicationInfoScreen(
                             ) {
                                 QuantityButton(
                                     iconRes = R.drawable.baseline_remove_24,
-                                    onClick = { viewModel.updateQuantity(-1) }
+                                    onClick = { viewModel.updateQuantity(-1) },
+                                    enabled = canModify
                                 )
                                 Text(
                                     text = med.quantity.toString(),
@@ -261,7 +274,8 @@ fun MedicationInfoScreen(
                                 )
                                 QuantityButton(
                                     iconRes = R.drawable.baseline_add_24,
-                                    onClick = { viewModel.updateQuantity(1) }
+                                    onClick = { viewModel.updateQuantity(1) },
+                                    enabled = canModify
                                 )
                             }
                         }
@@ -310,7 +324,8 @@ fun MedicationInfoScreen(
             } ?: Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator(color = GreenPrimary)
             }
-        }
+            } // Box(weight(1f))
+        } // Column
     }
 }
 
@@ -365,17 +380,21 @@ fun InfoCard(
 }
 
 @Composable
-fun QuantityButton(iconRes: Int, onClick: () -> Unit) {
+fun QuantityButton(iconRes: Int, onClick: () -> Unit, enabled: Boolean = true) {
     IconButton(
         onClick = onClick,
+        enabled = enabled,
         modifier = Modifier
             .size(48.dp)
-            .background(GreenPrimary.copy(alpha = 0.1f), CircleShape)
+            .background(
+                if (enabled) GreenPrimary.copy(alpha = 0.1f) else LightGray.copy(alpha = 0.1f),
+                CircleShape
+            )
     ) {
         Icon(
             painter = painterResource(iconRes),
             contentDescription = null,
-            tint = GreenPrimary
+            tint = if (enabled) GreenPrimary else LightGray
         )
     }
 }

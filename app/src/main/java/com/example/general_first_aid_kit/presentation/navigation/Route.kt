@@ -32,7 +32,8 @@ sealed interface Route: NavKey {
         val id: String,
         val name: String,
         val location: String,
-        val colorIndex: Int
+        val colorIndex: Int,
+        val isPublic: Boolean
     ) : Route
 
     @Serializable
@@ -40,7 +41,8 @@ sealed interface Route: NavKey {
         val id: String,
         val name: String,
         val location: String,
-        val colorIndex: Int
+        val colorIndex: Int,
+        val isPublic: Boolean
     ) : Route
 
     @Serializable

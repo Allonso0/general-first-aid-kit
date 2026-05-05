@@ -37,11 +37,13 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.general_first_aid_kit.R
 import com.example.general_first_aid_kit.presentation.component.GenericTabRow
 import com.example.general_first_aid_kit.presentation.component.KitCard
+import com.example.general_first_aid_kit.presentation.component.OfflineBanner
 import com.example.general_first_aid_kit.presentation.ui.theme.Dimensions
 import com.example.general_first_aid_kit.presentation.ui.theme.GreenPrimary
 import com.example.general_first_aid_kit.presentation.ui.theme.TextGreen
 import com.example.general_first_aid_kit.presentation.ui.theme.TextRed
 import com.example.general_first_aid_kit.presentation.ui.theme.White
+import com.example.general_first_aid_kit.domain.model.KitType
 import com.example.general_first_aid_kit.presentation.viewmodels.MainViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -50,11 +52,12 @@ fun MainScreen(
     onProfileClick: () -> Unit,
     onJoinClick: () -> Unit,
     onAddKitClick: () -> Unit,
-    onKitCardClick: (String, String, String, Int) -> Unit,
+    onKitCardClick: (String, String, String, Int, Boolean) -> Unit,
     viewModel: MainViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
     val isArchiveMode by viewModel.isArchiveMode.collectAsState()
+    val isOnline by viewModel.isOnline.collectAsState()
 
     Scaffold(
         topBar = {
@@ -122,6 +125,10 @@ fun MainScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
+            if (!isOnline) {
+                OfflineBanner(stringResource(R.string.offline_no_internet))
+            }
+
             GenericTabRow(
                 selectedTabIndex = if (isArchiveMode) 1 else 0,
                 tabs = listOf("Активные", "Архивные"),
@@ -196,14 +203,14 @@ fun MainScreen(
                                     content = {
                                         KitCard(
                                             kit = kit,
-                                            onClick = { onKitCardClick(kit.id, kit.name, kit.location, kit.colorIndex) }
+                                            onClick = { onKitCardClick(kit.id, kit.name, kit.location, kit.colorIndex, kit.type == KitType.SHARED) }
                                         )
                                     }
                                 ) */
 
                                 KitCard(
                                     kit = kit,
-                                    onClick = { onKitCardClick(kit.id, kit.name, kit.location, kit.colorIndex) }
+                                    onClick = { onKitCardClick(kit.id, kit.name, kit.location, kit.colorIndex, kit.type == KitType.SHARED) }
                                 )
 
                             }

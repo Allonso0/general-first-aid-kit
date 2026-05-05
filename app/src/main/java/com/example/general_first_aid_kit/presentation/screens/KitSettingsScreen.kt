@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -39,6 +40,7 @@ fun KitSettingsScreen(
     initialName: String,
     initialLocation: String,
     initialColorIndex: Int,
+    initialIsPublic: Boolean,
     onNavigateBack: () -> Unit,
     onSaveSuccess: () -> Unit,
     onDeleteSuccess: () -> Unit,
@@ -46,6 +48,17 @@ fun KitSettingsScreen(
     viewModel: KitSettingsViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
+    val isOnline by viewModel.isOnline.collectAsState()
+    val isSharedAndOffline = state.isPublic && !isOnline
+
+    val snackbarHostState = remember { SnackbarHostState() }
+    LaunchedEffect(state.error) {
+        state.error?.let {
+            snackbarHostState.showSnackbar(it)
+            viewModel.clearError()
+        }
+    }
+
     var showToPublicDialog by remember { mutableStateOf(false) }
     var showToPersonalDialog by remember { mutableStateOf(false) }
 
@@ -56,12 +69,12 @@ fun KitSettingsScreen(
     var showColorDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(kitId) {
-        viewModel.initScreen(kitId = kitId, initialName, initialLocation, initialColorIndex)
+        viewModel.initScreen(kitId = kitId, initialName, initialLocation, initialColorIndex, initialIsPublic)
     }
 
     LaunchedEffect(state.selectedTab) {
         if (state.selectedTab == 1) {
-            viewModel.initScreen(kitId, state.name, state.location, state.selectedColorIndex)
+            viewModel.initScreen(kitId, state.name, state.location, state.selectedColorIndex, state.isPublic)
         }
     }
 
@@ -143,6 +156,7 @@ fun KitSettingsScreen(
 
     Scaffold(
         containerColor = White,
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text(
@@ -183,6 +197,10 @@ fun KitSettingsScreen(
                 .padding(innerPadding)
                 .fillMaxSize()
         ) {
+            if (isSharedAndOffline) {
+                OfflineBanner(stringResource(R.string.offline_banner_shared_kit))
+            }
+
             GenericTabRow(
                 selectedTabIndex = state.selectedTab,
                 tabs = listOf("Настройки", "Участники", "Уведомления"),

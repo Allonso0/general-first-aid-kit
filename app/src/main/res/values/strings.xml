@@ -87,8 +87,14 @@
     <string name="error_empty_password">Введите пароль</string>
     <string name="error_short_password">Пароль должен быть не менее 6 символов</string>
     <string name="error_no_digit_password">Пароль должен содержать хотя бы одну цифру</string>
-    <string name="error_short_username">Имя слишком короткое</string>
+    <string name="error_empty_username">Введите имя</string>
+    <string name="error_short_username">Имя слишком короткое (минимум 2 символа)</string>
     <string name="error_long_username">Имя должно быть не длиннее 20 символов</string>
+    <string name="error_user_not_found">Пользователь с таким email не найден</string>
+    <string name="error_wrong_password">Неверный пароль</string>
+    <string name="error_email_in_use">Этот email уже используется</string>
+    <string name="error_too_many_requests">Слишком много попыток входа. Попробуйте позже</string>
+    <string name="error_unknown_auth">Произошла ошибка. Попробуйте снова</string>
 
     <!--Архивирование аптечки-->
     <string name="kit_archive">Архивировать аптечку</string>
@@ -104,6 +110,18 @@
     <string name="low_stock_threshold_hint">Уведомлять, когда количество лекарства не превышает это значение</string>
     <string name="expiry_warning_days_label">Предупреждать о сроке годности (дней)</string>
     <string name="expiry_warning_days_hint">Уведомлять за указанное количество дней до истечения срока годности</string>
+
+    <!--Офлайн-->
+    <string name="offline_no_internet">Нет подключения к интернету</string>
+    <string name="offline_banner_shared_kit">Режим просмотра: изменения в общей аптечке недоступны без интернета</string>
+    <string name="offline_banner_read_only">Режим просмотра: изменения недоступны без интернета</string>
+    <string name="error_offline_action">Это действие недоступно без подключения к интернету</string>
+    <string name="error_offline_edit_shared">Редактирование общей аптечки недоступно без подключения к интернету</string>
+    <string name="error_offline_delete_shared">Удаление в общей аптечке недоступно без подключения к интернету</string>
+    <string name="error_kit_save">Ошибка при сохранении</string>
+    <string name="error_kit_delete">Ошибка при удалении</string>
+    <string name="error_kit_leave">Ошибка при выходе из аптечки</string>
+    <string name="error_kit_archive_status">Ошибка при изменении статуса аптечки</string>
 
     <!--Общие-->
     <string name="ok">Понятно</string>

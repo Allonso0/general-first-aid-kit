@@ -85,8 +85,8 @@ fun NavigationRoot(
                         onProfileClick = { backStack.add(Route.Profile) },
                         onJoinClick = { backStack.add(Route.JoinKit) },
                         onAddKitClick = { backStack.add(Route.CreateKit) },
-                        onKitCardClick = { id, name, location, colorIndex ->
-                            backStack.add(Route.KitScreen(id, name, location, colorIndex))
+                        onKitCardClick = { id, name, location, colorIndex, isPublic ->
+                            backStack.add(Route.KitScreen(id, name, location, colorIndex, isPublic))
                         }
                     )
                 }
@@ -127,7 +127,7 @@ fun NavigationRoot(
                         kitName = key.name,
                         onNavigateBack = { backStack.pop() },
                         onNavigateToKitSettings = {
-                            backStack.add(Route.KitSettings(key.id, key.name, key.location, key.colorIndex))
+                            backStack.add(Route.KitSettings(key.id, key.name, key.location, key.colorIndex, key.isPublic))
                         },
                         onNavigateToAddManual = { backStack.add(Route.AddMedicationManual(key.id)) },
                         onScanBarcode = { backStack.add(Route.ScanBarcode(key.id)) },
@@ -142,6 +142,7 @@ fun NavigationRoot(
                         initialName = key.name,
                         initialLocation = key.location,
                         initialColorIndex = key.colorIndex,
+                        initialIsPublic = key.isPublic,
                         onNavigateBack = { backStack.pop() },
                         onSaveSuccess = {
                             backStack.setStack(Route.Main)
