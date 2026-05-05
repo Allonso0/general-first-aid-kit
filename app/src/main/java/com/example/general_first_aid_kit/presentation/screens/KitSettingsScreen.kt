@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -39,6 +40,7 @@ fun KitSettingsScreen(
     initialName: String,
     initialLocation: String,
     initialColorIndex: Int,
+    initialIsPublic: Boolean,
     onNavigateBack: () -> Unit,
     onSaveSuccess: () -> Unit,
     onDeleteSuccess: () -> Unit,
@@ -67,12 +69,12 @@ fun KitSettingsScreen(
     var showColorDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(kitId) {
-        viewModel.initScreen(kitId = kitId, initialName, initialLocation, initialColorIndex)
+        viewModel.initScreen(kitId = kitId, initialName, initialLocation, initialColorIndex, initialIsPublic)
     }
 
     LaunchedEffect(state.selectedTab) {
         if (state.selectedTab == 1) {
-            viewModel.initScreen(kitId, state.name, state.location, state.selectedColorIndex)
+            viewModel.initScreen(kitId, state.name, state.location, state.selectedColorIndex, state.isPublic)
         }
     }
 
@@ -196,7 +198,7 @@ fun KitSettingsScreen(
                 .fillMaxSize()
         ) {
             if (isSharedAndOffline) {
-                OfflineBanner("Режим просмотра: изменения в общей аптечке недоступны без интернета")
+                OfflineBanner(stringResource(R.string.offline_banner_shared_kit))
             }
 
             GenericTabRow(

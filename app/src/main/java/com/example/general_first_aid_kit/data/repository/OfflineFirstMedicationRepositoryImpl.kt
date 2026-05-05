@@ -128,7 +128,7 @@ class OfflineFirstMedicationRepositoryImpl @Inject constructor(
                 finalPhotoUrl = bucket.publicUrl(fileName)
             }
 
-            val medicationToSave = medication.copy(id = docRef.id, photoUrl = finalPhotoUrl)
+            val medicationToSave = medication.copy(id = docRef.id, kitId = kitId, photoUrl = finalPhotoUrl)
             docRef.set(medicationToSave).await()
             // Upsert to Room immediately for responsive UI; Firestore listener will confirm later
             medicationDao.upsert(medicationToSave.toMedicationEntity())

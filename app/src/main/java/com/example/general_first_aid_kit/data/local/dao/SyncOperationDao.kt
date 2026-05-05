@@ -16,11 +16,14 @@ interface SyncOperationDao {
     suspend fun getAll(): List<SyncOperationEntity>
 
     @Query("UPDATE sync_operations SET retryCount = :retryCount WHERE id = :id")
-    suspend fun updateRetryCount(id: String, retryCount: Int)
+    suspend fun updateRetryCount(id: String, retryCount: Int): Int
 
     @Query("DELETE FROM sync_operations WHERE id = :id")
-    suspend fun deleteById(id: String)
+    suspend fun deleteById(id: String): Int
+
+    @Query("DELETE FROM sync_operations WHERE entityId = :kitId OR kitId = :kitId")
+    suspend fun deleteAllForKit(kitId: String): Int
 
     @Query("DELETE FROM sync_operations")
-    suspend fun deleteAll()
+    suspend fun deleteAll(): Int
 }

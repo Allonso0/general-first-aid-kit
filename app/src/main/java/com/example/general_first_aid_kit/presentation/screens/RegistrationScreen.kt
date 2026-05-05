@@ -27,6 +27,7 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -35,6 +36,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -66,22 +68,17 @@ fun RegistrationScreen(
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val formErrors by viewModel.formErrors.collectAsStateWithLifecycle()
 
     LaunchedEffect(uiState) {
-        when (uiState) {
+        when (val state = uiState) {
             is AuthState.Authenticated -> {
                 onRegistrationClick()
                 viewModel.resetState()
             }
             is AuthState.Error -> {
-                snackbarHostState.showSnackbar(
-                    message = (uiState as AuthState.Error).message,
-                    duration = SnackbarDuration.Short
-                )
+                snackbarHostState.showSnackbar(state.message, duration = SnackbarDuration.Short)
                 viewModel.resetState()
-            }
-            is AuthState.ErrorRes -> {
-                // Обработка ошибки из ресурсов
             }
             else -> Unit
         }
@@ -91,6 +88,9 @@ fun RegistrationScreen(
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var isPasswordVisible by remember { mutableStateOf(false) }
+    var usernameTouched by remember { mutableStateOf(false) }
+    var emailTouched by remember { mutableStateOf(false) }
+    var passwordTouched by remember { mutableStateOf(false) }
 
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
@@ -114,7 +114,10 @@ fun RegistrationScreen(
                             contentDescription = stringResource(R.string.back_button_description)
                         )
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = White
+                )
             )
         },
         containerColor = White
@@ -151,22 +154,33 @@ fun RegistrationScreen(
 
                 OutlinedTextField(
                     value = username,
-                    onValueChange = { username = it },
-                    label = { Text(
-                        text = stringResource(R.string.username_label)
-                    ) },
-                    modifier = Modifier.fillMaxWidth(),
+                    onValueChange = {
+                        username = it
+                        if (formErrors.nameError != null) viewModel.validateNameField(it)
+                    },
+                    label = { Text(text = stringResource(R.string.username_label)) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .onFocusChanged { focusState ->
+                            if (focusState.isFocused) {
+                                usernameTouched = true
+                            } else if (usernameTouched) {
+                                viewModel.validateNameField(username)
+                            }
+                        },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                     singleLine = true,
+                    isError = formErrors.nameError != null,
+                    supportingText = formErrors.nameError?.let { resId ->
+                        { Text(stringResource(resId)) }
+                    },
                     shape = RoundedCornerShape(Dimensions.CornerRadiusExtraLarge),
                     colors = OutlinedTextFieldDefaults.colors(
                         cursorColor = Black,
-
                         focusedBorderColor = GreenPrimary,
                         focusedLabelColor = GreenPrimary,
                         focusedTextColor = TextBlack,
                         focusedTrailingIconColor = GreenPrimary,
-
                         unfocusedTextColor = TextGray,
                         unfocusedLabelColor = LightGray,
                         unfocusedBorderColor = LightGray,
@@ -178,22 +192,33 @@ fun RegistrationScreen(
 
                 OutlinedTextField(
                     value = email,
-                    onValueChange = { email = it },
-                    label = { Text(
-                        text = stringResource(R.string.email_label)
-                    ) },
-                    modifier = Modifier.fillMaxWidth(),
+                    onValueChange = {
+                        email = it
+                        if (formErrors.emailError != null) viewModel.validateEmailField(it)
+                    },
+                    label = { Text(text = stringResource(R.string.email_label)) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .onFocusChanged { focusState ->
+                            if (focusState.isFocused) {
+                                emailTouched = true
+                            } else if (emailTouched) {
+                                viewModel.validateEmailField(email)
+                            }
+                        },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                     singleLine = true,
+                    isError = formErrors.emailError != null,
+                    supportingText = formErrors.emailError?.let { resId ->
+                        { Text(stringResource(resId)) }
+                    },
                     shape = RoundedCornerShape(Dimensions.CornerRadiusExtraLarge),
                     colors = OutlinedTextFieldDefaults.colors(
                         cursorColor = Black,
-
                         focusedBorderColor = GreenPrimary,
                         focusedLabelColor = GreenPrimary,
                         focusedTextColor = TextBlack,
                         focusedTrailingIconColor = GreenPrimary,
-
                         unfocusedTextColor = TextGray,
                         unfocusedLabelColor = LightGray,
                         unfocusedBorderColor = LightGray,
@@ -205,32 +230,40 @@ fun RegistrationScreen(
 
                 OutlinedTextField(
                     value = password,
-                    onValueChange = { password = it },
-                    label = { Text(
-                        text = stringResource(R.string.password_label)
-                    ) },
-                    modifier = Modifier.fillMaxWidth(),
+                    onValueChange = {
+                        password = it
+                        if (formErrors.passwordError != null) viewModel.validatePasswordField(it)
+                    },
+                    label = { Text(text = stringResource(R.string.password_label)) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .onFocusChanged { focusState ->
+                            if (focusState.isFocused) {
+                                passwordTouched = true
+                            } else if (passwordTouched) {
+                                viewModel.validatePasswordField(password)
+                            }
+                        },
                     visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     singleLine = true,
+                    isError = formErrors.passwordError != null,
+                    supportingText = formErrors.passwordError?.let { resId ->
+                        { Text(stringResource(resId)) }
+                    },
                     shape = RoundedCornerShape(Dimensions.CornerRadiusExtraLarge),
                     trailingIcon = {
                         val image = if (isPasswordVisible) painterResource(R.drawable.baseline_visibility_off_24) else painterResource(R.drawable.baseline_visibility_24)
                         IconButton(onClick = { isPasswordVisible = !isPasswordVisible }) {
-                            Icon(
-                                painter = image,
-                                contentDescription = stringResource(R.string.visibility_switch)
-                            )
+                            Icon(painter = image, contentDescription = stringResource(R.string.visibility_switch))
                         }
                     },
                     colors = OutlinedTextFieldDefaults.colors(
                         cursorColor = Black,
-
                         focusedBorderColor = GreenPrimary,
                         focusedLabelColor = GreenPrimary,
                         focusedTextColor = TextBlack,
                         focusedTrailingIconColor = GreenPrimary,
-
                         unfocusedTextColor = TextGray,
                         unfocusedLabelColor = LightGray,
                         unfocusedBorderColor = LightGray,

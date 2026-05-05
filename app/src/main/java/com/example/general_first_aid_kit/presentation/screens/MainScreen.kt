@@ -43,6 +43,7 @@ import com.example.general_first_aid_kit.presentation.ui.theme.GreenPrimary
 import com.example.general_first_aid_kit.presentation.ui.theme.TextGreen
 import com.example.general_first_aid_kit.presentation.ui.theme.TextRed
 import com.example.general_first_aid_kit.presentation.ui.theme.White
+import com.example.general_first_aid_kit.domain.model.KitType
 import com.example.general_first_aid_kit.presentation.viewmodels.MainViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -51,7 +52,7 @@ fun MainScreen(
     onProfileClick: () -> Unit,
     onJoinClick: () -> Unit,
     onAddKitClick: () -> Unit,
-    onKitCardClick: (String, String, String, Int) -> Unit,
+    onKitCardClick: (String, String, String, Int, Boolean) -> Unit,
     viewModel: MainViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
@@ -125,7 +126,7 @@ fun MainScreen(
                 .padding(innerPadding)
         ) {
             if (!isOnline) {
-                OfflineBanner("Нет подключения к интернету")
+                OfflineBanner(stringResource(R.string.offline_no_internet))
             }
 
             GenericTabRow(
@@ -202,14 +203,14 @@ fun MainScreen(
                                     content = {
                                         KitCard(
                                             kit = kit,
-                                            onClick = { onKitCardClick(kit.id, kit.name, kit.location, kit.colorIndex) }
+                                            onClick = { onKitCardClick(kit.id, kit.name, kit.location, kit.colorIndex, kit.type == KitType.SHARED) }
                                         )
                                     }
                                 ) */
 
                                 KitCard(
                                     kit = kit,
-                                    onClick = { onKitCardClick(kit.id, kit.name, kit.location, kit.colorIndex) }
+                                    onClick = { onKitCardClick(kit.id, kit.name, kit.location, kit.colorIndex, kit.type == KitType.SHARED) }
                                 )
 
                             }

@@ -25,8 +25,8 @@ interface KitDao {
     fun observeByUserId(userId: String): Flow<List<KitEntity>>
 
     @Query("DELETE FROM kits WHERE id = :kitId")
-    suspend fun deleteById(kitId: String)
+    suspend fun deleteById(kitId: String): Int
 
     @Query("DELETE FROM kits")
-    suspend fun deleteAll()
+    suspend fun deleteAll(): Int
 }

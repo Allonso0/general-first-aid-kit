@@ -25,11 +25,11 @@ interface MedicationDao {
     fun observeById(kitId: String, medicationId: String): Flow<MedicationEntity?>
 
     @Query("DELETE FROM medications WHERE id = :medicationId")
-    suspend fun deleteById(medicationId: String)
+    suspend fun deleteById(medicationId: String): Int
 
     @Query("DELETE FROM medications WHERE kitId = :kitId")
-    suspend fun deleteByKitId(kitId: String)
+    suspend fun deleteByKitId(kitId: String): Int
 
     @Query("DELETE FROM medications")
-    suspend fun deleteAll()
+    suspend fun deleteAll(): Int
 }

@@ -6,7 +6,7 @@ object AuthValidator {
 
     fun validateName(name: String): ValidationResult {
         return when {
-            name.isBlank() -> ValidationResult.Error(R.string.error_empty_name)
+            name.isBlank() -> ValidationResult.Error(R.string.error_empty_username)
             name.length > 20 -> ValidationResult.Error(R.string.error_long_username)
             name.length < 2 -> ValidationResult.Error(R.string.error_short_username)
             else -> ValidationResult.Success
