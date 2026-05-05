@@ -1,34 +1,31 @@
 package com.example.general_first_aid_kit.presentation.viewmodels
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.general_first_aid_kit.data.connectivity.ConnectivityMonitor
 import com.example.general_first_aid_kit.domain.model.Kit
-import com.example.general_first_aid_kit.domain.model.KitType
 import com.example.general_first_aid_kit.domain.model.Medication
 import com.example.general_first_aid_kit.domain.usecase.GetMedicationsUseCase
 import com.example.general_first_aid_kit.domain.usecase.GetUserUseCase
 import com.example.general_first_aid_kit.domain.usecase.ObserveKitUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class KitViewModel @Inject constructor(
     private val getMedicationsUseCase: GetMedicationsUseCase,
-    private val observeKitUseCase: ObserveKitUseCase,
-    private val getUserUseCase: GetUserUseCase,
+    observeKitUseCase: ObserveKitUseCase,
+    getUserUseCase: GetUserUseCase,
     private val connectivityMonitor: ConnectivityMonitor
-) : ViewModel() {
+) : KitAwareViewModel(observeKitUseCase, getUserUseCase) {
 
     val isOnline: StateFlow<Boolean> = connectivityMonitor.isOnline
 
@@ -40,16 +37,13 @@ class KitViewModel @Inject constructor(
     private val _selectedCategory = MutableStateFlow<String?>("Все")
     val selectedCategory = _selectedCategory.asStateFlow()
 
-    private val _isUserKickedOrDeleted = MutableStateFlow(false)
-    val isUserKickedOrDeleted = _isUserKickedOrDeleted.asStateFlow()
-
     private val _currentKit = MutableStateFlow<Kit?>(null)
     val currentKit: StateFlow<Kit?> = _currentKit.asStateFlow()
 
     val isSharedAndOffline: StateFlow<Boolean> = combine(
         connectivityMonitor.isOnline,
-        _currentKit
-    ) { online, kit -> !online && kit?.type == KitType.SHARED }
+        isKitShared
+    ) { online, shared -> !online && shared }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -69,10 +63,11 @@ class KitViewModel @Inject constructor(
         initialValue = emptyList()
     )
 
-    fun loadKit(id: String) {
-        if (_kitId.value != id) {
-            _kitId.value = id
+    fun initWithKitId(kitId: String) {
+        if (_kitId.value != kitId) {
+            _kitId.value = kitId
         }
+        startObservingKit(kitId)
     }
 
     fun onSearchQueryChange(newQuery: String) {
@@ -83,15 +78,7 @@ class KitViewModel @Inject constructor(
         _selectedCategory.value = category
     }
 
-    fun startObservingKit(kitId: String) {
-        viewModelScope.launch {
-            val currentUserId = getUserUseCase()?.id ?: ""
-            observeKitUseCase(kitId).collect { kit ->
-                _currentKit.value = kit
-                if (kit == null || !kit.userIds.contains(currentUserId)) {
-                    _isUserKickedOrDeleted.value = true
-                }
-            }
-        }
+    override fun onKitUpdate(kit: Kit?) {
+        _currentKit.value = kit
     }
 }

@@ -6,6 +6,7 @@ import com.example.general_first_aid_kit.domain.model.Kit
 import com.example.general_first_aid_kit.data.connectivity.ConnectivityMonitor
 import com.example.general_first_aid_kit.domain.usecase.DeleteKitUseCase
 import com.example.general_first_aid_kit.domain.usecase.GetAllMedicationsUseCase
+import com.example.general_first_aid_kit.domain.usecase.GetAppSettingsUseCase
 import com.example.general_first_aid_kit.domain.usecase.GetKitsUseCase
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -25,6 +26,7 @@ class MainViewModel @Inject constructor(
     private val getKitsUseCase: GetKitsUseCase,
     private val deleteKitUseCase: DeleteKitUseCase,
     private val getAllMedicationsUseCase: GetAllMedicationsUseCase,
+    private val getAppSettingsUseCase: GetAppSettingsUseCase,
     private val auth: FirebaseAuth,
     private val connectivityMonitor: ConnectivityMonitor
 ) : ViewModel() {
@@ -41,6 +43,7 @@ class MainViewModel @Inject constructor(
     ) { kits, allMedications, isArchive ->
         val currentTime = System.currentTimeMillis()
         val currentUserId = auth.currentUser?.uid ?: ""
+        val lowStockThreshold = getAppSettingsUseCase().lowStockThreshold
 
         val enrichedKits = kits
             .filter { (currentUserId in it.archivedUserIds) == isArchive }
@@ -50,9 +53,7 @@ class MainViewModel @Inject constructor(
                 kit.copy(
                     countMedicine = kitMedications.size,
                     countExpired = kitMedications.count { it.expirationDate < currentTime },
-                    countRunningOut = kitMedications.count {
-                        it.quantity <= 2 // TODO: добавить выбор порога уведомления
-                    }
+                    countRunningOut = kitMedications.count { it.quantity <= lowStockThreshold }
                 )
             }
 

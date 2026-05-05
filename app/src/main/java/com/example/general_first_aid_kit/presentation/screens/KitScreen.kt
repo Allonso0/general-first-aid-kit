@@ -44,6 +44,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -75,8 +76,7 @@ fun KitScreen(
     val context = LocalContext.current
 
     LaunchedEffect(kitId) {
-        viewModel.loadKit(kitId)
-        viewModel.startObservingKit(kitId)
+        viewModel.initWithKitId(kitId)
     }
 
     val isKicked by viewModel.isUserKickedOrDeleted.collectAsState()
@@ -164,7 +164,7 @@ fun KitScreen(
                 .fillMaxSize()
         ) {
             if (isSharedAndOffline) {
-                OfflineBanner("Режим просмотра: изменения в общей аптечке недоступны без интернета")
+                OfflineBanner(stringResource(R.string.offline_banner_shared_kit))
             }
 
             Row(

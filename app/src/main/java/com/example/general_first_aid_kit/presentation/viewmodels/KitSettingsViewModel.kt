@@ -1,8 +1,11 @@
 package com.example.general_first_aid_kit.presentation.viewmodels
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.general_first_aid_kit.R
 import com.example.general_first_aid_kit.domain.model.KitNotificationSettings
+import dagger.hilt.android.qualifiers.ApplicationContext
 import com.example.general_first_aid_kit.domain.model.KitType
 import com.example.general_first_aid_kit.domain.model.User
 import com.example.general_first_aid_kit.domain.usecase.DeleteKitUseCase
@@ -38,7 +41,8 @@ class KitSettingsViewModel @Inject constructor(
     private val getKitNotificationSettings: GetKitNotificationSettingsUseCase,
     private val updateKitNotificationSettings: UpdateKitNotificationSettingsUseCase,
     private val setKitArchivedUseCase: SetKitArchivedUseCase,
-    private val connectivityMonitor: ConnectivityMonitor
+    private val connectivityMonitor: ConnectivityMonitor,
+    @ApplicationContext private val context: Context
 ) : ViewModel() {
 
     val isOnline: StateFlow<Boolean> = connectivityMonitor.isOnline
@@ -48,13 +52,14 @@ class KitSettingsViewModel @Inject constructor(
 
     private var currentKitId: String = ""
 
-    fun initScreen(kitId: String, initialName: String, initialLocation: String, initialColorIndex: Int) {
+    fun initScreen(kitId: String, initialName: String, initialLocation: String, initialColorIndex: Int, initialIsPublic: Boolean) {
         currentKitId = kitId
         _uiState.update {
             it.copy(
                 name = initialName,
                 location = initialLocation,
-                selectedColorIndex = initialColorIndex
+                selectedColorIndex = initialColorIndex,
+                isPublic = initialIsPublic
             )
         }
         loadKitData()
@@ -77,9 +82,11 @@ class KitSettingsViewModel @Inject constructor(
                 }
             }
 
+            var hasReceivedFirstEmit = false
+            var lastUserIds: List<String>? = null
             observeKitUseCase(currentKitId).collect { kit ->
                 if (kit == null) {
-                    if (!uiState.value.isLoading) {
+                    if (hasReceivedFirstEmit) {
                         _uiState.update { it.copy(isKitDeleted = true) }
                     }
                     return@collect
@@ -90,7 +97,14 @@ class KitSettingsViewModel @Inject constructor(
                     return@collect
                 }
 
-                val users = getUsersByIdsUseCase(kit.userIds)
+                hasReceivedFirstEmit = true
+
+                val users = if (kit.userIds != lastUserIds) {
+                    lastUserIds = kit.userIds
+                    getUsersByIdsUseCase(kit.userIds)
+                } else {
+                    _uiState.value.participants
+                }
 
                 _uiState.update {
                     it.copy(
@@ -161,7 +175,7 @@ class KitSettingsViewModel @Inject constructor(
 
     private fun blockIfSharedOffline(): Boolean {
         return if (isSharedAndOffline()) {
-            _uiState.update { it.copy(error = "Это действие недоступно без подключения к интернету") }
+            _uiState.update { it.copy(error = context.getString(R.string.error_offline_action)) }
             true
         } else false
     }
@@ -193,7 +207,7 @@ class KitSettingsViewModel @Inject constructor(
 
             _uiState.update { it.copy(isLoading = false) }
             if (result.isSuccess) onSuccess()
-            else _uiState.update { it.copy(error = "Ошибка при сохранении") }
+            else _uiState.update { it.copy(error = context.getString(R.string.error_kit_save)) }
         }
     }
 
@@ -208,7 +222,7 @@ class KitSettingsViewModel @Inject constructor(
             if (result.isSuccess) {
                 onSuccess()
             } else {
-                _uiState.update { it.copy(isLoading = false, error = "Ошибка при удалении") }
+                _uiState.update { it.copy(isLoading = false, error = context.getString(R.string.error_kit_delete)) }
             }
         }
     }
@@ -225,14 +239,14 @@ class KitSettingsViewModel @Inject constructor(
             if (result.isSuccess) {
                 onSuccess()
             } else {
-                _uiState.update { it.copy(isLoading = false, error = "Ошибка при выходе из аптечки") }
+                _uiState.update { it.copy(isLoading = false, error = context.getString(R.string.error_kit_leave)) }
             }
         }
     }
 
     fun generateInviteCode() {
         if (!connectivityMonitor.isOnline.value) {
-            _uiState.update { it.copy(error = "Это действие недоступно без подключения к интернету") }
+            _uiState.update { it.copy(error = context.getString(R.string.error_offline_action)) }
             return
         }
         viewModelScope.launch {
@@ -244,7 +258,7 @@ class KitSettingsViewModel @Inject constructor(
 
     fun removeParticipant(userId: String) {
         if (!connectivityMonitor.isOnline.value) {
-            _uiState.update { it.copy(error = "Это действие недоступно без подключения к интернету") }
+            _uiState.update { it.copy(error = context.getString(R.string.error_offline_action)) }
             return
         }
         viewModelScope.launch {
@@ -260,7 +274,7 @@ class KitSettingsViewModel @Inject constructor(
         viewModelScope.launch {
             val result = setKitArchivedUseCase(currentKitId, userId, archived)
             if (result.isSuccess) onSuccess()
-            else _uiState.update { it.copy(isLoading = false, error = "Ошибка при изменении статуса аптечки") }
+            else _uiState.update { it.copy(isLoading = false, error = context.getString(R.string.error_kit_archive_status)) }
         }
     }
 }
