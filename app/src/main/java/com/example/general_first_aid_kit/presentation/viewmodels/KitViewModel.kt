@@ -7,6 +7,7 @@ import com.example.general_first_aid_kit.domain.model.Medication
 import com.example.general_first_aid_kit.domain.usecase.GetMedicationsUseCase
 import com.example.general_first_aid_kit.domain.usecase.GetUserUseCase
 import com.example.general_first_aid_kit.domain.usecase.ObserveKitUseCase
+import com.example.general_first_aid_kit.presentation.utils.FuzzyMatcher
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -53,7 +54,7 @@ class KitViewModel @Inject constructor(
         _selectedCategory
     ) { list, query, category ->
         list.filter { med ->
-            val matchesQuery = query.isBlank() || med.name.contains(query, ignoreCase = true)
+            val matchesQuery = FuzzyMatcher.matches(query, med.name)
             val matchesCategory = category == null || category == "Все" || med.category == category
             matchesQuery && matchesCategory
         }
