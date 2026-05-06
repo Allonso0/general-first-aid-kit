@@ -10,7 +10,7 @@ plugins {
     alias(libs.plugins.hilt)
 
     id("com.google.gms.google-services")
-
+    id("jacoco")
 }
 
 android {
@@ -53,6 +53,9 @@ android {
     }
 
     buildTypes {
+        debug {
+            enableUnitTestCoverage = true
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(
@@ -72,6 +75,29 @@ android {
         buildConfig = true
         compose = true
     }
+}
+
+tasks.register<JacocoReport>("jacocoDomainReport") {
+    dependsOn("testDebugUnitTest")
+    group = "verification"
+
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
+
+    val classDir = fileTree("${layout.buildDirectory.get()}/tmp/kotlin-classes/debug") {
+        include("**/domain/usecase/**", "**/domain/util/**")
+        exclude("**/domain/model/**", "**/domain/repository/**")
+    }
+
+    sourceDirectories.setFrom(files("${projectDir}/src/main/java"))
+    classDirectories.setFrom(classDir)
+    executionData.setFrom(
+        fileTree(layout.buildDirectory.get()) {
+            include("jacoco/testDebugUnitTest.exec")
+        }
+    )
 }
 
 dependencies {
@@ -131,4 +157,16 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    testImplementation(libs.mockk)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.turbine)
+    testImplementation(libs.arch.core.testing)
+
+    androidTestImplementation(libs.mockk.android)
+    androidTestImplementation(libs.hilt.android.testing)
+    kspAndroidTest(libs.hilt.android.compiler)
+    androidTestImplementation(libs.androidx.room.testing)
+    androidTestImplementation(libs.androidx.work.testing)
+    androidTestImplementation(libs.kotlinx.coroutines.test)
 }
