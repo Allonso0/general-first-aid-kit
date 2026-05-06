@@ -270,7 +270,10 @@ fun KitScreen(
 
             if (medications.isEmpty()) {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("В этой аптечке пока пусто", color = TextGray)
+                    Text(
+                        text = if (searchQuery.isNotBlank()) "Лекарства не найдены" else "В этой аптечке пока пусто",
+                        color = TextGray
+                    )
                 }
             } else {
                 LazyColumn(
@@ -280,6 +283,7 @@ fun KitScreen(
                     items(medications, key = { it.id }) { med ->
                         MedicationCard(
                             medication = med,
+                            searchQuery = searchQuery,
                             onClick = { onNavigateToMedicationInfo(med.id) }
                         )
                     }

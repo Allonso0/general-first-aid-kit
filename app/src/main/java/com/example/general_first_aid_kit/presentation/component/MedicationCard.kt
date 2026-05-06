@@ -30,6 +30,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.general_first_aid_kit.R
@@ -44,9 +48,24 @@ import com.example.general_first_aid_kit.presentation.utils.formatExpirationDate
 import com.example.general_first_aid_kit.presentation.utils.getCategoryColor
 import com.example.general_first_aid_kit.presentation.utils.shimmerEffect
 
+private fun buildHighlightedName(name: String, query: String): androidx.compose.ui.text.AnnotatedString {
+    if (query.isBlank()) return buildAnnotatedString { append(name) }
+    val q = query.trim().lowercase()
+    val index = name.lowercase().indexOf(q)
+    if (index < 0) return buildAnnotatedString { append(name) }
+    return buildAnnotatedString {
+        append(name.substring(0, index))
+        withStyle(SpanStyle(background = GreenPrimary.copy(alpha = 0.2f), fontWeight = FontWeight.SemiBold)) {
+            append(name.substring(index, index + q.length))
+        }
+        append(name.substring(index + q.length))
+    }
+}
+
 @Composable
 fun MedicationCard(
     medication: Medication,
+    searchQuery: String = "",
     onClick: () -> Unit
 ) {
     val categoryName = medication.category.ifEmpty { "Без категории" }
@@ -120,7 +139,7 @@ fun MedicationCard(
                 Spacer(modifier = Modifier.height(Dimensions.SpacingExtraSmall))
 
                 Text(
-                    text = medication.name,
+                    text = buildHighlightedName(medication.name, searchQuery),
                     style = MaterialTheme.typography.bodyLarge,
                     color = TextBlack
                 )
