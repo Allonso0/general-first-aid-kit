@@ -10,11 +10,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
@@ -40,13 +37,15 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.example.general_first_aid_kit.R
 import com.example.general_first_aid_kit.presentation.component.ProfileMenuItem
-import com.example.general_first_aid_kit.presentation.ui.theme.Black
-import com.example.general_first_aid_kit.presentation.ui.theme.ButtonRed
+import com.example.general_first_aid_kit.presentation.ui.theme.KitColorBlueGray
+import com.example.general_first_aid_kit.presentation.ui.theme.KitColorLavender
+import com.example.general_first_aid_kit.presentation.ui.theme.KitColorOrange
 import com.example.general_first_aid_kit.presentation.ui.theme.Dimensions
 import com.example.general_first_aid_kit.presentation.ui.theme.GreenPrimary
 import com.example.general_first_aid_kit.presentation.ui.theme.LightGray
 import com.example.general_first_aid_kit.presentation.ui.theme.TextBlack
 import com.example.general_first_aid_kit.presentation.ui.theme.TextGreen
+import com.example.general_first_aid_kit.presentation.ui.theme.KitColorRed
 import com.example.general_first_aid_kit.presentation.ui.theme.TextRed
 import com.example.general_first_aid_kit.presentation.ui.theme.White
 import com.example.general_first_aid_kit.presentation.viewmodels.ProfileViewModel
@@ -151,48 +150,50 @@ fun ProfileScreen(
             )
 
             Spacer(modifier = Modifier.height(Dimensions.SpacingExtraLarge))
-            HorizontalDivider(color = Black)
 
             ProfileMenuItem(
                 icon = painterResource(R.drawable.baseline_person_24),
                 text = stringResource(R.string.profile_settings),
+                iconContainerColor = GreenPrimary,
                 onClick = { onNavigateToProfileSettings() }
             )
+
+            Spacer(modifier = Modifier.height(Dimensions.SpacingSmall))
 
             ProfileMenuItem(
                 icon = painterResource(R.drawable.baseline_settings_24),
                 text = stringResource(R.string.settings),
+                iconContainerColor = KitColorBlueGray,
                 onClick = { onNavigateToAppSettings() }
             )
+
+            Spacer(modifier = Modifier.height(Dimensions.SpacingSmall))
 
             ProfileMenuItem(
                 icon = painterResource(R.drawable.baseline_notifications_24),
                 text = stringResource(R.string.notifications_log),
+                iconContainerColor = KitColorOrange,
                 onClick = { onNavigateToNotificationLog() }
             )
+
+            Spacer(modifier = Modifier.height(Dimensions.SpacingSmall))
 
             ProfileMenuItem(
                 icon = painterResource(R.drawable.baseline_question_answer_24),
                 text = stringResource(R.string.how_to_use_the_app),
+                iconContainerColor = KitColorLavender,
                 onClick = { }
             )
 
-            Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.height(Dimensions.SpacingExtraLarge))
 
-            Button(
-                onClick = { onLogout() },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(Dimensions.LargeButtonHeight),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = ButtonRed,
-                    contentColor = TextRed
-                )
-            ) {
-                Text(
-                    text = stringResource(R.string.log_out)
-                )
-            }
+            ProfileMenuItem(
+                icon = painterResource(R.drawable.baseline_logout_24),
+                text = stringResource(R.string.log_out),
+                iconContainerColor = KitColorRed,
+                textColor = TextRed,
+                onClick = { onLogout() }
+            )
 
             Spacer(modifier = Modifier.height(Dimensions.SpacingLarge))
         }
