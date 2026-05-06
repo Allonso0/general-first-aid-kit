@@ -1,5 +1,12 @@
 package com.example.general_first_aid_kit.presentation.navigation
 
+import androidx.compose.animation.core.CubicBezierEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshots.Snapshot
@@ -28,6 +35,9 @@ import com.example.general_first_aid_kit.presentation.screens.NotificationLogScr
 import com.example.general_first_aid_kit.presentation.screens.ScanBarcodeScreen
 import com.example.general_first_aid_kit.presentation.viewmodels.AuthViewModel
 
+private val EmphasizedDecelerate = CubicBezierEasing(0.05f, 0.7f, 0.1f, 1.0f)
+private val EmphasizedAccelerate = CubicBezierEasing(0.3f, 0.0f, 0.8f, 0.15f)
+
 @Composable
 fun NavigationRoot(
     modifier: Modifier = Modifier,
@@ -48,6 +58,36 @@ fun NavigationRoot(
         ),
         onBack = {
             backStack.pop()
+        },
+        transitionSpec = {
+            (slideInHorizontally(
+                animationSpec = tween(300, easing = EmphasizedDecelerate),
+                initialOffsetX = { (it * 0.16f).toInt() }
+            ) + fadeIn(tween(150, delayMillis = 100, easing = EmphasizedDecelerate))) togetherWith
+            (slideOutHorizontally(
+                animationSpec = tween(200, easing = EmphasizedAccelerate),
+                targetOffsetX = { -(it * 0.16f).toInt() }
+            ) + fadeOut(tween(100, easing = EmphasizedAccelerate)))
+        },
+        popTransitionSpec = {
+            (slideInHorizontally(
+                animationSpec = tween(300, easing = EmphasizedDecelerate),
+                initialOffsetX = { -(it * 0.16f).toInt() }
+            ) + fadeIn(tween(150, delayMillis = 100, easing = EmphasizedDecelerate))) togetherWith
+            (slideOutHorizontally(
+                animationSpec = tween(200, easing = EmphasizedAccelerate),
+                targetOffsetX = { (it * 0.16f).toInt() }
+            ) + fadeOut(tween(100, easing = EmphasizedAccelerate)))
+        },
+        predictivePopTransitionSpec = {
+            (slideInHorizontally(
+                animationSpec = tween(300, easing = EmphasizedDecelerate),
+                initialOffsetX = { -(it * 0.16f).toInt() }
+            ) + fadeIn(tween(150, delayMillis = 100, easing = EmphasizedDecelerate))) togetherWith
+            (slideOutHorizontally(
+                animationSpec = tween(200, easing = EmphasizedAccelerate),
+                targetOffsetX = { (it * 0.16f).toInt() }
+            ) + fadeOut(tween(100, easing = EmphasizedAccelerate)))
         },
         entryProvider = { key ->
             when (key) {
