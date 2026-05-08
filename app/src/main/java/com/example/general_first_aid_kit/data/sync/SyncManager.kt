@@ -123,7 +123,6 @@ class SyncManager @Inject constructor(
                     .collection("medications").document(entity.id)
                     .set(medication).await()
 
-                // Clear localPhotoUri and persist the final Supabase URL
                 medicationDao.upsert(entity.copy(photoUrl = finalPhotoUrl, localPhotoUri = null))
             }
             "DELETE" -> {
@@ -131,7 +130,6 @@ class SyncManager @Inject constructor(
                     .collection("medications").document(op.entityId)
                     .delete().await()
 
-                // Delete Supabase photo if present
                 val entity = Json.decodeFromString<MedicationEntity>(op.payload)
                 entity.photoUrl?.let { url ->
                     try {
