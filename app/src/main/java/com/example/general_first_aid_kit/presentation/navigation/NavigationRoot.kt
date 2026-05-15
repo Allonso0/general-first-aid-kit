@@ -1,5 +1,6 @@
 package com.example.general_first_aid_kit.presentation.navigation
 
+import android.content.Context
 import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -11,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavEntry
@@ -28,6 +30,7 @@ import com.example.general_first_aid_kit.presentation.screens.KitSettingsScreen
 import com.example.general_first_aid_kit.presentation.screens.LoginScreen
 import com.example.general_first_aid_kit.presentation.screens.MainScreen
 import com.example.general_first_aid_kit.presentation.screens.MedicationInfoScreen
+import com.example.general_first_aid_kit.presentation.screens.OnboardingScreen
 import com.example.general_first_aid_kit.presentation.screens.ProfileScreen
 import com.example.general_first_aid_kit.presentation.screens.ProfileSettingsScreen
 import com.example.general_first_aid_kit.presentation.screens.RegistrationScreen
@@ -43,8 +46,14 @@ fun NavigationRoot(
     modifier: Modifier = Modifier,
     viewModel: AuthViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
     val startRoute = remember {
-        if (viewModel.isLogged()) Route.Main else Route.Welcome
+        when {
+            viewModel.isLogged() -> Route.Main
+            !context.getSharedPreferences("app_settings", Context.MODE_PRIVATE)
+                .getBoolean("onboarding_shown", false) -> Route.Onboarding()
+            else -> Route.Welcome
+        }
     }
 
     val backStack = rememberNavBackStack(startRoute)
@@ -91,6 +100,20 @@ fun NavigationRoot(
         },
         entryProvider = { key ->
             when (key) {
+                is Route.Onboarding -> NavEntry(key) {
+                    OnboardingScreen(
+                        onFinish = {
+                            if (key.isFromProfile) {
+                                backStack.pop()
+                            } else {
+                                backStack.setStack(Route.Welcome)
+                            }
+                        },
+                        onNavigateBack = if (key.isFromProfile) {
+                            { backStack.pop() }
+                        } else null
+                    )
+                }
                 is Route.Welcome -> NavEntry(key) {
                     GreetingScreen(
                         onNavigateToLogin = {
@@ -145,6 +168,9 @@ fun NavigationRoot(
                         },
                         onNavigateToNotificationLog = {
                             backStack.add(Route.NotificationLog)
+                        },
+                        onNavigateToOnboarding = {
+                            backStack.add(Route.Onboarding(isFromProfile = true))
                         }
                     )
                 }

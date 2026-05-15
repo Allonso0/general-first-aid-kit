@@ -123,6 +123,20 @@
     <string name="error_kit_leave">Ошибка при выходе из аптечки</string>
     <string name="error_kit_archive_status">Ошибка при изменении статуса аптечки</string>
 
+    <!--Онбординг-->
+    <string name="onboarding_skip">Пропустить</string>
+    <string name="onboarding_close">Закрыть</string>
+    <string name="onboarding_next">Далее</string>
+    <string name="onboarding_start">Начать</string>
+    <string name="onboarding_page1_title">Ваша аптечка всегда под рукой</string>
+    <string name="onboarding_page1_subtitle">Общая аптечка помогает вести учёт лекарств дома, в офисе или на даче — и всегда знать, что есть в запасе</string>
+    <string name="onboarding_page2_title">Управляйте аптечкой вместе</string>
+    <string name="onboarding_page2_subtitle">Создайте общую аптечку и пригласите семью или коллег по коду приглашения. Все изменения видны всем участникам в реальном времени</string>
+    <string name="onboarding_page3_title">Добавляйте лекарства за секунды</string>
+    <string name="onboarding_page3_subtitle">Наведите камеру на штрих-код упаковки — название и категория заполнятся автоматически. Или добавьте лекарство вручную</string>
+    <string name="onboarding_page4_title">Не пропустите важное</string>
+    <string name="onboarding_page4_subtitle">Приложение предупредит о лекарствах с истекающим сроком годности и заканчивающихся запасах — заблаговременно и без лишних напоминаний</string>
+
     <!--Общие-->
     <string name="ok">Понятно</string>
     <string name="error_dialog_title">Ошибка</string>

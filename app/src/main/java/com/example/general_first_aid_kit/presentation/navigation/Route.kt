@@ -7,6 +7,9 @@ import kotlinx.serialization.Serializable
 sealed interface Route: NavKey {
 
     @Serializable
+    data class Onboarding(val isFromProfile: Boolean = false) : Route
+
+    @Serializable
     data object Welcome : Route
 
     @Serializable
