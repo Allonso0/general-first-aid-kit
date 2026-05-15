@@ -95,7 +95,10 @@ tasks.register<JacocoReport>("jacocoDomainReport") {
     classDirectories.setFrom(classDir)
     executionData.setFrom(
         fileTree(layout.buildDirectory.get()) {
-            include("jacoco/testDebugUnitTest.exec")
+            include(
+                "outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec",
+                "jacoco/testDebugUnitTest.exec"
+            )
         }
     )
 }

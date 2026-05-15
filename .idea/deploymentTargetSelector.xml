@@ -13,10 +13,10 @@
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="Tests in 'com.example.general_first_aid_kit.data.local.dao'">
+      <SelectionState runConfigName="Tests in 'com.example.general_first_aid_kit.data.worker'">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="Tests in 'com.example.general_first_aid_kit.data.worker'">
+      <SelectionState runConfigName="Tests in 'com.example.general_first_aid_kit.presentation'">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

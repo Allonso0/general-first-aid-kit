@@ -186,6 +186,48 @@ class SaveMedicationUseCaseTest {
         }
     }
 
+    @Test
+    fun `should_fallbackToKitId_in_activityMessage_when_kitNotFound`() = runTest {
+        coEvery { getKit(any()) } returns Result.failure(Exception("not found"))
+        var capturedMessage = ""
+        coEvery { fanOutNotification(any(), any(), any(), any(), any()) } coAnswers {
+            capturedMessage = arg(3)
+        }
+
+        useCase("kit-fallback", fakeMedication(), null, "user-1", "Иван", true)
+
+        assertTrue(capturedMessage.contains("kit-fallback"))
+    }
+
+    @Test
+    fun `should_includeKitNameInActivityMessage`() = runTest {
+        coEvery { getKit(any()) } returns Result.success(fakeKit(name = "Домашняя"))
+        var capturedMessage = ""
+        coEvery { fanOutNotification(any(), any(), any(), any(), any()) } coAnswers {
+            capturedMessage = arg(3)
+        }
+
+        useCase("kit-1", fakeMedication(name = "Аспирин"), null, "user-1", "Иван", true)
+
+        assertTrue(capturedMessage.contains("Домашняя"))
+    }
+
+    @Test
+    fun `should_includeKitNameInLowStockMessage`() = runTest {
+        every { getAppSettings() } returns AppSettings(lowStockThreshold = 5)
+        coEvery { getKit(any()) } returns Result.success(fakeKit(name = "Семейная"))
+        val messages = mutableListOf<String>()
+        coEvery { fanOutNotification(any(), any(), any(), any(), any()) } coAnswers {
+            messages.add(arg(3))
+        }
+
+        useCase("kit-1", fakeMedication(name = "Ибупрофен", quantity = 2), null, "user-1", "Иван", true)
+
+        val lowStockMsg = messages.find { it.contains("заканчивается") }
+        assertTrue("Сообщение low stock должно содержать имя аптечки",
+            lowStockMsg?.contains("Семейная") == true)
+    }
+
     private fun fakeMedication(
         id: String = "med-1",
         name: String = "Аспирин",
