@@ -59,6 +59,7 @@ fun ProfileScreen(
     onNavigateToProfileSettings: () -> Unit,
     onNavigateToAppSettings: () -> Unit,
     onNavigateToNotificationLog: () -> Unit,
+    onNavigateToOnboarding: () -> Unit,
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
     val user by viewModel.user.collectAsState()
@@ -182,7 +183,7 @@ fun ProfileScreen(
                 icon = painterResource(R.drawable.baseline_question_answer_24),
                 text = stringResource(R.string.how_to_use_the_app),
                 iconContainerColor = KitColorLavender,
-                onClick = { }
+                onClick = { onNavigateToOnboarding() }
             )
 
             Spacer(modifier = Modifier.height(Dimensions.SpacingExtraLarge))
