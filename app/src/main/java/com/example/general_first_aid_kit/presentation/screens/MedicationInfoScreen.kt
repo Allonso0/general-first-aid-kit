@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -130,7 +131,7 @@ fun MedicationInfoScreen(
             GreenSemiCircle(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(Dimensions.SemiCircleHeightDefault)
+                    .fillMaxHeight(0.5f)
                     .align(Alignment.BottomCenter)
             )
 
@@ -142,7 +143,6 @@ fun MedicationInfoScreen(
                         .padding(Dimensions.PaddingMedium),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    // Фото лекарства с тонкой обводкой
                     Surface(
                         modifier = Modifier
                             .size(Dimensions.MedicationPhotoSize)
@@ -324,8 +324,8 @@ fun MedicationInfoScreen(
             } ?: Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator(color = GreenPrimary)
             }
-            } // Box(weight(1f))
-        } // Column
+            }
+        }
     }
 }
 

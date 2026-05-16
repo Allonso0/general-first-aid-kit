@@ -2,10 +2,13 @@ package com.example.general_first_aid_kit.presentation.screens
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -135,9 +138,17 @@ fun LoginScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
+            GreenSemiCircle(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.45f)
+                    .align(Alignment.BottomCenter)
+            )
+
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
                     .padding(Dimensions.PaddingLarge),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Top
@@ -290,12 +301,6 @@ fun LoginScreen(
                 }
             }
 
-            GreenSemiCircle(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(Dimensions.SemiCircleHeightDefault)
-                    .align(Alignment.BottomCenter)
-            )
         }
     }
 }

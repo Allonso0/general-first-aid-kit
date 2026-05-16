@@ -73,16 +73,17 @@ fun ScanBarcodeScreen(
     }
 
     Scaffold(
+        containerColor = Color.Black,
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Сканирование", color = GreenPrimary, fontWeight = FontWeight.Bold) },
+                title = { Text("Сканирование", color = White, fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(painterResource(R.drawable.baseline_arrow_back_ios_24), contentDescription = "Назад", tint = GreenPrimary)
+                        Icon(painterResource(R.drawable.baseline_arrow_back_ios_24), contentDescription = "Назад", tint = White)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Black.copy(alpha = 0.5f)
+                    containerColor = Color.Black.copy(alpha = 0.7f)
                 )
             )
         }
