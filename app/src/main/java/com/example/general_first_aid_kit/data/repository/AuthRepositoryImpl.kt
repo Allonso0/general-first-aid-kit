@@ -68,8 +68,27 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
+    override fun isEmailVerified(): Boolean =
+        firebaseAuth.currentUser?.isEmailVerified == true
+
     override suspend fun sendPasswordResetEmail(email: String): Result<Unit> = try {
         firebaseAuth.sendPasswordResetEmail(email).await()
+        Result.success(Unit)
+    } catch (e: Exception) {
+        Result.failure(e)
+    }
+
+    override suspend fun sendEmailVerification(): Result<Unit> = try {
+        val user = firebaseAuth.currentUser ?: throw Exception("No authenticated user")
+        user.sendEmailVerification().await()
+        Result.success(Unit)
+    } catch (e: Exception) {
+        Result.failure(e)
+    }
+
+    override suspend fun reloadUser(): Result<Unit> = try {
+        val user = firebaseAuth.currentUser ?: throw Exception("No authenticated user")
+        user.reload().await()
         Result.success(Unit)
     } catch (e: Exception) {
         Result.failure(e)

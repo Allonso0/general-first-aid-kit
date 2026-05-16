@@ -20,6 +20,7 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.example.general_first_aid_kit.presentation.screens.AppSettingsScreen
+import com.example.general_first_aid_kit.presentation.screens.EmailVerificationScreen
 import com.example.general_first_aid_kit.presentation.screens.ForgotPasswordScreen
 import com.example.general_first_aid_kit.presentation.screens.AddMedicationScreen
 import com.example.general_first_aid_kit.presentation.screens.CreateKitScreen
@@ -50,7 +51,8 @@ fun NavigationRoot(
     val context = LocalContext.current
     val startRoute = remember {
         when {
-            viewModel.isLogged() -> Route.Main
+            viewModel.isLogged() && viewModel.isEmailVerified() -> Route.Main
+            viewModel.isLogged() && !viewModel.isEmailVerified() -> Route.EmailVerification
             !context.getSharedPreferences("app_settings", Context.MODE_PRIVATE)
                 .getBoolean("onboarding_shown", false) -> Route.Onboarding()
             else -> Route.Welcome
@@ -128,20 +130,16 @@ fun NavigationRoot(
                 is Route.Login -> NavEntry(key) {
                     LoginScreen(
                         onNavigateBack = { backStack.pop() },
-                        onSuccess = {
-                            backStack.setStack(Route.Main)
-                        },
-                        onForgotPasswordClick = {
-                            backStack.add(Route.ForgotPassword)
-                        }
+                        onSuccess = { backStack.setStack(Route.Main) },
+                        onEmailUnverified = { backStack.setStack(Route.EmailVerification) },
+                        onForgotPasswordClick = { backStack.add(Route.ForgotPassword) }
                     )
                 }
                 is Route.Register -> NavEntry(key) {
                     RegistrationScreen(
                         onNavigateBack = { backStack.pop() },
-                        onRegistrationClick = {
-                            backStack.setStack(Route.Main)
-                        }
+                        onRegistrationClick = { backStack.setStack(Route.Main) },
+                        onEmailUnverified = { backStack.setStack(Route.EmailVerification) }
                     )
                 }
                 is Route.Main -> NavEntry(key) {
@@ -269,6 +267,15 @@ fun NavigationRoot(
                 is Route.ForgotPassword -> NavEntry(key) {
                     ForgotPasswordScreen(
                         onBackClick = { backStack.pop() }
+                    )
+                }
+                is Route.EmailVerification -> NavEntry(key) {
+                    EmailVerificationScreen(
+                        onVerified = { backStack.setStack(Route.Main) },
+                        onSignOut = {
+                            viewModel.onSignOutClick()
+                            backStack.setStack(Route.Welcome)
+                        }
                     )
                 }
                 else -> error("Unknown key: $key")

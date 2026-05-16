@@ -71,4 +71,7 @@ sealed interface Route: NavKey {
 
     @Serializable
     data object ForgotPassword : Route
+
+    @Serializable
+    data object EmailVerification : Route
 }

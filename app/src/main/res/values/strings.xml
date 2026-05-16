@@ -123,6 +123,15 @@
     <string name="error_kit_leave">Ошибка при выходе из аптечки</string>
     <string name="error_kit_archive_status">Ошибка при изменении статуса аптечки</string>
 
+    <!--Подтверждение email-->
+    <string name="email_verification_title">Подтверждение email</string>
+    <string name="email_verification_greeting_title">Почти готово!</string>
+    <string name="email_verification_description">Мы отправили письмо на вашу почту. Перейдите по ссылке в письме, а затем вернитесь в приложение</string>
+    <string name="btn_email_confirmed">Я подтвердил</string>
+    <string name="btn_resend_email">Отправить повторно</string>
+    <string name="email_not_verified">Email ещё не подтверждён. Проверьте почту</string>
+    <string name="email_resend_success">Письмо отправлено повторно</string>
+
     <!--Восстановление пароля-->
     <string name="forgot_password_title">Восстановление пароля</string>
     <string name="forgot_password_greeting_title">Забыли пароль?</string>
