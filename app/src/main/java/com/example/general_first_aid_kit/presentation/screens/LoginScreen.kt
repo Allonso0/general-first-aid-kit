@@ -68,6 +68,7 @@ fun LoginScreen(
     onNavigateBack: () -> Unit,
     onSuccess: () -> Unit,
     onForgotPasswordClick: () -> Unit,
+    onEmailUnverified: () -> Unit,
     viewModel: AuthViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -79,6 +80,10 @@ fun LoginScreen(
         when (val state = uiState) {
             is AuthState.Authenticated -> {
                 onSuccess()
+                viewModel.resetState()
+            }
+            is AuthState.AuthenticatedUnverified -> {
+                onEmailUnverified()
                 viewModel.resetState()
             }
             is AuthState.Error -> {

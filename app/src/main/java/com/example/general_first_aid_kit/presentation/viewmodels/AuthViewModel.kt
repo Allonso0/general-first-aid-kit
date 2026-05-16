@@ -5,6 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.general_first_aid_kit.R
 import com.example.general_first_aid_kit.domain.usecase.CheckAuthUseCase
+import com.example.general_first_aid_kit.domain.usecase.IsEmailVerifiedUseCase
+import com.example.general_first_aid_kit.domain.usecase.SendEmailVerificationUseCase
 import com.example.general_first_aid_kit.domain.usecase.SignInUseCase
 import com.example.general_first_aid_kit.domain.usecase.SignOutUseCase
 import com.example.general_first_aid_kit.domain.usecase.SignUpUseCase
@@ -26,6 +28,8 @@ class AuthViewModel @Inject constructor(
     private val signUpUseCase: SignUpUseCase,
     private val signOutUseCase: SignOutUseCase,
     private val checkAuthUseCase: CheckAuthUseCase,
+    private val isEmailVerifiedUseCase: IsEmailVerifiedUseCase,
+    private val sendEmailVerificationUseCase: SendEmailVerificationUseCase,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
@@ -84,7 +88,13 @@ class AuthViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.value = AuthState.Loading
             signInUseCase(email, password)
-                .onSuccess { _uiState.value = AuthState.Authenticated }
+                .onSuccess {
+                    _uiState.value = if (isEmailVerifiedUseCase()) {
+                        AuthState.Authenticated
+                    } else {
+                        AuthState.AuthenticatedUnverified
+                    }
+                }
                 .onFailure { _uiState.value = AuthState.Error(mapFirebaseError(it)) }
         }
     }
@@ -107,7 +117,10 @@ class AuthViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.value = AuthState.Loading
             signUpUseCase(email, password, username)
-                .onSuccess { _uiState.value = AuthState.Authenticated }
+                .onSuccess {
+                    sendEmailVerificationUseCase()
+                    _uiState.value = AuthState.AuthenticatedUnverified
+                }
                 .onFailure { _uiState.value = AuthState.Error(mapFirebaseError(it)) }
         }
     }
@@ -136,6 +149,8 @@ class AuthViewModel @Inject constructor(
 
     fun isLogged() = checkAuthUseCase()
 
+    fun isEmailVerified() = isEmailVerifiedUseCase()
+
     fun resetState() {
         _uiState.value = AuthState.Idle
         _formErrors.value = AuthFormErrors()
@@ -152,5 +167,6 @@ sealed interface AuthState {
     data object Idle : AuthState
     data object Loading : AuthState
     data object Authenticated : AuthState
+    data object AuthenticatedUnverified : AuthState
     data class Error(val message: String) : AuthState
 }

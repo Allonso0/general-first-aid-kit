@@ -64,6 +64,7 @@ import com.example.general_first_aid_kit.presentation.viewmodels.AuthViewModel
 fun RegistrationScreen(
     onNavigateBack: () -> Unit,
     onRegistrationClick: () -> Unit,
+    onEmailUnverified: () -> Unit,
     viewModel: AuthViewModel = hiltViewModel()
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
@@ -74,6 +75,10 @@ fun RegistrationScreen(
         when (val state = uiState) {
             is AuthState.Authenticated -> {
                 onRegistrationClick()
+                viewModel.resetState()
+            }
+            is AuthState.AuthenticatedUnverified -> {
+                onEmailUnverified()
                 viewModel.resetState()
             }
             is AuthState.Error -> {
