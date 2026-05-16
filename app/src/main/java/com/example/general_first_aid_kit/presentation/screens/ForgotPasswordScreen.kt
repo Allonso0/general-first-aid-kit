@@ -1,6 +1,9 @@
 package com.example.general_first_aid_kit.presentation.screens
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -113,6 +116,13 @@ fun ForgotPasswordScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
+            GreenSemiCircle(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.45f)
+                    .align(Alignment.BottomCenter)
+            )
+
             if (uiState is ForgotPasswordState.Success) {
                 Column(
                     modifier = Modifier
@@ -138,7 +148,8 @@ fun ForgotPasswordScreen(
             } else {
                 Column(
                     modifier = Modifier
-                        .fillMaxSize()
+                        .fillMaxWidth()
+                        .verticalScroll(rememberScrollState())
                         .padding(Dimensions.PaddingLarge),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Top
@@ -223,12 +234,6 @@ fun ForgotPasswordScreen(
                 }
             }
 
-            GreenSemiCircle(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(Dimensions.SemiCircleHeightDefault)
-                    .align(Alignment.BottomCenter)
-            )
         }
     }
 }

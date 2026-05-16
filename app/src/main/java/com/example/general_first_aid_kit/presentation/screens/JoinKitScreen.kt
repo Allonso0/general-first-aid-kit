@@ -59,7 +59,7 @@ fun JoinKitScreen(
             GreenSemiCircle(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(Dimensions.SemiCircleHeightDefault)
+                    .fillMaxHeight(0.45f)
                     .align(Alignment.BottomCenter)
             )
 

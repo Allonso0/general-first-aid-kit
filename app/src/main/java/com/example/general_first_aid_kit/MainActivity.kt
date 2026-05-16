@@ -71,7 +71,7 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
-            GeneralfirstaidkitTheme {
+            GeneralfirstaidkitTheme(darkTheme = false) {
                 Surface(modifier = Modifier.fillMaxSize()) {
                     NavigationRoot()
                 }

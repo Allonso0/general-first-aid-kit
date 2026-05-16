@@ -1,7 +1,9 @@
 package com.example.general_first_aid_kit.presentation.screens
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -26,6 +28,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.res.painterResource
@@ -36,6 +39,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.general_first_aid_kit.R
+import com.example.general_first_aid_kit.presentation.component.GreenSemiCircle
 import com.example.general_first_aid_kit.presentation.ui.theme.Black
 import com.example.general_first_aid_kit.presentation.ui.theme.Dimensions
 import com.example.general_first_aid_kit.presentation.ui.theme.GreenPrimary
@@ -82,13 +86,24 @@ fun AppSettingsScreen(
         },
         containerColor = White
     ) { innerPadding ->
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(Dimensions.PaddingLarge)
-                .verticalScroll(rememberScrollState())
         ) {
+            GreenSemiCircle(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.45f)
+                    .align(Alignment.BottomCenter)
+            )
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(Dimensions.PaddingLarge)
+                    .verticalScroll(rememberScrollState())
+            ) {
             Text(
                 text = stringResource(R.string.settings_notifications_section),
                 style = MaterialTheme.typography.titleMedium,
@@ -136,6 +151,7 @@ fun AppSettingsScreen(
                     modifier = Modifier.padding(horizontal = Dimensions.PaddingSmall)
                 )
             }
+        }
         }
     }
 }

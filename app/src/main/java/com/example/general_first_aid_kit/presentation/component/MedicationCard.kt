@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -77,7 +78,7 @@ fun MedicationCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(Dimensions.MedicationCardHeight)
+            .heightIn(min = Dimensions.MedicationCardHeight)
             .clickable(onClick = onClick),
         colors = CardDefaults.cardColors(containerColor = White),
         shape = RoundedCornerShape(Dimensions.CornerRadiusMedium),
@@ -85,7 +86,7 @@ fun MedicationCard(
     ) {
         Row(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
                 .padding(Dimensions.PaddingSmall),
             verticalAlignment = Alignment.CenterVertically
         ) {
