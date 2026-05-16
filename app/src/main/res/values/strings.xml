@@ -123,6 +123,14 @@
     <string name="error_kit_leave">Ошибка при выходе из аптечки</string>
     <string name="error_kit_archive_status">Ошибка при изменении статуса аптечки</string>
 
+    <!--Восстановление пароля-->
+    <string name="forgot_password_title">Восстановление пароля</string>
+    <string name="forgot_password_greeting_title">Забыли пароль?</string>
+    <string name="forgot_password_description">Введите email, на который зарегистрирован аккаунт, и мы отправим ссылку для восстановления</string>
+    <string name="btn_send_reset_link">Отправить ссылку</string>
+    <string name="forgot_password_success_title">Письмо отправлено!</string>
+    <string name="forgot_password_success_description">Проверьте вашу почту и следуйте инструкциям в письме для восстановления пароля</string>
+
     <!--Онбординг-->
     <string name="onboarding_skip">Пропустить</string>
     <string name="onboarding_close">Закрыть</string>

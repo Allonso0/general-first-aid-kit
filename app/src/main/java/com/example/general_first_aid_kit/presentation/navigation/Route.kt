@@ -68,4 +68,7 @@ sealed interface Route: NavKey {
 
     @Serializable
     data class ScanBarcode(val kitId: String) : Route
+
+    @Serializable
+    data object ForgotPassword : Route
 }
