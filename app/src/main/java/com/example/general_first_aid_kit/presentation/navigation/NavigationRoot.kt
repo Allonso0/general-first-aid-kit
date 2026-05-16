@@ -20,6 +20,7 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.example.general_first_aid_kit.presentation.screens.AppSettingsScreen
+import com.example.general_first_aid_kit.presentation.screens.ForgotPasswordScreen
 import com.example.general_first_aid_kit.presentation.screens.AddMedicationScreen
 import com.example.general_first_aid_kit.presentation.screens.CreateKitScreen
 import com.example.general_first_aid_kit.presentation.screens.EditMedicationScreen
@@ -131,7 +132,7 @@ fun NavigationRoot(
                             backStack.setStack(Route.Main)
                         },
                         onForgotPasswordClick = {
-                            //TODO: экран восстановления пароля
+                            backStack.add(Route.ForgotPassword)
                         }
                     )
                 }
@@ -263,6 +264,11 @@ fun NavigationRoot(
                             backStack.pop()
                             backStack.add(Route.AddMedicationManual(key.kitId, barcode))
                         }
+                    )
+                }
+                is Route.ForgotPassword -> NavEntry(key) {
+                    ForgotPasswordScreen(
+                        onBackClick = { backStack.pop() }
                     )
                 }
                 else -> error("Unknown key: $key")
