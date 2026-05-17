@@ -80,7 +80,7 @@ fun ColorSelectionDialog(
                 Spacer(modifier = Modifier.height(Dimensions.PaddingMedium))
 
                 TextButton(onClick = onDismiss) {
-                    Text("Закрыть", color = GreenPrimary)
+                    Text(stringResource(R.string.onboarding_close), color = GreenPrimary)
                 }
             }
         }

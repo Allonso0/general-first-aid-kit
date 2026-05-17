@@ -26,8 +26,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -55,9 +55,12 @@ fun MainScreen(
     onKitCardClick: (String, String, String, Int, Boolean) -> Unit,
     viewModel: MainViewModel = hiltViewModel()
 ) {
-    val state by viewModel.uiState.collectAsState()
-    val isArchiveMode by viewModel.isArchiveMode.collectAsState()
-    val isOnline by viewModel.isOnline.collectAsState()
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val isArchiveMode by viewModel.isArchiveMode.collectAsStateWithLifecycle()
+    val isOnline by viewModel.isOnline.collectAsStateWithLifecycle()
+
+    val tabActive = stringResource(R.string.tab_active)
+    val tabArchived = stringResource(R.string.tab_archived)
 
     Scaffold(
         topBar = {
@@ -131,7 +134,7 @@ fun MainScreen(
 
             GenericTabRow(
                 selectedTabIndex = if (isArchiveMode) 1 else 0,
-                tabs = listOf("Активные", "Архивные"),
+                tabs = listOf(tabActive, tabArchived),
                 onTabSelected = { viewModel.setArchiveMode(it == 1) }
             )
 
@@ -151,7 +154,7 @@ fun MainScreen(
                     state.error != null -> {
                         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                             Text(
-                                text = "Ошибка: ${state.error}",
+                                text = stringResource(R.string.error_with_detail, state.error ?: ""),
                                 color = TextRed,
                                 textAlign = TextAlign.Center,
                                 modifier = Modifier.padding(Dimensions.PaddingMedium)
@@ -162,7 +165,7 @@ fun MainScreen(
                     state.kits.isEmpty() -> {
                         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                             Text(
-                                text = "Список пуст.\nНажмите +, чтобы создать аптечку.",
+                                text = stringResource(R.string.kits_empty_hint),
                                 color = GreenPrimary,
                                 textAlign = TextAlign.Center,
                                 style = MaterialTheme.typography.bodyLarge,

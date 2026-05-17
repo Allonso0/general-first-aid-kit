@@ -21,8 +21,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -62,7 +62,7 @@ fun ProfileScreen(
     onNavigateToOnboarding: () -> Unit,
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
-    val user by viewModel.user.collectAsState()
+    val user by viewModel.user.collectAsStateWithLifecycle()
     var isImageLoading by remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
@@ -139,7 +139,7 @@ fun ProfileScreen(
             Spacer(modifier = Modifier.height(Dimensions.SpacingMedium))
 
             Text(
-                text = user?.name ?: "Загрузка...",
+                text = user?.name ?: stringResource(R.string.loading_label),
                 style = MaterialTheme.typography.titleMedium,
                 color = TextBlack
             )

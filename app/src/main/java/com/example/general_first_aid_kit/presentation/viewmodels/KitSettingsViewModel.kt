@@ -1,6 +1,7 @@
 package com.example.general_first_aid_kit.presentation.viewmodels
 
 import android.content.Context
+import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.general_first_aid_kit.R
@@ -281,6 +282,7 @@ class KitSettingsViewModel @Inject constructor(
 
 enum class NotificationSetting { EXPIRY, LOW_STOCK, MEMBER_ACTIVITY }
 
+@Immutable
 data class KitSettingsUiState(
     val name: String = "",
     val location: String = "",

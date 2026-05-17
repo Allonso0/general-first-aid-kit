@@ -33,8 +33,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -79,30 +79,32 @@ fun KitScreen(
         viewModel.initWithKitId(kitId)
     }
 
-    val isKicked by viewModel.isUserKickedOrDeleted.collectAsState()
+    val isKicked by viewModel.isUserKickedOrDeleted.collectAsStateWithLifecycle()
     LaunchedEffect(isKicked) {
         if (isKicked) {
             onNavigateBack()
         }
     }
 
-    val medications by viewModel.medications.collectAsState()
-    val searchQuery by viewModel.searchQuery.collectAsState()
-    val isSharedAndOffline by viewModel.isSharedAndOffline.collectAsState()
+    val medications by viewModel.medications.collectAsStateWithLifecycle()
+    val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
+    val isSharedAndOffline by viewModel.isSharedAndOffline.collectAsStateWithLifecycle()
 
     var showFilterMenu by remember { mutableStateOf(false) }
-    val selectedCategory by viewModel.selectedCategory.collectAsState()
-    val categories = listOf(
-        "Все",
-        "Без категории",
-        "Жаропонижающее",
-        "Обезболивающее",
-        "Антигистаминное",
-        "Спазмолитик",
-        "Антибиотик",
-        "Витамины",
-        "Антисептик"
-    )
+    val selectedCategory by viewModel.selectedCategory.collectAsStateWithLifecycle()
+
+    val catAll = stringResource(R.string.tab_all)
+    val catNone = stringResource(R.string.no_category)
+    val catAntipyretic = stringResource(R.string.cat_antipyretic)
+    val catPainkiller = stringResource(R.string.cat_painkiller)
+    val catAntihistamine = stringResource(R.string.cat_antihistamine)
+    val catSpasmolytic = stringResource(R.string.cat_spasmolytic)
+    val catAntibiotic = stringResource(R.string.cat_antibiotic)
+    val catVitamins = stringResource(R.string.cat_vitamins)
+    val catAntiseptic = stringResource(R.string.cat_antiseptic)
+    val categories = remember(catAll, catNone, catAntipyretic, catPainkiller, catAntihistamine, catSpasmolytic, catAntibiotic, catVitamins, catAntiseptic) {
+        listOf(catAll, catNone, catAntipyretic, catPainkiller, catAntihistamine, catSpasmolytic, catAntibiotic, catVitamins, catAntiseptic)
+    }
 
     Scaffold(
         containerColor = White,
@@ -129,7 +131,7 @@ fun KitScreen(
                     IconButton(onClick = onNavigateToKitSettings) {
                         Icon(
                             painter = painterResource(R.drawable.baseline_more_horiz_24),
-                            contentDescription = "Инфо",
+                            contentDescription = stringResource(R.string.kit_settings_desc),
                             tint = GreenPrimary
                         )
                     }
@@ -149,7 +151,7 @@ fun KitScreen(
                         } else {
                             android.widget.Toast.makeText(
                                 context,
-                                "Для сканирования требуется интернет",
+                                context.getString(R.string.internet_required_for_scan),
                                 android.widget.Toast.LENGTH_SHORT
                             ).show()
                         }
@@ -181,7 +183,7 @@ fun KitScreen(
                     onValueChange = viewModel::onSearchQueryChange,
                     placeholder = {
                         Text(
-                            text = "Введите название лекарства...",
+                            text = stringResource(R.string.search_medication_hint),
                             style = MaterialTheme.typography.bodyLarge,
                             color = TextGray
                         )
@@ -217,7 +219,7 @@ fun KitScreen(
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.baseline_filter_list_24),
-                            contentDescription = "Фильтр",
+                            contentDescription = stringResource(R.string.filter_desc),
                             tint = White
                         )
                     }
@@ -257,7 +259,7 @@ fun KitScreen(
                                     if (isSelected) {
                                         Icon(
                                             painter = painterResource(R.drawable.baseline_check_24),
-                                            contentDescription = "Выбрано",
+                                            contentDescription = stringResource(R.string.filter_selected_desc),
                                             tint = GreenPrimary
                                         )
                                     }
@@ -271,7 +273,7 @@ fun KitScreen(
             if (medications.isEmpty()) {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text(
-                        text = if (searchQuery.isNotBlank()) "Лекарства не найдены" else "В этой аптечке пока пусто",
+                        text = if (searchQuery.isNotBlank()) stringResource(R.string.medications_not_found) else stringResource(R.string.kit_medications_empty),
                         color = TextGray
                     )
                 }

@@ -1,5 +1,6 @@
 package com.example.general_first_aid_kit.presentation.viewmodels
 
+import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.general_first_aid_kit.domain.model.AppNotification
@@ -57,6 +58,7 @@ class NotificationLogViewModel @Inject constructor(
     }
 }
 
+@Immutable
 data class NotificationLogUiState(
     val notifications: List<AppNotification> = emptyList(),
     val isLoading: Boolean = false,

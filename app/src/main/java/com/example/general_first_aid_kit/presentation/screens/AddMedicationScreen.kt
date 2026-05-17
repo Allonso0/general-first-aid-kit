@@ -46,8 +46,8 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -91,7 +91,7 @@ fun AddMedicationScreen(
     onNavigateBack: () -> Unit,
     viewModel: AddMedicationViewModel = hiltViewModel()
 ) {
-    val state by viewModel.uiState.collectAsState()
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
     LaunchedEffect(scannedBarcode) {
@@ -124,17 +124,18 @@ fun AddMedicationScreen(
     )
 
     var expanded by remember { mutableStateOf(false) }
-    val categories = listOf(
-        stringResource(R.string.no_category),
-        stringResource(R.string.cat_antipyretic),
-        stringResource(R.string.cat_painkiller),
-        stringResource(R.string.cat_antihistamine),
-        stringResource(R.string.cat_spasmolytic),
-        stringResource(R.string.cat_antibiotic),
-        stringResource(R.string.cat_vitamins),
-        stringResource(R.string.cat_antiseptic)
-    )
-    val isNoCategory = state.category.isEmpty() || state.category == stringResource(R.string.no_category)
+    val catNone = stringResource(R.string.no_category)
+    val catAntipyretic = stringResource(R.string.cat_antipyretic)
+    val catPainkiller = stringResource(R.string.cat_painkiller)
+    val catAntihistamine = stringResource(R.string.cat_antihistamine)
+    val catSpasmolytic = stringResource(R.string.cat_spasmolytic)
+    val catAntibiotic = stringResource(R.string.cat_antibiotic)
+    val catVitamins = stringResource(R.string.cat_vitamins)
+    val catAntiseptic = stringResource(R.string.cat_antiseptic)
+    val categories = remember(catNone, catAntipyretic, catPainkiller, catAntihistamine, catSpasmolytic, catAntibiotic, catVitamins, catAntiseptic) {
+        listOf(catNone, catAntipyretic, catPainkiller, catAntihistamine, catSpasmolytic, catAntibiotic, catVitamins, catAntiseptic)
+    }
+    val isNoCategory = state.category.isEmpty() || state.category == catNone
     val displayColor = if (isNoCategory) TextGray else TextBlack
 
     if (showPhotoSourceDialog) {
@@ -239,7 +240,7 @@ fun AddMedicationScreen(
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 CircularProgressIndicator(color = GreenPrimary)
                 Spacer(modifier = Modifier.height(8.dp))
-                Text("Идентифицируем лекарство...", color = GreenPrimary)
+                Text(stringResource(R.string.loading_medication_identification), color = GreenPrimary)
             }
         }
     } else {
@@ -357,7 +358,7 @@ fun AddMedicationScreen(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     OutlinedTextField(
-                        value = state.category.ifEmpty { stringResource(R.string.no_category) },
+                        value = state.category.ifEmpty { catNone },
                         onValueChange = {},
                         readOnly = true,
                         label = { Text(stringResource(R.string.category_label)) },
@@ -389,7 +390,7 @@ fun AddMedicationScreen(
                                 text = {
                                     Text(
                                         text = selectionOption,
-                                        color = if (selectionOption == stringResource(R.string.no_category)) TextGray else TextBlack
+                                        color = if (selectionOption == catNone) TextGray else TextBlack
                                     )
                                 },
                                 onClick = {

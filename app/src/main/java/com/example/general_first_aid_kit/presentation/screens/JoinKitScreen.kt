@@ -12,11 +12,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.general_first_aid_kit.R
 import com.example.general_first_aid_kit.presentation.component.GreenSemiCircle
 import com.example.general_first_aid_kit.presentation.ui.theme.Dimensions
@@ -35,13 +37,13 @@ fun JoinKitScreen(
     viewModel: JoinKitViewModel = hiltViewModel()
 ) {
     var code by remember { mutableStateOf("") }
-    val state by viewModel.uiState.collectAsState()
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
 
     Scaffold(
         containerColor = White,
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Присоединиться", color = GreenPrimary, fontWeight = FontWeight.Bold) },
+                title = { Text(stringResource(R.string.join_kit_title), color = GreenPrimary, fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(painterResource(R.drawable.baseline_arrow_back_ios_24), null, tint = GreenPrimary)
@@ -70,7 +72,7 @@ fun JoinKitScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    "Введите 8-значный код приглашения, чтобы получить доступ к общей аптечке",
+                    stringResource(R.string.join_kit_instruction),
                     color = TextGray,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(bottom = 32.dp)
@@ -107,7 +109,7 @@ fun JoinKitScreen(
                     if (state.isLoading) {
                         CircularProgressIndicator(color = White, modifier = Modifier.size(24.dp))
                     } else {
-                        Text("Присоединиться", fontWeight = FontWeight.Bold, color = White)
+                        Text(stringResource(R.string.join_kit_title), fontWeight = FontWeight.Bold, color = White)
                     }
                 }
             }
