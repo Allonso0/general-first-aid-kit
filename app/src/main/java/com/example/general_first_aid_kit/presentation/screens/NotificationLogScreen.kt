@@ -33,8 +33,8 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -76,7 +76,7 @@ fun NotificationLogScreen(
     onNavigateBack: () -> Unit,
     viewModel: NotificationLogViewModel = hiltViewModel()
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
     var showDeleteDialog by remember { mutableStateOf(false) }
 
@@ -242,7 +242,7 @@ private fun NotificationItem(notification: AppNotification) {
         formatNotificationTime(notification.timestamp)
     }
 
-    val backgroundColor = if (!notification.isRead) GreenSecondary.copy(alpha = 0.18f) else White
+    val backgroundColor = if (!notification.isRead) UnreadBackground else White
 
     Row(
         modifier = Modifier
@@ -286,6 +286,8 @@ private fun NotificationItem(notification: AppNotification) {
         }
     }
 }
+
+private val UnreadBackground = GreenSecondary.copy(alpha = 0.18f)
 
 private val moscowTz = TimeZone.getTimeZone("Europe/Moscow")
 

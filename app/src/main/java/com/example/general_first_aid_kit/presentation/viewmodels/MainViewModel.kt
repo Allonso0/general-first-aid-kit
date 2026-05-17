@@ -1,5 +1,6 @@
 package com.example.general_first_aid_kit.presentation.viewmodels
 
+import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.general_first_aid_kit.domain.model.Kit
@@ -83,6 +84,7 @@ class MainViewModel @Inject constructor(
     }
 }
 
+@Immutable
 data class MainUiState(
     val kits: List<Kit> = emptyList(),
     val isLoading: Boolean = true,

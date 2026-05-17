@@ -33,8 +33,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -79,30 +79,32 @@ fun KitScreen(
         viewModel.initWithKitId(kitId)
     }
 
-    val isKicked by viewModel.isUserKickedOrDeleted.collectAsState()
+    val isKicked by viewModel.isUserKickedOrDeleted.collectAsStateWithLifecycle()
     LaunchedEffect(isKicked) {
         if (isKicked) {
             onNavigateBack()
         }
     }
 
-    val medications by viewModel.medications.collectAsState()
-    val searchQuery by viewModel.searchQuery.collectAsState()
-    val isSharedAndOffline by viewModel.isSharedAndOffline.collectAsState()
+    val medications by viewModel.medications.collectAsStateWithLifecycle()
+    val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
+    val isSharedAndOffline by viewModel.isSharedAndOffline.collectAsStateWithLifecycle()
 
     var showFilterMenu by remember { mutableStateOf(false) }
-    val selectedCategory by viewModel.selectedCategory.collectAsState()
-    val categories = listOf(
-        "Все",
-        "Без категории",
-        "Жаропонижающее",
-        "Обезболивающее",
-        "Антигистаминное",
-        "Спазмолитик",
-        "Антибиотик",
-        "Витамины",
-        "Антисептик"
-    )
+    val selectedCategory by viewModel.selectedCategory.collectAsStateWithLifecycle()
+    val categories = remember {
+        listOf(
+            "Все",
+            "Без категории",
+            "Жаропонижающее",
+            "Обезболивающее",
+            "Антигистаминное",
+            "Спазмолитик",
+            "Антибиотик",
+            "Витамины",
+            "Антисептик"
+        )
+    }
 
     Scaffold(
         containerColor = White,

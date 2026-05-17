@@ -17,6 +17,7 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.general_first_aid_kit.R
 import com.example.general_first_aid_kit.presentation.component.GreenSemiCircle
 import com.example.general_first_aid_kit.presentation.ui.theme.Dimensions
@@ -35,7 +36,7 @@ fun JoinKitScreen(
     viewModel: JoinKitViewModel = hiltViewModel()
 ) {
     var code by remember { mutableStateOf("") }
-    val state by viewModel.uiState.collectAsState()
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
 
     Scaffold(
         containerColor = White,

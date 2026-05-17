@@ -23,6 +23,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.example.general_first_aid_kit.R
 import com.example.general_first_aid_kit.presentation.component.*
@@ -47,9 +48,9 @@ fun KitSettingsScreen(
     onArchiveSuccess: () -> Unit,
     viewModel: KitSettingsViewModel = hiltViewModel()
 ) {
-    val state by viewModel.uiState.collectAsState()
-    val isOnline by viewModel.isOnline.collectAsState()
-    val isSharedAndOffline = state.isPublic && !isOnline
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val isOnline by viewModel.isOnline.collectAsStateWithLifecycle()
+    val isSharedAndOffline by remember { derivedStateOf { state.isPublic && !isOnline } }
 
     val snackbarHostState = remember { SnackbarHostState() }
     LaunchedEffect(state.error) {

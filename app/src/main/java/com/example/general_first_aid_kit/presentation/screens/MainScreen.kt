@@ -26,8 +26,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -55,9 +55,9 @@ fun MainScreen(
     onKitCardClick: (String, String, String, Int, Boolean) -> Unit,
     viewModel: MainViewModel = hiltViewModel()
 ) {
-    val state by viewModel.uiState.collectAsState()
-    val isArchiveMode by viewModel.isArchiveMode.collectAsState()
-    val isOnline by viewModel.isOnline.collectAsState()
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val isArchiveMode by viewModel.isArchiveMode.collectAsStateWithLifecycle()
+    val isOnline by viewModel.isOnline.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = {

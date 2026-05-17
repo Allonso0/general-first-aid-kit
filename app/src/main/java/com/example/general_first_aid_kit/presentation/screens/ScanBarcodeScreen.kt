@@ -160,7 +160,7 @@ fun BarcodeCameraPreview(
         BarcodeScanning.getClient(options)
     }
 
-    val isDetected = remember { BooleanArray(1) { false } }
+    val isDetected = remember { java.util.concurrent.atomic.AtomicBoolean(false) }
 
     LaunchedEffect(isFlashOn) {
         cameraControl.value?.enableTorch(isFlashOn)
@@ -183,14 +183,13 @@ fun BarcodeCameraPreview(
                     .build()
 
                 imageAnalysis.setAnalyzer(cameraExecutor) { imageProxy ->
-                    if (isDetected[0]) {
+                    if (isDetected.get()) {
                         imageProxy.close()
                         return@setAnalyzer
                     }
 
                     processImageWithMLKit(scanner, imageProxy) { result ->
-                        if (!isDetected[0]) {
-                            isDetected[0] = true
+                        if (isDetected.compareAndSet(false, true)) {
                             ContextCompat.getMainExecutor(context).execute {
                                 onBarcodeScanned(result)
                             }

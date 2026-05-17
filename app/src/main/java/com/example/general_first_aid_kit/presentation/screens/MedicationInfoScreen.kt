@@ -29,8 +29,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -69,7 +69,7 @@ fun MedicationInfoScreen(
         viewModel.startObservingKit(kitId)
     }
 
-    val isKicked by viewModel.isUserKickedOrDeleted.collectAsState()
+    val isKicked by viewModel.isUserKickedOrDeleted.collectAsStateWithLifecycle()
     LaunchedEffect(isKicked) {
         if (isKicked) {
             onNavigateBack()
@@ -77,9 +77,9 @@ fun MedicationInfoScreen(
     }
 
 
-    val medication by viewModel.medication.collectAsState()
-    val isOnline by viewModel.isOnline.collectAsState()
-    val isKitShared by viewModel.isKitShared.collectAsState()
+    val medication by viewModel.medication.collectAsStateWithLifecycle()
+    val isOnline by viewModel.isOnline.collectAsStateWithLifecycle()
+    val isKitShared by viewModel.isKitShared.collectAsStateWithLifecycle()
     val canModify = !(isKitShared && !isOnline)
 
     Scaffold(

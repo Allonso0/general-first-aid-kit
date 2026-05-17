@@ -34,6 +34,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -65,28 +66,22 @@ fun OnboardingScreen(
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
-    val pages = listOf(
-        OnboardingPageData(
-            iconRes = R.drawable.baseline_medication_24,
-            title = stringResource(R.string.onboarding_page1_title),
-            subtitle = stringResource(R.string.onboarding_page1_subtitle)
-        ),
-        OnboardingPageData(
-            iconRes = R.drawable.baseline_group_24,
-            title = stringResource(R.string.onboarding_page2_title),
-            subtitle = stringResource(R.string.onboarding_page2_subtitle)
-        ),
-        OnboardingPageData(
-            iconRes = R.drawable.baseline_camera_alt_24,
-            title = stringResource(R.string.onboarding_page3_title),
-            subtitle = stringResource(R.string.onboarding_page3_subtitle)
-        ),
-        OnboardingPageData(
-            iconRes = R.drawable.baseline_notifications_24,
-            title = stringResource(R.string.onboarding_page4_title),
-            subtitle = stringResource(R.string.onboarding_page4_subtitle)
+    val t1 = stringResource(R.string.onboarding_page1_title)
+    val s1 = stringResource(R.string.onboarding_page1_subtitle)
+    val t2 = stringResource(R.string.onboarding_page2_title)
+    val s2 = stringResource(R.string.onboarding_page2_subtitle)
+    val t3 = stringResource(R.string.onboarding_page3_title)
+    val s3 = stringResource(R.string.onboarding_page3_subtitle)
+    val t4 = stringResource(R.string.onboarding_page4_title)
+    val s4 = stringResource(R.string.onboarding_page4_subtitle)
+    val pages = remember(t1, s1, t2, s2, t3, s3, t4, s4) {
+        listOf(
+            OnboardingPageData(R.drawable.baseline_medication_24, t1, s1),
+            OnboardingPageData(R.drawable.baseline_group_24, t2, s2),
+            OnboardingPageData(R.drawable.baseline_camera_alt_24, t3, s3),
+            OnboardingPageData(R.drawable.baseline_notifications_24, t4, s4)
         )
-    )
+    }
 
     val pagerState = rememberPagerState(pageCount = { pages.size })
     val currentPage = pagerState.currentPage
@@ -115,10 +110,8 @@ fun OnboardingScreen(
                 .padding(horizontal = 32.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Space reserved for the top button overlay
             Spacer(modifier = Modifier.height(64.dp))
 
-            // Only this part slides on swipe
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier.weight(1f)
@@ -128,7 +121,6 @@ fun OnboardingScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Fixed progress dots
             Row(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
@@ -154,7 +146,6 @@ fun OnboardingScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Fixed Next / Start button
             Button(
                 onClick = {
                     coroutineScope.launch {
@@ -186,8 +177,6 @@ fun OnboardingScreen(
             Spacer(modifier = Modifier.height(32.dp))
         }
 
-        // Close button (from profile) — styled icon button, always visible
-        // Skip button (first launch) — text button, hidden on last page
         Box(
             modifier = Modifier
                 .align(Alignment.TopEnd)
@@ -271,7 +260,6 @@ private fun OnboardingPageContent(page: OnboardingPageData) {
 @Composable
 private fun OnboardingBackground() {
     Box(modifier = Modifier.fillMaxSize()) {
-        // Large circle — top-right, partially off-screen
         Box(
             modifier = Modifier
                 .size(280.dp)
@@ -279,7 +267,6 @@ private fun OnboardingBackground() {
                 .offset(x = 90.dp, y = (-50).dp)
                 .background(GreenPrimary.copy(alpha = 0.07f), CircleShape)
         )
-        // Medium circle — bottom-left, partially off-screen
         Box(
             modifier = Modifier
                 .size(220.dp)
@@ -287,7 +274,6 @@ private fun OnboardingBackground() {
                 .offset(x = (-65).dp, y = 65.dp)
                 .background(GreenPrimary.copy(alpha = 0.06f), CircleShape)
         )
-        // Small circle — top-left
         Box(
             modifier = Modifier
                 .size(120.dp)
@@ -295,7 +281,6 @@ private fun OnboardingBackground() {
                 .offset(x = (-40).dp, y = 110.dp)
                 .background(GreenPrimary.copy(alpha = 0.05f), CircleShape)
         )
-        // Tiny accent circle — bottom-right
         Box(
             modifier = Modifier
                 .size(90.dp)

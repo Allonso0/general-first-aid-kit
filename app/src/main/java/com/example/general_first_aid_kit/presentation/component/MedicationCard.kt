@@ -69,10 +69,10 @@ fun MedicationCard(
     searchQuery: String = "",
     onClick: () -> Unit
 ) {
-    val categoryName = medication.category.ifEmpty { "Без категории" }
-    val categoryColor = getCategoryColor(categoryName)
-
-    val formattedDate = formatExpirationDate(medication.expirationDate)
+    val categoryName = remember(medication.category) { medication.category.ifEmpty { "Без категории" } }
+    val categoryColor = remember(medication.category) { getCategoryColor(categoryName) }
+    val formattedDate = remember(medication.expirationDate) { formatExpirationDate(medication.expirationDate) }
+    val highlightedName = remember(medication.name, searchQuery) { buildHighlightedName(medication.name, searchQuery) }
     var isImageLoading by remember { mutableStateOf(true) }
 
     Card(
@@ -140,7 +140,7 @@ fun MedicationCard(
                 Spacer(modifier = Modifier.height(Dimensions.SpacingExtraSmall))
 
                 Text(
-                    text = buildHighlightedName(medication.name, searchQuery),
+                    text = highlightedName,
                     style = MaterialTheme.typography.bodyLarge,
                     color = TextBlack
                 )

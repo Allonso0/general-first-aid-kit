@@ -1,5 +1,6 @@
 package com.example.general_first_aid_kit.presentation.viewmodels
 
+import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.general_first_aid_kit.domain.model.Medication
@@ -132,6 +133,7 @@ class AddMedicationViewModel @Inject constructor(
     }
 }
 
+@Immutable
 data class AddMedicationUiState(
     val name: String = "",
     val nameErrorResId: Int? = null,
