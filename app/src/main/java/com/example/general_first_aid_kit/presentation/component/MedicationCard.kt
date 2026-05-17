@@ -27,6 +27,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
@@ -69,7 +70,8 @@ fun MedicationCard(
     searchQuery: String = "",
     onClick: () -> Unit
 ) {
-    val categoryName = remember(medication.category) { medication.category.ifEmpty { "Без категории" } }
+    val noCategoryLabel = stringResource(R.string.no_category)
+    val categoryName = remember(medication.category, noCategoryLabel) { medication.category.ifEmpty { noCategoryLabel } }
     val categoryColor = remember(medication.category) { getCategoryColor(categoryName) }
     val formattedDate = remember(medication.expirationDate) { formatExpirationDate(medication.expirationDate) }
     val highlightedName = remember(medication.name, searchQuery) { buildHighlightedName(medication.name, searchQuery) }
@@ -100,7 +102,7 @@ fun MedicationCard(
                 if (!medication.photoUrl.isNullOrEmpty()) {
                     AsyncImage(
                         model = medication.photoUrl,
-                        contentDescription = "Фото ${medication.name}",
+                        contentDescription = stringResource(R.string.medication_photo_of, medication.name),
                         modifier = Modifier
                             .fillMaxSize()
                             .then(if (isImageLoading) Modifier.shimmerEffect() else Modifier),
@@ -154,7 +156,7 @@ fun MedicationCard(
                     Box(modifier = Modifier.size(8.dp).clip(RoundedCornerShape(50)).background(dateColor))
                     Spacer(modifier = Modifier.width(Dimensions.SpacingExtraSmall))
                     Text(
-                        text = "Годен до: $formattedDate",
+                        text = stringResource(R.string.expires_until, formattedDate),
                         style = MaterialTheme.typography.bodySmall,
                         color = TextBlack
                     )

@@ -42,8 +42,6 @@ class OfflineFirstKitRepositoryImpl @Inject constructor(
     private val startedSyncForUser = Collections.synchronizedSet(mutableSetOf<String>())
     private val startedSyncForKit = Collections.synchronizedSet(mutableSetOf<String>())
 
-    // ── Firebase → Room sync ─────────────────────────────────────────────────
-
     override fun getKits(userId: String): Flow<List<Kit>> {
         startUserKitsSync(userId)
         return kitDao.observeByUserId(userId).map { entities -> entities.map { it.toKit() } }
@@ -75,7 +73,7 @@ class OfflineFirstKitRepositoryImpl @Inject constructor(
                                     syncOperationDao.deleteAllForKit(change.document.id)
                                 }
                             }
-                        } catch (_: Exception) { /* Room error — skip this change */ }
+                        } catch (_: Exception) { }
                     }
                 }
         }
@@ -112,8 +110,6 @@ class OfflineFirstKitRepositoryImpl @Inject constructor(
         }
     }
 
-    // ── Reads ────────────────────────────────────────────────────────────────
-
     override suspend fun getKitById(kitId: String): Result<Kit> = withContext(Dispatchers.IO) {
         kitDao.getById(kitId)?.let { return@withContext Result.success(it.toKit()) }
         try {
@@ -126,8 +122,6 @@ class OfflineFirstKitRepositoryImpl @Inject constructor(
             Result.failure(e)
         }
     }
-
-    // ── Writes ───────────────────────────────────────────────────────────────
 
     override suspend fun createKit(kit: Kit): Result<Unit> = withContext(Dispatchers.IO) {
         try {
@@ -226,7 +220,6 @@ class OfflineFirstKitRepositoryImpl @Inject constructor(
         }
     }
 
-    // Always requires internet — invite codes and member management are server-side operations
     override suspend fun joinKitByCode(userId: String, inviteCode: String): Result<Kit> = withContext(Dispatchers.IO) {
         try {
             val snapshot = firestore.collection("kits")
@@ -266,8 +259,6 @@ class OfflineFirstKitRepositoryImpl @Inject constructor(
             Result.failure(e)
         }
     }
-
-    // ── Helpers ──────────────────────────────────────────────────────────────
 
     private suspend fun queueOperation(
         entityType: String,

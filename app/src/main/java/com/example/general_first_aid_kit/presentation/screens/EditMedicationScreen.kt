@@ -123,8 +123,8 @@ fun EditMedicationScreen(
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
-            title = { Text("Удалить лекарство?") },
-            text = { Text("Вы уверены, что хотите удалить это лекарство? Это действие нельзя отменить.") },
+            title = { Text(stringResource(R.string.dialog_delete_medication_title)) },
+            text = { Text(stringResource(R.string.dialog_delete_medication_text)) },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -133,12 +133,12 @@ fun EditMedicationScreen(
                     },
                     colors = ButtonDefaults.textButtonColors(contentColor = TextRed)
                 ) {
-                    Text("Удалить")
+                    Text(stringResource(R.string.delete))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteDialog = false }) {
-                    Text("Отмена", color = TextGray)
+                    Text(stringResource(R.string.cancel), color = TextGray)
                 }
             },
             containerColor = White
@@ -171,7 +171,7 @@ fun EditMedicationScreen(
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
-                    Text("Редактирование", style = MaterialTheme.typography.titleLarge, color = GreenPrimary, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.screen_edit_medication_title), style = MaterialTheme.typography.titleLarge, color = GreenPrimary, fontWeight = FontWeight.Bold)
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
@@ -362,7 +362,7 @@ fun EditMedicationScreen(
                 border = androidx.compose.foundation.BorderStroke(1.dp, TextRed),
                 shape = RoundedCornerShape(Dimensions.CornerRadiusMedium)
             ) {
-                Text("Удалить лекарство", color = TextRed)
+                Text(stringResource(R.string.action_delete_medication), color = TextRed)
             }
         }
     }

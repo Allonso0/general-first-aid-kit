@@ -154,7 +154,7 @@ fun ProfileSettingsScreen(
                     contentAlignment = Alignment.BottomCenter
                 ) {
                     Text(
-                        text = "Изм.",
+                        text = stringResource(R.string.edit_photo_label),
                         color = White,
                         style = MaterialTheme.typography.labelSmall,
                         modifier = Modifier.padding(bottom = Dimensions.PaddingSmall)
@@ -217,7 +217,7 @@ fun ProfileSettingsScreen(
                             .size(Dimensions.MediumButtonHeight - Dimensions.PaddingMedium)
                     )
                 } else {
-                    Text("Сохранить изменения")
+                    Text(stringResource(R.string.action_save_changes))
                 }
             }
 

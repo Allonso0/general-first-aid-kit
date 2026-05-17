@@ -24,6 +24,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import com.example.general_first_aid_kit.R
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.general_first_aid_kit.presentation.ui.theme.Black
@@ -134,7 +136,7 @@ fun KitColorPreview(
                     .clickable { onChooseClick() },
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = "Выбрать", color = White, style = MaterialTheme.typography.labelLarge)
+                Text(text = stringResource(R.string.choose), color = White, style = MaterialTheme.typography.labelLarge)
             }
         }
     }

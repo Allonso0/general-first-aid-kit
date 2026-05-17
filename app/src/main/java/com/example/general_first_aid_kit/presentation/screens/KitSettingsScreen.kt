@@ -52,6 +52,10 @@ fun KitSettingsScreen(
     val isOnline by viewModel.isOnline.collectAsStateWithLifecycle()
     val isSharedAndOffline by remember { derivedStateOf { state.isPublic && !isOnline } }
 
+    val tabSettings = stringResource(R.string.settings)
+    val tabParticipants = stringResource(R.string.tab_participants)
+    val tabNotifications = stringResource(R.string.tab_kit_notifications)
+
     val snackbarHostState = remember { SnackbarHostState() }
     LaunchedEffect(state.error) {
         state.error?.let {
@@ -161,7 +165,7 @@ fun KitSettingsScreen(
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text(
-                    text = "Информация",
+                    text = stringResource(R.string.kit_info_title),
                     style = MaterialTheme.typography.titleLarge,
                     color = GreenPrimary,
                     fontWeight = FontWeight.Bold)
@@ -183,7 +187,7 @@ fun KitSettingsScreen(
                         ) {
                             Icon(
                                 painter = painterResource(R.drawable.baseline_check_24),
-                                contentDescription = "Сохранить",
+                                contentDescription = stringResource(R.string.save),
                                 tint = GreenPrimary
                             )
                         }
@@ -204,7 +208,7 @@ fun KitSettingsScreen(
 
             GenericTabRow(
                 selectedTabIndex = state.selectedTab,
-                tabs = listOf("Настройки", "Участники", "Уведомления"),
+                tabs = listOf(tabSettings, tabParticipants, tabNotifications),
                 onTabSelected = { viewModel.onEvent(KitSettingsEvent.TabChanged(it)) }
             )
 
@@ -252,41 +256,41 @@ fun SettingsTabContent(
             .padding(Dimensions.PaddingMedium),
         verticalArrangement = Arrangement.spacedBy(Dimensions.SpacingMedium)
     ) {
-        KitSectionTitle("Цвет обложки")
+        KitSectionTitle(stringResource(R.string.cover_color))
         KitColorPreview(
             colorIndex = state.selectedColorIndex,
             onChooseClick = if (state.isOwner) onShowColorDialog else null
         )
 
-        KitSectionTitle("Основная информация")
+        KitSectionTitle(stringResource(R.string.main_info))
         KitInputField(
             value = state.name,
             onValueChange = { onEvent(KitSettingsEvent.NameChanged(it)) },
-            label = "Название",
+            label = stringResource(R.string.label_name),
             focusedTextColor = if (state.isOwner) TextBlack else TextGray,
             enabled = state.isOwner
         )
         KitInputField(
             value = state.location,
             onValueChange = { onEvent(KitSettingsEvent.LocationChanged(it)) },
-            label = "Местоположение",
+            label = stringResource(R.string.location),
             focusedTextColor = if (state.isOwner) TextBlack else TextGray,
             enabled = state.isOwner
         )
 
-        KitSectionTitle("Тип аптечки")
+        KitSectionTitle(stringResource(R.string.kit_type))
         KitTypeRadioButton(
             selected = !state.isPublic,
-            title = "Личная аптечка",
-            subtitle = "Только вы видите содержимое",
+            title = stringResource(R.string.personal_kit),
+            subtitle = stringResource(R.string.personal_kit_only_you),
             onClick = {
                 if (state.isOwner && state.isPublic) onToggleTypeClick(false)
             }
         )
         KitTypeRadioButton(
             selected = state.isPublic,
-            title = "Общая аптечка",
-            subtitle = "Доступ по приглашению",
+            title = stringResource(R.string.public_kit),
+            subtitle = stringResource(R.string.public_kit_by_invite),
             onClick = {
                 if (state.isOwner && !state.isPublic) onToggleTypeClick(true)
             }
@@ -302,7 +306,7 @@ fun SettingsTabContent(
             colors = ButtonDefaults.outlinedButtonColors(contentColor = GreenPrimary)
         ) {
             Text(
-                text = if (state.isArchived) "Активировать аптечку" else "Архивировать аптечку",
+                text = if (state.isArchived) stringResource(R.string.kit_unarchive) else stringResource(R.string.kit_archive),
                 fontWeight = FontWeight.SemiBold
             )
         }
@@ -317,7 +321,7 @@ fun SettingsTabContent(
                 shape = RoundedCornerShape(Dimensions.CornerRadiusMedium),
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = TextRed)
             ) {
-                Text("Удалить аптечку", fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.action_delete_kit), fontWeight = FontWeight.Bold)
             }
         } else {
             OutlinedButton(
@@ -329,7 +333,7 @@ fun SettingsTabContent(
                 shape = RoundedCornerShape(Dimensions.CornerRadiusMedium),
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = TextRed)
             ) {
-                Text("Покинуть аптечку", fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.action_leave_kit), fontWeight = FontWeight.Bold)
             }
         }
     }
@@ -360,14 +364,14 @@ fun ParticipantsTabContent(
                 )
                 Spacer(modifier = Modifier.height(Dimensions.PaddingMedium))
                 Text(
-                    text = "Это личная аптечка",
+                    text = stringResource(R.string.personal_kit_empty_state),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = TextGray
                 )
                 Spacer(modifier = Modifier.height(Dimensions.PaddingSmall))
                 Text(
-                    text = "Список участников доступен только для общих аптечек. Вы можете изменить тип аптечки во вкладке «Настройки».",
+                    text = stringResource(R.string.participants_unavailable_description),
                     style = MaterialTheme.typography.bodyMedium,
                     color = TextGray,
                     textAlign = TextAlign.Center
@@ -437,7 +441,7 @@ fun ParticipantsTabContent(
                                     )
                                     if (isUserOwner) {
                                         Text(
-                                            text = "Владелец",
+                                            text = stringResource(R.string.role_owner),
                                             color = GreenPrimary,
                                             style = MaterialTheme.typography.labelMedium
                                         )
@@ -448,7 +452,7 @@ fun ParticipantsTabContent(
                                     IconButton(onClick = { onRemoveParticipant(user.id) }) {
                                         Icon(
                                             painter = painterResource(R.drawable.baseline_delete_24),
-                                            contentDescription = "Удалить",
+                                            contentDescription = stringResource(R.string.delete),
                                             tint = TextRed.copy(alpha = 0.7f)
                                         )
                                     }
@@ -476,7 +480,7 @@ fun ParticipantsTabContent(
                             Icon(painterResource(R.drawable.baseline_group_24), null, tint = White)
                             Spacer(Modifier.width(8.dp))
                             Text(
-                                text = "Пригласить участника",
+                                text = stringResource(R.string.action_invite_participant),
                                 fontWeight = FontWeight.Bold,
                                 color = TextWhite
                             )
@@ -494,7 +498,7 @@ fun ParticipantsTabContent(
             containerColor = White,
             title = {
                 Text(
-                    text = "Код приглашения",
+                    text = stringResource(R.string.invite_code_title),
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.Center,
                     fontWeight = FontWeight.Bold,
@@ -507,7 +511,7 @@ fun ParticipantsTabContent(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        "Передайте этот 8-значный код пользователю:",
+                        stringResource(R.string.invite_code_instruction),
                         style = MaterialTheme.typography.bodyMedium,
                         color = TextGray,
                         textAlign = TextAlign.Center
@@ -521,7 +525,7 @@ fun ParticipantsTabContent(
                         border = androidx.compose.foundation.BorderStroke(1.dp, LightGray.copy(alpha = 0.5f))
                     ) {
                         Text(
-                            text = state.inviteCode ?: "Генерация...",
+                            text = state.inviteCode ?: stringResource(R.string.invite_code_generating),
                             modifier = Modifier.padding(horizontal = 32.dp, vertical = 16.dp),
                             style = MaterialTheme.typography.headlineMedium,
                             fontWeight = FontWeight.ExtraBold,
@@ -539,7 +543,7 @@ fun ParticipantsTabContent(
                     ) {
                         Icon(painterResource(R.drawable.baseline_refresh_24), null, modifier = Modifier.size(18.dp))
                         Spacer(Modifier.width(8.dp))
-                        Text("Обновить код")
+                        Text(stringResource(R.string.action_refresh_code))
                     }
                 }
             },
@@ -551,7 +555,7 @@ fun ParticipantsTabContent(
                     shape = RoundedCornerShape(Dimensions.CornerRadiusMedium)
                 ) {
                     Text(
-                        text = "Готово",
+                        text = stringResource(R.string.action_done),
                         fontWeight = FontWeight.Bold,
                         color = TextWhite
                     )
@@ -573,11 +577,11 @@ fun NotificationsTabContent(
             .padding(Dimensions.PaddingMedium),
         verticalArrangement = Arrangement.spacedBy(Dimensions.SpacingExtraSmall)
     ) {
-        KitSectionTitle("Уведомления для этой аптечки")
+        KitSectionTitle(stringResource(R.string.notif_kit_section_title))
 
         NotificationCheckboxItem(
             checked = state.notifyExpiry,
-            text = "Уведомлять об истечении срока годности",
+            text = stringResource(R.string.notif_expiry_checkbox),
             onCheckedChange = {
                 onEvent(KitSettingsEvent.NotificationSettingChanged(NotificationSetting.EXPIRY, it))
             }
@@ -585,7 +589,7 @@ fun NotificationsTabContent(
 
         NotificationCheckboxItem(
             checked = state.notifyLowStock,
-            text = "Уведомлять о низком остатке",
+            text = stringResource(R.string.notif_low_stock_checkbox),
             onCheckedChange = {
                 onEvent(KitSettingsEvent.NotificationSettingChanged(NotificationSetting.LOW_STOCK, it))
             }
@@ -594,7 +598,7 @@ fun NotificationsTabContent(
         if (state.isPublic) {
             NotificationCheckboxItem(
                 checked = state.notifyMemberActivity,
-                text = "Уведомлять об активности участников",
+                text = stringResource(R.string.notif_member_activity_checkbox),
                 onCheckedChange = {
                     onEvent(KitSettingsEvent.NotificationSettingChanged(NotificationSetting.MEMBER_ACTIVITY, it))
                 }
@@ -604,7 +608,7 @@ fun NotificationsTabContent(
         Spacer(modifier = Modifier.height(Dimensions.SpacingMedium))
 
         Text(
-            text = "Настройки применяются только к этой аптечке. Даже отключённые уведомления сохраняются в журнале.",
+            text = stringResource(R.string.notif_settings_note),
             style = MaterialTheme.typography.labelSmall,
             color = TextGray
         )

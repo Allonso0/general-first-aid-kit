@@ -59,6 +59,9 @@ fun MainScreen(
     val isArchiveMode by viewModel.isArchiveMode.collectAsStateWithLifecycle()
     val isOnline by viewModel.isOnline.collectAsStateWithLifecycle()
 
+    val tabActive = stringResource(R.string.tab_active)
+    val tabArchived = stringResource(R.string.tab_archived)
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -131,7 +134,7 @@ fun MainScreen(
 
             GenericTabRow(
                 selectedTabIndex = if (isArchiveMode) 1 else 0,
-                tabs = listOf("Активные", "Архивные"),
+                tabs = listOf(tabActive, tabArchived),
                 onTabSelected = { viewModel.setArchiveMode(it == 1) }
             )
 
@@ -151,7 +154,7 @@ fun MainScreen(
                     state.error != null -> {
                         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                             Text(
-                                text = "Ошибка: ${state.error}",
+                                text = stringResource(R.string.error_with_detail, state.error ?: ""),
                                 color = TextRed,
                                 textAlign = TextAlign.Center,
                                 modifier = Modifier.padding(Dimensions.PaddingMedium)
@@ -162,7 +165,7 @@ fun MainScreen(
                     state.kits.isEmpty() -> {
                         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                             Text(
-                                text = "Список пуст.\nНажмите +, чтобы создать аптечку.",
+                                text = stringResource(R.string.kits_empty_hint),
                                 color = GreenPrimary,
                                 textAlign = TextAlign.Center,
                                 style = MaterialTheme.typography.bodyLarge,

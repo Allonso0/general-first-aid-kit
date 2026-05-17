@@ -24,6 +24,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import com.example.general_first_aid_kit.R
 import com.example.general_first_aid_kit.presentation.ui.theme.Dimensions
@@ -53,7 +54,7 @@ fun ExpandableAddMedicationFAB(
                 verticalArrangement = Arrangement.spacedBy(Dimensions.SpacingMedium)
             ) {
                 FabSubItem(
-                    label = "Сканировать",
+                    label = stringResource(R.string.fab_scan_label),
                     iconRes = R.drawable.baseline_camera_alt_24,
                     onClick = {
                         expanded = false
@@ -62,7 +63,7 @@ fun ExpandableAddMedicationFAB(
                 )
 
                 FabSubItem(
-                    label = "Вручную",
+                    label = stringResource(R.string.fab_manual_label),
                     iconRes = R.drawable.baseline_edit_note_24,
                     onClick = {
                         expanded = false
@@ -81,7 +82,7 @@ fun ExpandableAddMedicationFAB(
         ) {
             Icon(
                 painter = if (expanded) painterResource(R.drawable.baseline_close_24) else painterResource(R.drawable.baseline_add_24),
-                contentDescription = if (expanded) "Закрыть" else "Добавить лекарство",
+                contentDescription = if (expanded) stringResource(R.string.onboarding_close) else stringResource(R.string.fab_add_medication_desc),
                 tint = White
             )
         }

@@ -139,7 +139,7 @@ fun ProfileScreen(
             Spacer(modifier = Modifier.height(Dimensions.SpacingMedium))
 
             Text(
-                text = user?.name ?: "Загрузка...",
+                text = user?.name ?: stringResource(R.string.loading_label),
                 style = MaterialTheme.typography.titleMedium,
                 color = TextBlack
             )

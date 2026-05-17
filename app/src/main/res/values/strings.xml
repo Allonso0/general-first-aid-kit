@@ -154,6 +154,117 @@
     <string name="onboarding_page4_title">Не пропустите важное</string>
     <string name="onboarding_page4_subtitle">Приложение предупредит о лекарствах с истекающим сроком годности и заканчивающихся запасах — заблаговременно и без лишних напоминаний</string>
 
+    <!--Экран сканирования штрих-кода-->
+    <string name="scan_title">Сканирование</string>
+    <string name="scan_instruction">Наведите рамку на штрих-код</string>
+    <string name="flashlight_desc">Фонарик</string>
+    <string name="camera_permission_required">Требуется разрешение на использование камеры</string>
+
+    <!--Главный экран-->
+    <string name="tab_active">Активные</string>
+    <string name="tab_archived">Архивные</string>
+    <string name="error_with_detail">Ошибка: %1$s</string>
+    <string name="kits_empty_hint">Список пуст.\nНажмите +, чтобы создать аптечку.</string>
+
+    <!--Экран аптечки-->
+    <string name="tab_all">Все</string>
+    <string name="kit_settings_desc">Инфо</string>
+    <string name="internet_required_for_scan">Для сканирования требуется интернет</string>
+    <string name="search_medication_hint">Введите название лекарства...</string>
+    <string name="filter_desc">Фильтр</string>
+    <string name="filter_selected_desc">Выбрано</string>
+    <string name="medications_not_found">Лекарства не найдены</string>
+    <string name="kit_medications_empty">В этой аптечке пока пусто</string>
+
+    <!--Карточка аптечки-->
+    <string name="kit_type_personal_short">Личная</string>
+    <string name="participants_count_short">%1$d участ.</string>
+    <string name="label_medications_colon">Лекарств:</string>
+    <string name="label_expired_colon">Просроченные:</string>
+    <string name="label_running_out_colon">Заканчиваются:</string>
+
+    <!--Карточка лекарства-->
+    <string name="medication_photo_of">Фото %1$s</string>
+    <string name="expires_until">Годен до: %1$s</string>
+
+    <!--Экран информации о лекарстве-->
+    <string name="screen_about_medication">О лекарстве</string>
+    <string name="action_edit">Редактировать</string>
+    <string name="label_expiry">Срок годности</string>
+    <string name="label_in_stock">В наличии</string>
+    <string name="label_change_quantity">Изменить количество</string>
+    <string name="label_description">Описание</string>
+
+    <!--Журнал уведомлений-->
+    <string name="notif_clear_log">Очистить журнал</string>
+    <string name="notif_clear_log_confirm_text">Все уведомления будут удалены. Это действие нельзя отменить.</string>
+    <string name="notif_mark_all_read">Отметить все как прочитанные</string>
+    <string name="notif_empty">Уведомлений пока нет</string>
+    <string name="notif_time_today_prefix">Сегодня</string>
+    <string name="notif_time_yesterday_prefix">Вчера</string>
+
+    <!--Настройки аптечки-->
+    <string name="kit_info_title">Информация</string>
+    <string name="tab_participants">Участники</string>
+    <string name="tab_kit_notifications">Уведомления</string>
+    <string name="label_name">Название</string>
+    <string name="personal_kit_only_you">Только вы видите содержимое</string>
+    <string name="public_kit_by_invite">Доступ по приглашению</string>
+    <string name="personal_kit_empty_state">Это личная аптечка</string>
+    <string name="participants_unavailable_description">Список участников доступен только для общих аптечек. Вы можете изменить тип аптечки во вкладке «Настройки».</string>
+    <string name="role_owner">Владелец</string>
+    <string name="action_invite_participant">Пригласить участника</string>
+    <string name="invite_code_title">Код приглашения</string>
+    <string name="invite_code_instruction">Передайте этот 8-значный код пользователю:</string>
+    <string name="invite_code_generating">Генерация...</string>
+    <string name="action_refresh_code">Обновить код</string>
+    <string name="action_done">Готово</string>
+    <string name="notif_kit_section_title">Уведомления для этой аптечки</string>
+    <string name="notif_expiry_checkbox">Уведомлять об истечении срока годности</string>
+    <string name="notif_low_stock_checkbox">Уведомлять о низком остатке</string>
+    <string name="notif_member_activity_checkbox">Уведомлять об активности участников</string>
+    <string name="notif_settings_note">Настройки применяются только к этой аптечке. Даже отключённые уведомления сохраняются в журнале.</string>
+    <string name="action_delete_kit">Удалить аптечку</string>
+    <string name="action_leave_kit">Покинуть аптечку</string>
+
+    <!--Диалоги смены типа аптечки-->
+    <string name="dialog_make_public_title">Сделать аптечку общей?</string>
+    <string name="dialog_make_public_text">После смены типа вы сможете приглашать других пользователей. Они смогут просматривать и редактировать список лекарств.</string>
+    <string name="action_make_public">Сделать общей</string>
+    <string name="dialog_make_personal_title">Сделать аптечку личной?</string>
+    <string name="dialog_make_personal_text">Все текущие участники будут немедленно удалены. Доступ к аптечке останется только у вас.</string>
+    <string name="action_make_personal">Сделать личной</string>
+    <string name="dialog_delete_kit_title">Удалить аптечку?</string>
+    <string name="dialog_delete_kit_text">Вы уверены, что хотите полностью удалить аптечку? Все данные о лекарствах будут потеряны для всех участников.</string>
+    <string name="dialog_leave_kit_title">Покинуть аптечку?</string>
+    <string name="dialog_leave_kit_text">Вы больше не сможете просматривать содержимое этой аптечки. Чтобы вернуться, вам понадобится новый код приглашения.</string>
+    <string name="action_leave">Покинуть</string>
+    <string name="action_archive">Архивировать</string>
+    <string name="action_activate">Активировать</string>
+
+    <!--Редактирование лекарства-->
+    <string name="dialog_delete_medication_title">Удалить лекарство?</string>
+    <string name="dialog_delete_medication_text">Вы уверены, что хотите удалить это лекарство? Это действие нельзя отменить.</string>
+    <string name="screen_edit_medication_title">Редактирование</string>
+    <string name="action_delete_medication">Удалить лекарство</string>
+
+    <!--Добавление лекарства-->
+    <string name="loading_medication_identification">Идентифицируем лекарство...</string>
+
+    <!--Присоединение к аптечке-->
+    <string name="join_kit_title">Присоединиться</string>
+    <string name="join_kit_instruction">Введите 8-значный код приглашения, чтобы получить доступ к общей аптечке</string>
+
+    <!--Настройки профиля-->
+    <string name="edit_photo_label">Изм.</string>
+    <string name="action_save_changes">Сохранить изменения</string>
+
+    <!--FAB добавления лекарства-->
+    <string name="fab_scan_label">Сканировать</string>
+    <string name="fab_manual_label">Вручную</string>
+    <string name="fab_add_medication_desc">Добавить лекарство</string>
+    <string name="loading_label">Загрузка...</string>
+
     <!--Общие-->
     <string name="ok">Понятно</string>
     <string name="error_dialog_title">Ошибка</string>

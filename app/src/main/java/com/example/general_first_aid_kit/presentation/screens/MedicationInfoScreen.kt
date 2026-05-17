@@ -88,7 +88,7 @@ fun MedicationInfoScreen(
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = "О лекарстве",
+                        text = stringResource(R.string.screen_about_medication),
                         style = MaterialTheme.typography.titleLarge,
                         color = GreenPrimary,
                         fontWeight = FontWeight.Bold
@@ -98,7 +98,7 @@ fun MedicationInfoScreen(
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             painter = painterResource(R.drawable.baseline_arrow_back_ios_24),
-                            contentDescription = "Назад",
+                            contentDescription = stringResource(R.string.back_button_description),
                             tint = GreenPrimary
                         )
                     }
@@ -110,7 +110,7 @@ fun MedicationInfoScreen(
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.baseline_edit_note_24),
-                            contentDescription = "Редактировать",
+                            contentDescription = stringResource(R.string.action_edit),
                             tint = if (canModify) GreenPrimary else LightGray
                         )
                     }
@@ -201,7 +201,7 @@ fun MedicationInfoScreen(
                             .padding(horizontal = 16.dp, vertical = 6.dp)
                     ) {
                         Text(
-                            text = med.category.ifEmpty { "Без категории" },
+                            text = med.category.ifEmpty { stringResource(R.string.no_category) },
                             style = MaterialTheme.typography.bodyMedium,
                             color = categoryColor,
                             fontWeight = FontWeight.Medium
@@ -216,13 +216,13 @@ fun MedicationInfoScreen(
                     ) {
                         InfoCard(
                             modifier = Modifier.weight(1f),
-                            label = "Срок годности",
+                            label = stringResource(R.string.label_expiry),
                             value = formatExpirationDate(med.expirationDate),
                             iconRes = R.drawable.baseline_calendar_today_24
                         )
                         InfoCard(
                             modifier = Modifier.weight(1f),
-                            label = "В наличии",
+                            label = stringResource(R.string.label_in_stock),
                             value = "${med.quantity} ${med.unit}",
                             iconRes = R.drawable.baseline_medication_24
                         )
@@ -250,7 +250,7 @@ fun MedicationInfoScreen(
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text(
-                                text = "Изменить количество",
+                                text = stringResource(R.string.label_change_quantity),
                                 style = MaterialTheme.typography.labelLarge,
                                 color = TextGray
                             )
@@ -303,7 +303,7 @@ fun MedicationInfoScreen(
                                     .padding(Dimensions.PaddingMedium)
                             ) {
                                 Text(
-                                    text = "Описание",
+                                    text = stringResource(R.string.label_description),
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.Bold,
                                     color = TextBlack

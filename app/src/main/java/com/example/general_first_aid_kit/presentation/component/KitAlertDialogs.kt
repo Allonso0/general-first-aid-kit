@@ -2,6 +2,8 @@ package com.example.general_first_aid_kit.presentation.component
 
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
+import com.example.general_first_aid_kit.R
 import com.example.general_first_aid_kit.presentation.ui.theme.GreenPrimary
 import com.example.general_first_aid_kit.presentation.ui.theme.TextBlack
 import com.example.general_first_aid_kit.presentation.ui.theme.TextGray
@@ -15,21 +17,19 @@ fun ChangeToPublicDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Сделать аптечку общей?", color = TextBlack) },
-        text = {
-            Text("После смены типа вы сможете приглашать других пользователей. Они смогут просматривать и редактировать список лекарств.")
-        },
+        title = { Text(stringResource(R.string.dialog_make_public_title), color = TextBlack) },
+        text = { Text(stringResource(R.string.dialog_make_public_text)) },
         confirmButton = {
             Button(
                 onClick = onConfirm,
                 colors = ButtonDefaults.buttonColors(containerColor = GreenPrimary)
             ) {
-                Text("Сделать общей", color = White)
+                Text(stringResource(R.string.action_make_public), color = White)
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Отмена", color = TextGray)
+                Text(stringResource(R.string.cancel), color = TextGray)
             }
         },
         containerColor = White
@@ -43,21 +43,19 @@ fun ChangeToPersonalDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Сделать аптечку личной?", color = TextBlack) },
-        text = {
-            Text("Все текущие участники будут немедленно удалены. Доступ к аптечке останется только у вас.")
-        },
+        title = { Text(stringResource(R.string.dialog_make_personal_title), color = TextBlack) },
+        text = { Text(stringResource(R.string.dialog_make_personal_text)) },
         confirmButton = {
             Button(
                 onClick = onConfirm,
                 colors = ButtonDefaults.buttonColors(containerColor = GreenPrimary)
             ) {
-                Text("Сделать личной", color = White)
+                Text(stringResource(R.string.action_make_personal), color = White)
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Отмена", color = TextGray)
+                Text(stringResource(R.string.cancel), color = TextGray)
             }
         },
         containerColor = White
@@ -71,19 +69,21 @@ fun DeleteKitConfirmationDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(text = "Удалить аптечку?", color = TextBlack) },
-        text = { Text(
-            text = "Вы уверены, что хотите полностью удалить аптечку? Все данные о лекарствах будут потеряны для всех участников.",
-            color = TextBlack
-        ) },
+        title = { Text(text = stringResource(R.string.dialog_delete_kit_title), color = TextBlack) },
+        text = {
+            Text(
+                text = stringResource(R.string.dialog_delete_kit_text),
+                color = TextBlack
+            )
+        },
         confirmButton = {
             TextButton(onClick = onConfirm) {
-                Text("Удалить", color = TextRed)
+                Text(stringResource(R.string.delete), color = TextRed)
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Отмена", color = TextGray)
+                Text(stringResource(R.string.cancel), color = TextGray)
             }
         },
         containerColor = White
@@ -97,19 +97,21 @@ fun LeaveKitConfirmationDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(text = "Покинуть аптечку?", color = TextBlack) },
-        text = { Text(
-            text = "Вы больше не сможете просматривать содержимое этой аптечки. Чтобы вернуться, вам понадобится новый код приглашения.",
-            color = TextBlack
-        ) },
+        title = { Text(text = stringResource(R.string.dialog_leave_kit_title), color = TextBlack) },
+        text = {
+            Text(
+                text = stringResource(R.string.dialog_leave_kit_text),
+                color = TextBlack
+            )
+        },
         confirmButton = {
             TextButton(onClick = onConfirm) {
-                Text("Покинуть", color = TextRed)
+                Text(stringResource(R.string.action_leave), color = TextRed)
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Отмена", color = TextGray)
+                Text(stringResource(R.string.cancel), color = TextGray)
             }
         },
         containerColor = White
@@ -123,22 +125,24 @@ fun ArchiveKitConfirmationDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(text = "Архивировать аптечку?", color = TextBlack) },
-        text = { Text(
-            text = "Аптечка будет скрыта из основного списка и перемещена во вкладку «Архивные». Уведомления из этой аптечки поступать не будут.",
-            color = TextBlack
-        ) },
+        title = { Text(text = stringResource(R.string.kit_archive_dialog_title), color = TextBlack) },
+        text = {
+            Text(
+                text = stringResource(R.string.kit_archive_dialog_text),
+                color = TextBlack
+            )
+        },
         confirmButton = {
             Button(
                 onClick = onConfirm,
                 colors = ButtonDefaults.buttonColors(containerColor = GreenPrimary)
             ) {
-                Text("Архивировать", color = White)
+                Text(stringResource(R.string.action_archive), color = White)
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Отмена", color = TextGray)
+                Text(stringResource(R.string.cancel), color = TextGray)
             }
         },
         containerColor = White
@@ -152,22 +156,24 @@ fun UnarchiveKitConfirmationDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(text = "Активировать аптечку?", color = TextBlack) },
-        text = { Text(
-            text = "Аптечка вернётся в основной список активных аптечек. Уведомления из неё возобновятся.",
-            color = TextBlack
-        ) },
+        title = { Text(text = stringResource(R.string.kit_unarchive_dialog_title), color = TextBlack) },
+        text = {
+            Text(
+                text = stringResource(R.string.kit_unarchive_dialog_text),
+                color = TextBlack
+            )
+        },
         confirmButton = {
             Button(
                 onClick = onConfirm,
                 colors = ButtonDefaults.buttonColors(containerColor = GreenPrimary)
             ) {
-                Text("Активировать", color = White)
+                Text(stringResource(R.string.action_activate), color = White)
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Отмена", color = TextGray)
+                Text(stringResource(R.string.cancel), color = TextGray)
             }
         },
         containerColor = White

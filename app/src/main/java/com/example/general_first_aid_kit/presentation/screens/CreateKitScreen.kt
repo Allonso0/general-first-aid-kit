@@ -79,7 +79,7 @@ fun CreateKitScreen(
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = "Новая аптечка",
+                        text = stringResource(R.string.new_kit),
                         style = MaterialTheme.typography.titleLarge,
                         color = White
                     )

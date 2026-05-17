@@ -46,9 +46,6 @@ class OfflineFirstMedicationRepositoryImpl @Inject constructor(
     private val allMedicationsListenerStarted = AtomicBoolean(false)
     private val bucketName = "medications"
 
-    // ── Firebase → Room sync ─────────────────────────────────────────────────
-
-    // One collection-group listener covers all kits — no per-kit listeners needed.
     private fun ensureAllMedicationsSyncing() {
         if (!allMedicationsListenerStarted.compareAndSet(false, true)) return
         scope.launch {
@@ -78,8 +75,6 @@ class OfflineFirstMedicationRepositoryImpl @Inject constructor(
         }
     }
 
-    // ── Reads ────────────────────────────────────────────────────────────────
-
     override fun getMedications(kitId: String): Flow<List<Medication>> {
         ensureAllMedicationsSyncing()
         return medicationDao.observeByKitId(kitId).map { entities -> entities.map { it.toMedication() } }
@@ -94,8 +89,6 @@ class OfflineFirstMedicationRepositoryImpl @Inject constructor(
         ensureAllMedicationsSyncing()
         return medicationDao.observeById(kitId, medicationId).map { it?.toMedication() }
     }
-
-    // ── Writes ───────────────────────────────────────────────────────────────
 
     override suspend fun saveMedication(
         kitId: String,
@@ -130,7 +123,6 @@ class OfflineFirstMedicationRepositoryImpl @Inject constructor(
 
             val medicationToSave = medication.copy(id = docRef.id, kitId = kitId, photoUrl = finalPhotoUrl)
             docRef.set(medicationToSave).await()
-            // Upsert to Room immediately for responsive UI; Firestore listener will confirm later
             medicationDao.upsert(medicationToSave.toMedicationEntity())
             Result.success(Unit)
         } catch (e: Exception) {
@@ -186,7 +178,6 @@ class OfflineFirstMedicationRepositoryImpl @Inject constructor(
                 }
                 Result.success(Unit)
             } catch (e: Exception) {
-                // Firestore delete failed — restore to Room and let caller handle the error
                 medicationDao.upsert(medication.toMedicationEntity())
                 Result.failure(e)
             }

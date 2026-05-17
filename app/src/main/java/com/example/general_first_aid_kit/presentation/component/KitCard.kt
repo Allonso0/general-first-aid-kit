@@ -22,6 +22,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.example.general_first_aid_kit.R
 import com.example.general_first_aid_kit.domain.model.Kit
 import com.example.general_first_aid_kit.domain.model.KitType
 import com.example.general_first_aid_kit.presentation.ui.theme.Black
@@ -71,7 +73,10 @@ fun KitCard(
 
                 Spacer(modifier = Modifier.height(Dimensions.SpacingExtraSmall))
 
-                val typeText = if (kit.type == KitType.PERSONAL) "Личная" else "${kit.userIds.size} участ."
+                val typeText = if (kit.type == KitType.PERSONAL)
+                    stringResource(R.string.kit_type_personal_short)
+                else
+                    stringResource(R.string.participants_count_short, kit.userIds.size)
                 Text(
                     text = "$typeText • ${kit.location}",
                     style = MaterialTheme.typography.bodySmall,
@@ -86,15 +91,15 @@ fun KitCard(
 
                 Column(verticalArrangement = Arrangement.spacedBy(Dimensions.SpacingExtraSmall)) {
                     MedicineRow(
-                        label = "Лекарств:",
+                        label = stringResource(R.string.label_medications_colon),
                         count = kit.countMedicine
                     )
                     MedicineRow(
-                        label = "Просроченные:",
+                        label = stringResource(R.string.label_expired_colon),
                         count = kit.countExpired,
                     )
                     MedicineRow(
-                        label = "Заканчиваются:",
+                        label = stringResource(R.string.label_running_out_colon),
                         count = kit.countRunningOut
                     )
                 }

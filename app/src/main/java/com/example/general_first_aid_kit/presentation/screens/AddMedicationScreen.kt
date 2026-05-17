@@ -240,7 +240,7 @@ fun AddMedicationScreen(
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 CircularProgressIndicator(color = GreenPrimary)
                 Spacer(modifier = Modifier.height(8.dp))
-                Text("Идентифицируем лекарство...", color = GreenPrimary)
+                Text(stringResource(R.string.loading_medication_identification), color = GreenPrimary)
             }
         }
     } else {

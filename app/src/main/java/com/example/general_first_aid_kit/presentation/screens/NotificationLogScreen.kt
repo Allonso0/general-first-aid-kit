@@ -97,14 +97,14 @@ fun NotificationLogScreen(
             containerColor = White,
             title = {
                 Text(
-                    text = "Очистить журнал",
+                    text = stringResource(R.string.notif_clear_log),
                     style = MaterialTheme.typography.titleMedium,
                     color = TextBlack
                 )
             },
             text = {
                 Text(
-                    text = "Все уведомления будут удалены. Это действие нельзя отменить.",
+                    text = stringResource(R.string.notif_clear_log_confirm_text),
                     style = MaterialTheme.typography.bodyMedium,
                     color = TextGray
                 )
@@ -115,7 +115,7 @@ fun NotificationLogScreen(
                     showDeleteDialog = false
                 }) {
                     Text(
-                        text = "Удалить",
+                        text = stringResource(R.string.delete),
                         color = TextRed,
                         style = MaterialTheme.typography.labelLarge
                     )
@@ -124,7 +124,7 @@ fun NotificationLogScreen(
             dismissButton = {
                 TextButton(onClick = { showDeleteDialog = false }) {
                     Text(
-                        text = "Отмена",
+                        text = stringResource(R.string.cancel),
                         color = GreenPrimary,
                         style = MaterialTheme.typography.labelLarge
                     )
@@ -163,7 +163,7 @@ fun NotificationLogScreen(
                         ) {
                             Icon(
                                 painter = painterResource(R.drawable.baseline_delete_24),
-                                contentDescription = "Очистить журнал"
+                                contentDescription = stringResource(R.string.notif_clear_log)
                             )
                         }
                     }
@@ -192,7 +192,7 @@ fun NotificationLogScreen(
                         )
                     ) {
                         Text(
-                            text = "Отметить все как прочитанные",
+                            text = stringResource(R.string.notif_mark_all_read),
                             style = MaterialTheme.typography.labelLarge
                         )
                     }
@@ -215,7 +215,7 @@ fun NotificationLogScreen(
                 }
                 uiState.notifications.isEmpty() -> {
                     Text(
-                        text = "Уведомлений пока нет",
+                        text = stringResource(R.string.notif_empty),
                         modifier = Modifier.align(Alignment.Center),
                         style = MaterialTheme.typography.bodyLarge,
                         color = TextGray
@@ -238,8 +238,10 @@ fun NotificationLogScreen(
 
 @Composable
 private fun NotificationItem(notification: AppNotification) {
-    val formattedDate = remember(notification.timestamp) {
-        formatNotificationTime(notification.timestamp)
+    val todayPrefix = stringResource(R.string.notif_time_today_prefix)
+    val yesterdayPrefix = stringResource(R.string.notif_time_yesterday_prefix)
+    val formattedDate = remember(notification.timestamp, todayPrefix, yesterdayPrefix) {
+        formatNotificationTime(notification.timestamp, todayPrefix, yesterdayPrefix)
     }
 
     val backgroundColor = if (!notification.isRead) UnreadBackground else White
@@ -291,7 +293,7 @@ private val UnreadBackground = GreenSecondary.copy(alpha = 0.18f)
 
 private val moscowTz = TimeZone.getTimeZone("Europe/Moscow")
 
-private fun formatNotificationTime(timestamp: Long): String {
+private fun formatNotificationTime(timestamp: Long, todayPrefix: String, yesterdayPrefix: String): String {
     if (timestamp <= 0L) return ""
 
     val timeFormat = SimpleDateFormat("HH:mm", Locale("ru")).apply { timeZone = moscowTz }
@@ -305,8 +307,8 @@ private fun formatNotificationTime(timestamp: Long): String {
     }
 
     return when {
-        sameDay(calTs, today) -> "Сегодня, ${timeFormat.format(Date(timestamp))}"
-        sameDay(calTs, yesterday) -> "Вчера, ${timeFormat.format(Date(timestamp))}"
+        sameDay(calTs, today) -> "$todayPrefix, ${timeFormat.format(Date(timestamp))}"
+        sameDay(calTs, yesterday) -> "$yesterdayPrefix, ${timeFormat.format(Date(timestamp))}"
         else -> SimpleDateFormat("d MMM, HH:mm", Locale("ru"))
             .apply { timeZone = moscowTz }
             .format(Date(timestamp))

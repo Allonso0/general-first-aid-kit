@@ -29,6 +29,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -76,10 +77,10 @@ fun ScanBarcodeScreen(
         containerColor = Color.Black,
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Сканирование", color = White, fontWeight = FontWeight.Bold) },
+                title = { Text(stringResource(R.string.scan_title), color = White, fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(painterResource(R.drawable.baseline_arrow_back_ios_24), contentDescription = "Назад", tint = White)
+                        Icon(painterResource(R.drawable.baseline_arrow_back_ios_24), contentDescription = stringResource(R.string.back_button_description), tint = White)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -103,7 +104,7 @@ fun ScanBarcodeScreen(
                 ) {
 
                     Text(
-                        text = "Наведите рамку на штрих-код",
+                        text = stringResource(R.string.scan_instruction),
                         color = White,
                         style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier.padding(bottom = 150.dp)
@@ -124,7 +125,7 @@ fun ScanBarcodeScreen(
                             } else {
                                 painterResource(R.drawable.baseline_flashlight_on_24)
                             },
-                            contentDescription = "Фонарик",
+                            contentDescription = stringResource(R.string.flashlight_desc),
                             tint = if (isFlashOn) Color.Yellow else White,
                             modifier = Modifier.size(32.dp)
                         )
@@ -132,7 +133,7 @@ fun ScanBarcodeScreen(
                 }
             } else {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("Требуется разрешение на использование камеры")
+                    Text(stringResource(R.string.camera_permission_required))
                 }
             }
         }

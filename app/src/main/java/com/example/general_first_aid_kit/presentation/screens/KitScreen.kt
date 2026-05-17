@@ -92,18 +92,18 @@ fun KitScreen(
 
     var showFilterMenu by remember { mutableStateOf(false) }
     val selectedCategory by viewModel.selectedCategory.collectAsStateWithLifecycle()
-    val categories = remember {
-        listOf(
-            "Все",
-            "Без категории",
-            "Жаропонижающее",
-            "Обезболивающее",
-            "Антигистаминное",
-            "Спазмолитик",
-            "Антибиотик",
-            "Витамины",
-            "Антисептик"
-        )
+
+    val catAll = stringResource(R.string.tab_all)
+    val catNone = stringResource(R.string.no_category)
+    val catAntipyretic = stringResource(R.string.cat_antipyretic)
+    val catPainkiller = stringResource(R.string.cat_painkiller)
+    val catAntihistamine = stringResource(R.string.cat_antihistamine)
+    val catSpasmolytic = stringResource(R.string.cat_spasmolytic)
+    val catAntibiotic = stringResource(R.string.cat_antibiotic)
+    val catVitamins = stringResource(R.string.cat_vitamins)
+    val catAntiseptic = stringResource(R.string.cat_antiseptic)
+    val categories = remember(catAll, catNone, catAntipyretic, catPainkiller, catAntihistamine, catSpasmolytic, catAntibiotic, catVitamins, catAntiseptic) {
+        listOf(catAll, catNone, catAntipyretic, catPainkiller, catAntihistamine, catSpasmolytic, catAntibiotic, catVitamins, catAntiseptic)
     }
 
     Scaffold(
@@ -131,7 +131,7 @@ fun KitScreen(
                     IconButton(onClick = onNavigateToKitSettings) {
                         Icon(
                             painter = painterResource(R.drawable.baseline_more_horiz_24),
-                            contentDescription = "Инфо",
+                            contentDescription = stringResource(R.string.kit_settings_desc),
                             tint = GreenPrimary
                         )
                     }
@@ -151,7 +151,7 @@ fun KitScreen(
                         } else {
                             android.widget.Toast.makeText(
                                 context,
-                                "Для сканирования требуется интернет",
+                                context.getString(R.string.internet_required_for_scan),
                                 android.widget.Toast.LENGTH_SHORT
                             ).show()
                         }
@@ -183,7 +183,7 @@ fun KitScreen(
                     onValueChange = viewModel::onSearchQueryChange,
                     placeholder = {
                         Text(
-                            text = "Введите название лекарства...",
+                            text = stringResource(R.string.search_medication_hint),
                             style = MaterialTheme.typography.bodyLarge,
                             color = TextGray
                         )
@@ -219,7 +219,7 @@ fun KitScreen(
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.baseline_filter_list_24),
-                            contentDescription = "Фильтр",
+                            contentDescription = stringResource(R.string.filter_desc),
                             tint = White
                         )
                     }
@@ -259,7 +259,7 @@ fun KitScreen(
                                     if (isSelected) {
                                         Icon(
                                             painter = painterResource(R.drawable.baseline_check_24),
-                                            contentDescription = "Выбрано",
+                                            contentDescription = stringResource(R.string.filter_selected_desc),
                                             tint = GreenPrimary
                                         )
                                     }
@@ -273,7 +273,7 @@ fun KitScreen(
             if (medications.isEmpty()) {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text(
-                        text = if (searchQuery.isNotBlank()) "Лекарства не найдены" else "В этой аптечке пока пусто",
+                        text = if (searchQuery.isNotBlank()) stringResource(R.string.medications_not_found) else stringResource(R.string.kit_medications_empty),
                         color = TextGray
                     )
                 }
