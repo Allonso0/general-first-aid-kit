@@ -46,7 +46,7 @@ fun KitCard(
         shape = RoundedCornerShape(Dimensions.CornerRadiusMedium),
         elevation = CardDefaults.cardElevation(defaultElevation = Dimensions.KitCardElevation)
     ) {
-        Row(modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min)) {
+        Row(modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min).heightIn(min = Dimensions.KitCardHeight)) {
             Box(
                 modifier = Modifier
                     .fillMaxHeight()
