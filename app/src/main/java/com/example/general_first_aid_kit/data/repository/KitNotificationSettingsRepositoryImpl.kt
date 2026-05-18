@@ -14,20 +14,24 @@ class KitNotificationSettingsRepositoryImpl @Inject constructor(
 
     override suspend fun getSettings(userId: String, kitId: String): KitNotificationSettings {
         return withContext(Dispatchers.IO) {
-            val doc = firestore
-                .collection("users").document(userId)
-                .collection("kitNotificationSettings").document(kitId)
-                .get().await()
+            try {
+                val doc = firestore
+                    .collection("users").document(userId)
+                    .collection("kitNotificationSettings").document(kitId)
+                    .get().await()
 
-            if (doc.exists()) {
-                KitNotificationSettings(
-                    kitId = kitId,
-                    userId = userId,
-                    notifyExpiry = doc.getBoolean("notifyExpiry") ?: true,
-                    notifyLowStock = doc.getBoolean("notifyLowStock") ?: true,
-                    notifyMemberActivity = doc.getBoolean("notifyMemberActivity") ?: true
-                )
-            } else {
+                if (doc.exists()) {
+                    KitNotificationSettings(
+                        kitId = kitId,
+                        userId = userId,
+                        notifyExpiry = doc.getBoolean("notifyExpiry") ?: true,
+                        notifyLowStock = doc.getBoolean("notifyLowStock") ?: true,
+                        notifyMemberActivity = doc.getBoolean("notifyMemberActivity") ?: true
+                    )
+                } else {
+                    KitNotificationSettings(kitId = kitId, userId = userId)
+                }
+            } catch (_: Exception) {
                 KitNotificationSettings(kitId = kitId, userId = userId)
             }
         }
@@ -35,16 +39,19 @@ class KitNotificationSettingsRepositoryImpl @Inject constructor(
 
     override suspend fun saveSettings(userId: String, settings: KitNotificationSettings) {
         withContext(Dispatchers.IO) {
-            firestore
-                .collection("users").document(userId)
-                .collection("kitNotificationSettings").document(settings.kitId)
-                .set(
-                    mapOf(
-                        "notifyExpiry" to settings.notifyExpiry,
-                        "notifyLowStock" to settings.notifyLowStock,
-                        "notifyMemberActivity" to settings.notifyMemberActivity
-                    )
-                ).await()
+            try {
+                firestore
+                    .collection("users").document(userId)
+                    .collection("kitNotificationSettings").document(settings.kitId)
+                    .set(
+                        mapOf(
+                            "notifyExpiry" to settings.notifyExpiry,
+                            "notifyLowStock" to settings.notifyLowStock,
+                            "notifyMemberActivity" to settings.notifyMemberActivity
+                        )
+                    ).await()
+            } catch (_: Exception) {
+            }
         }
     }
 }

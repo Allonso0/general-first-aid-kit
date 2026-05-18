@@ -232,7 +232,7 @@ class OfflineFirstKitRepositoryImpl @Inject constructor(
                 .update("userIds", FieldValue.arrayUnion(userId)).await()
             val kit = document.toObject(Kit::class.java)?.copy(id = document.id)
                 ?: return@withContext Result.failure(Exception("Не удалось прочитать данные аптечки"))
-            kitDao.upsert(kit.toKitEntity())
+            kitDao.upsert(kit.copy(userIds = (kit.userIds + userId).distinct()).toKitEntity())
             Result.success(kit)
         } catch (e: Exception) {
             Result.failure(e)
