@@ -16,6 +16,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -212,28 +213,39 @@ fun KitSettingsScreen(
                 onTabSelected = { viewModel.onEvent(KitSettingsEvent.TabChanged(it)) }
             )
 
-            when (state.selectedTab) {
-                0 -> SettingsTabContent(
-                    state = state,
-                    onEvent = viewModel::onEvent,
-                    onShowColorDialog = { showColorDialog = true },
-                    onDeleteClick = { showDeleteConfirm = true },
-                    onLeaveClick = { showLeaveConfirm = true },
-                    onArchiveClick = { showArchiveConfirm = true },
-                    onToggleTypeClick = { isPublicTarget ->
-                        if (isPublicTarget) showToPublicDialog = true
-                        else showToPersonalDialog = true
-                    }
-                )
-                1 -> ParticipantsTabContent(
-                    state = state,
-                    onGenerateCode = { viewModel.generateInviteCode() },
-                    onRemoveParticipant = viewModel::removeParticipant
-                )
-                else -> NotificationsTabContent(
-                    state = state,
-                    onEvent = viewModel::onEvent
-                )
+            if (!state.isInitialized) {
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(color = GreenPrimary)
+                }
+            } else {
+                when (state.selectedTab) {
+                    0 -> SettingsTabContent(
+                        state = state,
+                        onEvent = viewModel::onEvent,
+                        onShowColorDialog = { showColorDialog = true },
+                        onDeleteClick = { showDeleteConfirm = true },
+                        onLeaveClick = { showLeaveConfirm = true },
+                        onArchiveClick = { showArchiveConfirm = true },
+                        onToggleTypeClick = { isPublicTarget ->
+                            if (isPublicTarget) showToPublicDialog = true
+                            else showToPersonalDialog = true
+                        }
+                    )
+                    1 -> ParticipantsTabContent(
+                        state = state,
+                        onGenerateCode = { viewModel.generateInviteCode() },
+                        onRemoveParticipant = viewModel::removeParticipant
+                    )
+                    else -> NotificationsTabContent(
+                        state = state,
+                        onEvent = viewModel::onEvent
+                    )
+                }
             }
         }
     }
@@ -379,14 +391,7 @@ fun ParticipantsTabContent(
             }
         } else {
             Column(modifier = Modifier.fillMaxSize()) {
-                if (state.isLoading && state.participants.isEmpty()) {
-                    Box(Modifier
-                        .weight(1f)
-                        .fillMaxWidth(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator(color = GreenPrimary)
-                    }
-                } else {
-                    LazyColumn(
+                LazyColumn(
                         modifier = Modifier
                             .weight(1f)
                             .padding(horizontal = 16.dp),
@@ -460,7 +465,6 @@ fun ParticipantsTabContent(
                             }
                         }
                     }
-                }
 
                 if (state.isOwner) {
                     Box(modifier = Modifier
@@ -492,6 +496,7 @@ fun ParticipantsTabContent(
     }
 
     if (showInviteDialog) {
+        val context = LocalContext.current
 
         AlertDialog(
             onDismissRequest = { showInviteDialog = false },
@@ -522,7 +527,7 @@ fun ParticipantsTabContent(
                     Surface(
                         color = LightGray.copy(alpha = 0.2f),
                         shape = RoundedCornerShape(12.dp),
-                        border = androidx.compose.foundation.BorderStroke(1.dp, LightGray.copy(alpha = 0.5f))
+                        border = BorderStroke(1.dp, LightGray.copy(alpha = 0.5f))
                     ) {
                         Text(
                             text = state.inviteCode ?: stringResource(R.string.invite_code_generating),
@@ -536,6 +541,27 @@ fun ParticipantsTabContent(
                     }
 
                     Spacer(Modifier.height(16.dp))
+
+                    val codeCopiedMessage = stringResource(R.string.message_code_copied)
+                    TextButton(
+                        onClick = {
+                            state.inviteCode?.let { code ->
+                                val clipboard = context.getSystemService(android.content.ClipboardManager::class.java)
+                                clipboard?.setPrimaryClip(android.content.ClipData.newPlainText(null, code))
+                                android.widget.Toast.makeText(
+                                    context,
+                                    codeCopiedMessage,
+                                    android.widget.Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        },
+                        enabled = state.inviteCode != null,
+                        colors = ButtonDefaults.textButtonColors(contentColor = GreenPrimary)
+                    ) {
+                        Icon(painterResource(R.drawable.baseline_content_copy_24), null, modifier = Modifier.size(18.dp))
+                        Spacer(Modifier.width(8.dp))
+                        Text(stringResource(R.string.action_copy_code))
+                    }
 
                     TextButton(
                         onClick = onGenerateCode,

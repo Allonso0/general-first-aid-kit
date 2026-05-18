@@ -218,6 +218,8 @@
     <string name="invite_code_instruction">Передайте этот 8-значный код пользователю:</string>
     <string name="invite_code_generating">Генерация...</string>
     <string name="action_refresh_code">Обновить код</string>
+    <string name="action_copy_code">Скопировать код</string>
+    <string name="message_code_copied">Код скопирован</string>
     <string name="action_done">Готово</string>
     <string name="notif_kit_section_title">Уведомления для этой аптечки</string>
     <string name="notif_expiry_checkbox">Уведомлять об истечении срока годности</string>

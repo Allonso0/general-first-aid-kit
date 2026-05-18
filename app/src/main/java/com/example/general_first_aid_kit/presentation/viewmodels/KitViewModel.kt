@@ -54,7 +54,7 @@ class KitViewModel @Inject constructor(
         _selectedCategory
     ) { list, query, category ->
         list.filter { med ->
-            val matchesQuery = FuzzyMatcher.matches(query, med.name)
+            val matchesQuery = FuzzyMatcher.matches(query, med.name) || FuzzyMatcher.matches(query, med.description)
             val matchesCategory = category == null || category == "Все" || med.category == category
             matchesQuery && matchesCategory
         }

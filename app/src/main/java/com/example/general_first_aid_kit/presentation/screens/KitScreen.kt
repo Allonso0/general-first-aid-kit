@@ -74,6 +74,7 @@ fun KitScreen(
     viewModel: KitViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
+    val internetRequiredMsg = stringResource(R.string.internet_required_for_scan)
 
     LaunchedEffect(kitId) {
         viewModel.initWithKitId(kitId)
@@ -151,7 +152,7 @@ fun KitScreen(
                         } else {
                             android.widget.Toast.makeText(
                                 context,
-                                context.getString(R.string.internet_required_for_scan),
+                                internetRequiredMsg,
                                 android.widget.Toast.LENGTH_SHORT
                             ).show()
                         }
@@ -181,6 +182,7 @@ fun KitScreen(
                 OutlinedTextField(
                     value = searchQuery,
                     onValueChange = viewModel::onSearchQueryChange,
+                    singleLine = true,
                     placeholder = {
                         Text(
                             text = stringResource(R.string.search_medication_hint),

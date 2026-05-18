@@ -53,7 +53,7 @@ class KitSettingsViewModel @Inject constructor(
 
     private var currentKitId: String = ""
 
-    fun initScreen(kitId: String, initialName: String, initialLocation: String, initialColorIndex: Int, initialIsPublic: Boolean) {
+    fun setInitialValues(kitId: String, initialName: String, initialLocation: String, initialColorIndex: Int, initialIsPublic: Boolean) {
         currentKitId = kitId
         _uiState.update {
             it.copy(
@@ -63,6 +63,10 @@ class KitSettingsViewModel @Inject constructor(
                 isPublic = initialIsPublic
             )
         }
+    }
+
+    fun initScreen(kitId: String, initialName: String, initialLocation: String, initialColorIndex: Int, initialIsPublic: Boolean) {
+        setInitialValues(kitId, initialName, initialLocation, initialColorIndex, initialIsPublic)
         loadKitData()
     }
 
@@ -119,7 +123,8 @@ class KitSettingsViewModel @Inject constructor(
                         isOwner = kit.ownerId == currentUser?.id,
                         participants = users,
                         currentUserId = currentUser?.id ?: "",
-                        isLoading = false
+                        isLoading = false,
+                        isInitialized = true
                     )
                 }
             }
@@ -295,6 +300,7 @@ data class KitSettingsUiState(
     val notifyMemberActivity: Boolean = true,
     val selectedTab: Int = 0,
     val isLoading: Boolean = false,
+    val isInitialized: Boolean = false,
     val error: String? = null,
     val inviteCode: String? = null,
     val isOwner: Boolean = false,
